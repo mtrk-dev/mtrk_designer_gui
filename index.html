@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html data-bs-theme="dark">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>MTRK Create SDL</title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
+        <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    </head>
+    <body>
+        <div class="container">
+            <div class="row" style="margin-top: 0%">
+              <div class="col-lg-2">
+                <div class="btn-group-vertical" role="group" aria-label="Button group with nested dropdown">
+
+                    <button id="rf_excitation_btn" type="button" class="btn btn-secondary drag" draggable="true">RF Excitation</button>
+                    <button id="grad_slice_select_btn" type="button" class="btn btn-secondary drag" draggable="true">Grad Slice Select</button>
+                    <button id="grad_slice_refocus_btn" type="button" class="btn btn-secondary drag" draggable="true">Grad Slice Refocus</button>
+                    <button id="grad_read_dephase_btn" type="button" class="btn btn-secondary drag" draggable="true">Grad Read Dephase</button>
+                    <button id="grad_read_readout_btn" type="button" class="btn btn-secondary drag" draggable="true">Grad Read Readout</button>
+                    <button id="grad_phase_encode_btn" type="button" class="btn btn-secondary drag" draggable="true">Grad Phase Encode</button>
+                    <button id="adc_readout_btn" type="button" class="btn btn-secondary drag" draggable="true">ADC Readout</button>
+                    <!-- <div class="btn-group" role="group">
+                      <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                        Dropdown
+                      </button>
+                      <div class="dropdown-menu">
+                        <a class="dropdown-item" href="#">Dropdown link</a>
+                        <a class="dropdown-item" href="#">Dropdown link</a>
+                      </div>
+                    </div> -->
+                  </div>
+              </div>
+              <div class="col-lg">
+                <div id="rf_chart" class="dropzone"></div>
+                <div id="slice_chart" class="dropzone"></div>
+                <div id="phase_chart" class="dropzone"></div>
+                <div id="readout_chart" class="dropzone"></div>
+                <div id="adc_chart" class="dropzone"></div>
+              </div>
+            </div>
+        </div>
+        
+
+        
+
+
+
+
+
+
+
+
+
+        <script type="module" src="index.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.0.1/math.min.js" integrity="sha512-B82WLflI1EQiR9sGbIV1ddGVvK4ghj1xjMShL7YvcOrHjX2qP72lHztT1DxBVPiz1aTR6mOUJbtwj06uadL2GA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+    </body>
+</html>
