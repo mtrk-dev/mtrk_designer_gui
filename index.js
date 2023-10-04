@@ -231,6 +231,33 @@ $(document).ready(function() {
         Plotly.addTraces(target, data);
             });
     });
+
+    $(".dropzone").each(function () {
+        var plot = this;
+        plot.on('plotly_doubleclick', function(data) {
+            if (shiftIsPressed) {
+                try {
+                    Plotly.deleteTraces(plot, -1);
+                    console.log("Deleted last trace from " + plot.id);
+                  }
+                  catch(err) {
+                    console.log("No traces to delete!")
+                  }
+            }
+        });
+    });
+
 });
+
+// Check whether shift button is pressed
+$(document).keydown(function(event) {
+    if (event.which == "16") {
+        shiftIsPressed = true;
+    }
+});
+$(document).keyup(function() {
+    shiftIsPressed = false;
+});
+var shiftIsPressed = false;
 
 
