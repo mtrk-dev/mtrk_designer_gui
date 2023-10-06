@@ -187,7 +187,7 @@ var shape_template =
       x0: 0,
       y0: 0,
       x1: 50,
-      y1: 1,
+      y1: 1.1,
       line: {
         color: 'rgb(129, 133, 137)',
         width: 1
@@ -251,14 +251,15 @@ $(document).ready(function() {
         // prevent default action (open as link for some elements)
         event.preventDefault();
 
-        console.log(dragged.id +" dropped at " + target.id);
+        let xInDataCoord = mx*event.x + cx;
+        console.log(dragged.id +" dropped at " + target.id + " | Location: " + Math.round(xInDataCoord));
         
         let dragged_array = object_to_array[dragged.id];
-        let starting_point = 0;
-        if ("shapes" in target.layout) {
-            // If a trace is added previously, retrieving its end time.
-            starting_point = target.layout.shapes.slice(-1)[0]["x1"]+10;
-        }
+        let starting_point = xInDataCoord;
+        // if ("shapes" in target.layout) {
+        //     // If a trace is added previously, retrieving its end time.
+        //     starting_point = target.layout.shapes.slice(-1)[0]["x1"]+10;
+        // }
         let x_data = []
         for (let i=0; i<dragged_array.length; i+=1) {
             x_data.push(starting_point+i);
@@ -281,7 +282,7 @@ $(document).ready(function() {
             shapes: added_shapes
             };
         Plotly.relayout(target, update);
-        starting_point += dragged_array.length;
+        // starting_point += dragged_array.length;
         });
     });
 
@@ -333,4 +334,15 @@ $(document).keyup(function() {
     shiftIsPressed = false;
 });
 var shiftIsPressed = false;
+
+// Pre processing code to convert the mouse point x-value to plot's xaxis value.
+var xaxis = rf_chart._fullLayout.xaxis;
+var margin = rf_chart._fullLayout.margin;
+var offsets = rf_chart.getBoundingClientRect();
+var xy1 = rf_chart.layout.xaxis.range[0];
+var xy2 = rf_chart.layout.xaxis.range[1];
+var xx1 = offsets.left + margin.l;
+var xx2 = offsets.left + rf_chart.offsetWidth - margin.r;
+var mx = (xy2 - xy1) / (xx2 - xx1);
+var cx = -(mx * xx1) + xy1;
 
