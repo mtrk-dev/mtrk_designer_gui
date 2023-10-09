@@ -20,6 +20,8 @@ const adc_readout_array = [0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
 
 const rf_pulse_array = [];
 for (let i=0; i < 128; i++) {
+    if (i < 20) continue;
+    if (i > 108) break;
     rf_pulse_array.push(rf_array[2*i]);
 }
 
@@ -128,6 +130,9 @@ const layout = {
         t: 20,
         b: 40
       },
+    title : {
+        text: ""
+    },
     xaxis: {
         title: "time (ms)",
         titlefont: {
@@ -141,7 +146,8 @@ const layout = {
         },
         "gridcolor": "rgba(255,255,255,0.05)",
         "zerolinecolor": "rgba(255,255,255,0.1)",
-        range: [0, 200]
+        range: [0, 200],
+        // fixedrange: true,
     },
     yaxis: {
         title: "RF (V)",
@@ -182,6 +188,7 @@ var shapes_array = [];
 var shape_template = 
     {
       type: 'rect',
+      layer: 'below',
       xref: 'x',
       yref: 'y',
       x0: 0,
@@ -199,6 +206,7 @@ var shape_template =
 const config = {
     scrollZoom: true,
     responsive: true,
+    editable: true,
     // displayModeBar: false,
 }
 
@@ -315,12 +323,41 @@ $(document).ready(function() {
     //         Plotly.relayout(plot, ed);
     //     });
     // }
-    // $(".dropzone").each(function () {
-    //     var plot = this;
-    //     plot.on("plotly_relayout", function(ed) {
-    //         relayout(ed);
-    //     });
-    // });
+    $(".dropzone").each(function () {
+        var plot = this;
+        plot.on("plotly_relayout", function(ed) {
+            if ("shapes" in ed || "xaxis.range[0]" in ed) {
+                console.log("Not moved!");
+            } else {
+                try {
+                    console.log("Moved!");
+                    // Here, the offset of 1 is because there is one default trace present in the plot to show empty plots.
+                    let shape_number = parseInt(Object.keys(ed)[0][7]);
+                    let y = plot.data[shape_number+1]["y"];
+                    let line = plot.data[shape_number+1]["line"];
+                    let hovertemplate = plot.data[shape_number+1]["hovertemplate"];
+                    // delete the trace from the old location.
+                    Plotly.deleteTraces(plot, shape_number+1);
+                    
+                    // Draw a trace at the new location
+                    let starting_point = parseFloat(ed[Object.keys(ed)[0]]);
+                    let x_data = []
+                    for (let i=0; i<y.length; i+=1) {
+                        x_data.push(starting_point+i);
+                    }
+                    let data = {};
+                    data["y"] = y;
+                    data["x"] = x_data;
+                    data["line"] = line;
+                    data["hovertemplate"] = hovertemplate;
+                    Plotly.addTraces(plot, data);
+                }
+                catch (err) {
+                    console.log("Not a valid move!")
+                }
+            }
+        });
+    });
 
 });
 
