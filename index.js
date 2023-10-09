@@ -333,14 +333,20 @@ $(document).ready(function() {
                     console.log("Moved!");
                     // Here, the offset of 1 is because there is one default trace present in the plot to show empty plots.
                     let shape_number = parseInt(Object.keys(ed)[0][7]);
+                    for (var key in ed) {
+                        if (key.endsWith(".x0")) {
+                            var starting_point = ed[key];
+                        }
+                    }
+                    
                     let y = plot.data[shape_number+1]["y"];
                     let line = plot.data[shape_number+1]["line"];
                     let hovertemplate = plot.data[shape_number+1]["hovertemplate"];
+                    
                     // delete the trace from the old location.
                     Plotly.deleteTraces(plot, shape_number+1);
                     
                     // Draw a trace at the new location
-                    let starting_point = parseFloat(ed[Object.keys(ed)[0]]);
                     let x_data = []
                     for (let i=0; i<y.length; i+=1) {
                         x_data.push(starting_point+i);
@@ -353,7 +359,8 @@ $(document).ready(function() {
                     Plotly.addTraces(plot, data);
                 }
                 catch (err) {
-                    console.log("Not a valid move!")
+                    console.log(err);
+                    console.log("Not a valid move!");
                 }
             }
         });
