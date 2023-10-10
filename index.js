@@ -199,6 +199,11 @@ const config = {
     scrollZoom: true,
     responsive: true,
     editable: true,
+    edits: {
+        axisTitleText: false,
+        titleText: false,
+        // shapePosition: false
+    },
     // displayModeBar: false,
 }
 
@@ -278,6 +283,7 @@ $(document).ready(function() {
         let added_shapes=[];
         if ("shapes" in target.layout) { added_shapes = target.layout.shapes;}
         added_shapes.push(shape);
+
         var update = {
             shapes: added_shapes
             };
