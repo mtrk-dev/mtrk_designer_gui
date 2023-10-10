@@ -176,6 +176,7 @@ readout_layout["xaxis"]["title"] = "";
 
 // We will use the shape template and keep adding to the total shapes in one axis.
 var shapes_array = [];
+const shape_height = 1.1;
 var shape_template = 
     {
       type: 'rect',
@@ -185,7 +186,7 @@ var shape_template =
       x0: 0,
       y0: 0,
       x1: 50,
-      y1: 1.1,
+      y1: shape_height,
       line: {
         color: 'rgb(129, 133, 137)',
         width: 1
@@ -332,6 +333,21 @@ $(document).ready(function() {
                         if (key.endsWith(".y0")) {
                             var y0_val = ed[key];
                         }
+                        if (key.endsWith(".x1")) {
+                            var ending_point = ed[key];
+                        }
+                        if (key.endsWith(".y1")) {
+                            var y1_val = ed[key];
+                        }
+                    }
+
+                    // If the width or height of the shape is changed, it has been stretched/squeezed not moved.
+                    var dimensions = get_trace_dimensions(plot, shape_number+1);
+                    if (Math.abs((ending_point - starting_point) - dimensions[0]) > 2 || Math.abs((y1_val - y0_val) - dimensions[1]) > 0.1) {
+                        console.log("Stretched/squeezed not moved!!!");
+                        // We revert the stretch/squeeze and return.
+                        revert_shape_change(plot, shape_number);
+                        return;
                     }
 
                     // If the y0 value is not zero after moving for a shape, we want to move the shape to zero.
@@ -398,6 +414,26 @@ function move_shape_to_zero_line(plot, shape_number) {
     shapes[shape_number]["y0"] = 0;
     shapes[shape_number]["y1"] = y1 - y0;
     var update = {
+        shapes: shapes
+        };
+    Plotly.relayout(plot, update);
+}
+
+function get_trace_dimensions(plot, trace_number) {
+    let x_arr = plot.data[trace_number]["x"];
+    let width = x_arr.slice(-1)[0] - x_arr[0] + 1;
+    let height = shape_height;
+    return [width, height];
+}
+
+function revert_shape_change(plot, shape_number) {
+    let shapes = JSON.parse(JSON.stringify(plot.layout["shapes"]));
+    shapes[shape_number]["y0"] = 0;
+    shapes[shape_number]["y1"] = shape_height;
+    let x_arr = plot.data[shape_number+1]["x"];
+    shapes[shape_number]["x0"] = x_arr[0];
+    shapes[shape_number]["x1"] = x_arr.slice(-1)[0];
+    let update = {
         shapes: shapes
         };
     Plotly.relayout(plot, update);
