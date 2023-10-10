@@ -338,6 +338,15 @@ $(document).ready(function() {
                         if (key.endsWith(".x0")) {
                             var starting_point = ed[key];
                         }
+                        if (key.endsWith(".y0")) {
+                            var y0_val = ed[key];
+                        }
+                    }
+
+                    // If the y0 value is not zero after moving for a shape, we want to move the shape to zero.
+                    if (Math.abs(y0_val) != 0) {
+                        console.log("Lifted!");
+                        move_shape_to_zero_line(plot, shape_number);
                     }
                     
                     let y = plot.data[shape_number+1]["y"];
@@ -391,3 +400,14 @@ var xx2 = offsets.left + rf_chart.offsetWidth - margin.r;
 var mx = (xy2 - xy1) / (xx2 - xx1);
 var cx = -(mx * xx1) + xy1;
 
+function move_shape_to_zero_line(plot, shape_number) {
+    let shapes = JSON.parse(JSON.stringify(plot.layout["shapes"]));
+    let y0 = shapes[shape_number]["y0"];
+    let y1 = shapes[shape_number]["y1"];
+    shapes[shape_number]["y0"] = 0;
+    shapes[shape_number]["y1"] = y1 - y0;
+    var update = {
+        shapes: shapes
+        };
+    Plotly.relayout(plot, update);
+}
