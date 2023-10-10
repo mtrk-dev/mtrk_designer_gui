@@ -162,7 +162,7 @@ const layout = {
         "gridcolor": "rgba(255,255,255,0.05)",
         "zerolinecolor": "rgba(255,255,255,0.1)",
         fixedrange: true,
-        range: [0, 1.5],
+        range: [0, 2],
     },
 };
 
@@ -188,7 +188,7 @@ var shapes_array = [];
 var shape_template = 
     {
       type: 'rect',
-      layer: 'below',
+    //   layer: 'above',
       xref: 'x',
       yref: 'y',
       x0: 0,
@@ -295,20 +295,21 @@ $(document).ready(function() {
     });
 
     // Delete last drawn trace on the respective axis.
-    $(".dropzone").each(function () {
-        var plot = this;
-        plot.on('plotly_doubleclick', function(data) {
-            if (shiftIsPressed) {
-                try {
-                    Plotly.deleteTraces(plot, -1);
-                    console.log("Deleted last trace from " + plot.id);
-                  }
-                  catch(err) {
-                    console.log("No traces to delete!")
-                  }
-            }
-        });
-    });
+    // Commenting it out for now- might be better to implement this using edit object popup.
+    // $(".dropzone").each(function () {
+    //     var plot = this;
+    //     plot.on('plotly_doubleclick', function(data) {
+    //         if (shiftIsPressed) {
+    //             try {
+    //                 Plotly.deleteTraces(plot, -1);
+    //                 console.log("Deleted last trace from " + plot.id);
+    //               }
+    //               catch(err) {
+    //                 console.log("No traces to delete!")
+    //               }
+    //         }
+    //     });
+    // });
 
     // sync zoom among all plots.
     // var plots = [rf_chart, slice_chart, phase_chart, readout_chart, adc_chart];
@@ -356,7 +357,7 @@ $(document).ready(function() {
                     data["x"] = x_data;
                     data["line"] = line;
                     data["hovertemplate"] = hovertemplate;
-                    Plotly.addTraces(plot, data);
+                    Plotly.addTraces(plot, data, shape_number+1);
                 }
                 catch (err) {
                     console.log(err);
