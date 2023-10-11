@@ -194,6 +194,23 @@ var shape_template =
       fillcolor: 'rgba(129, 133, 137, 0.2)'
     };
 
+var line_shape_template = {
+    type: 'line',
+    layer: 'below',
+    x0: 0,
+    y0: 0,
+    x1: 0,
+    // yref: 'paper',
+    y1: shape_height,
+    line: {
+        color: 'grey',
+        width: 1.5,
+        dash: 'dot'
+    },
+}
+
+// keeping default 10 for now, later to be set by user.
+const anchor_time = 10;
 
 const config = {
     scrollZoom: true,
@@ -284,6 +301,12 @@ $(document).ready(function() {
         if ("shapes" in target.layout) { added_shapes = target.layout.shapes;}
         added_shapes.push(shape);
 
+        // add a line shape to show anchor point.
+        var line_shape = JSON.parse(JSON.stringify(line_shape_template));
+        line_shape["x0"] = starting_point+anchor_time;
+        line_shape["x1"] = starting_point+anchor_time;
+        added_shapes.push(line_shape);
+
         var update = {
             shapes: added_shapes
             };
@@ -331,7 +354,9 @@ $(document).ready(function() {
                 try {
                     console.log("Moved!");
                     // Here, the offset of 1 is because there is one default trace present in the plot to show empty plots.
+                    // and division by 2 is because we have 2 shapes per trace. One for box and other for anchor position.
                     let shape_number = parseInt(Object.keys(ed)[0][7]);
+                    let trace_number = (shape_number/2)+1;
                     for (var key in ed) {
                         if (key.endsWith(".x0")) {
                             var starting_point = ed[key];
@@ -348,7 +373,7 @@ $(document).ready(function() {
                     }
 
                     // If the width or height of the shape is changed, it has been stretched/squeezed not moved.
-                    var dimensions = get_trace_dimensions(plot, shape_number+1);
+                    var dimensions = get_trace_dimensions(plot, trace_number);
                     if (Math.abs((ending_point - starting_point) - dimensions[0]) > 2 || Math.abs((y1_val - y0_val) - dimensions[1]) > 0.1) {
                         console.log("Stretched/squeezed not moved!!!");
                         // We revert the stretch/squeeze and return.
@@ -362,12 +387,12 @@ $(document).ready(function() {
                         move_shape_to_zero_line(plot, shape_number);
                     }
                     
-                    let y = plot.data[shape_number+1]["y"];
-                    let line = plot.data[shape_number+1]["line"];
-                    let hovertemplate = plot.data[shape_number+1]["hovertemplate"];
+                    let y = plot.data[trace_number]["y"];
+                    let line = plot.data[trace_number]["line"];
+                    let hovertemplate = plot.data[trace_number]["hovertemplate"];
                     
                     // delete the trace from the old location.
-                    Plotly.deleteTraces(plot, shape_number+1);
+                    Plotly.deleteTraces(plot, trace_number);
                     
                     // Draw a trace at the new location
                     let x_data = []
@@ -379,7 +404,12 @@ $(document).ready(function() {
                     data["x"] = x_data;
                     data["line"] = line;
                     data["hovertemplate"] = hovertemplate;
-                    Plotly.addTraces(plot, data, shape_number+1);
+                    Plotly.addTraces(plot, data, trace_number);
+
+                    // Move the vertical line shape to the new location
+                    // Here, shape_number + 1, will give the line shape number, as we are always creating line shape after box shape.
+                    move_vertical_line_shape(plot, shape_number+1, starting_point);
+
                 }
                 catch (err) {
                     console.log(err);
@@ -425,6 +455,17 @@ function move_shape_to_zero_line(plot, shape_number) {
     Plotly.relayout(plot, update);
 }
 
+function move_vertical_line_shape(plot, line_shape_number, starting_point) {
+    let shapes = JSON.parse(JSON.stringify(plot.layout["shapes"]));
+    let pos = starting_point + anchor_time;
+    shapes[line_shape_number]["x0"] = pos;
+    shapes[line_shape_number]["x1"] = pos;
+    var update = {
+        shapes: shapes
+        };
+    Plotly.relayout(plot, update);
+}
+
 function get_trace_dimensions(plot, trace_number) {
     let x_arr = plot.data[trace_number]["x"];
     let width = x_arr.slice(-1)[0] - x_arr[0] + 1;
@@ -436,7 +477,8 @@ function revert_shape_change(plot, shape_number) {
     let shapes = JSON.parse(JSON.stringify(plot.layout["shapes"]));
     shapes[shape_number]["y0"] = 0;
     shapes[shape_number]["y1"] = shape_height;
-    let x_arr = plot.data[shape_number+1]["x"];
+    let trace_number = (shape_number/2)+1;
+    let x_arr = plot.data[trace_number]["x"];
     shapes[shape_number]["x0"] = x_arr[0];
     shapes[shape_number]["x1"] = x_arr.slice(-1)[0];
     let update = {
