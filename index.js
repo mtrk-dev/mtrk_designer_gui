@@ -221,6 +221,7 @@ const config = {
         titleText: false,
         // shapePosition: false
     },
+    // doubleClick: false,
     // displayModeBar: false,
 }
 
@@ -419,6 +420,35 @@ $(document).ready(function() {
         });
     });
 
+    $(".dropzone").each(function () {
+        var plot = this;
+        plot.on('plotly_click', function(data){
+            if (!shiftIsPressed) return;
+            $('#exampleModal').modal('toggle');
+        });
+    });
+    $("#modal_close_btn").on( "click", function() {
+        $('#exampleModal').modal('toggle');
+    });
+    $("#modal_close_logo_btn").on( "click", function() {
+        $('#exampleModal').modal('toggle');
+    });
+
+    $('#variableAmplitudeGroup').hide();
+    $('#inputConstantAmplitude').hide();
+
+    $('input[type="radio"]').click(function(){
+        if ($(this).is(':checked')) {
+          if ($(this).val() == "constant") {
+            $('#inputConstantAmplitude').show();
+            $('#variableAmplitudeGroup').hide();
+          }
+          else if ($(this).val() == "variable") {
+            $('#variableAmplitudeGroup').show();
+            $('#inputConstantAmplitude').hide();
+          }
+        }
+    });
 });
 
 // Check whether shift button is pressed
