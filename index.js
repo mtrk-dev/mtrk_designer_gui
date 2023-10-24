@@ -457,6 +457,19 @@ $(document).ready(function() {
         });
     });
 
+    $("#kernel-time-btn").click(function () {
+        var kernel_time = $("#kernelTimeInput").val();
+        $(".dropzone").each(function () {
+            var plot = this;
+            // Change the range and relayout plot.
+            let update = {
+                "xaxis.range": [0, kernel_time]
+                };
+            Plotly.relayout(plot, update);
+            recalculate_mouse_to_plot_conversion_variables();
+        });
+    });
+
     $("#modal_close_btn").on( "click", function() {
         $('#parametersModal').modal('toggle');
     });
@@ -502,6 +515,18 @@ var xx1 = offsets.left + margin.l;
 var xx2 = offsets.left + rf_chart.offsetWidth - margin.r;
 var mx = (xy2 - xy1) / (xx2 - xx1);
 var cx = -(mx * xx1) + xy1;
+
+function recalculate_mouse_to_plot_conversion_variables() {
+    xaxis = rf_chart._fullLayout.xaxis;
+    margin = rf_chart._fullLayout.margin;
+    offsets = rf_chart.getBoundingClientRect();
+    xy1 = rf_chart.layout.xaxis.range[0];
+    xy2 = rf_chart.layout.xaxis.range[1];
+    xx1 = offsets.left + margin.l;
+    xx2 = offsets.left + rf_chart.offsetWidth - margin.r;
+    mx = (xy2 - xy1) / (xx2 - xx1);
+    cx = -(mx * xx1) + xy1;
+}
 
 function move_shape_to_zero_line(plot, shape_number) {
     let shapes = JSON.parse(JSON.stringify(plot.layout["shapes"]));

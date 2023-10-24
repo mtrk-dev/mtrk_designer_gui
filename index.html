@@ -12,21 +12,21 @@
         <div class="container">
             <div class="row" style="margin-top: 0%">
               <div class="col-lg-2">
-                <div class="btn-group-vertical" role="group" aria-label="Button group with nested dropdown">
-
+                <div class="row">
+                  <div class="input-group mb-3">
+                    <span class="input-group-text">TR (ms)</span>
+                    <!-- <span class="input-group-text">200</span> -->
+                    <input id="kernelTimeInput" placeholder="200" class="form-control" aria-label="Kernel Time">
+                    <button id="kernel-time-btn" type="button" class="btn btn-secondary">&#10003;</button>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="btn-group-vertical" role="group" aria-label="Button group with nested dropdown">
                     <button id="rf_excitation_btn" type="button" class="btn btn-secondary drag" draggable="true">RF Excitation</button>
                     <button id="gradient_btn" type="button" class="btn btn-secondary drag" draggable="true">Gradient</button>
                     <button id="adc_readout_btn" type="button" class="btn btn-secondary drag" draggable="true">ADC Readout</button>
-                    <!-- <div class="btn-group" role="group">
-                      <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                        Dropdown
-                      </button>
-                      <div class="dropdown-menu">
-                        <a class="dropdown-item" href="#">Dropdown link</a>
-                        <a class="dropdown-item" href="#">Dropdown link</a>
-                      </div>
-                    </div> -->
                   </div>
+                </div>              
               </div>
               <div class="col-lg">
                 <div id="rf_chart" class="dropzone"></div>
