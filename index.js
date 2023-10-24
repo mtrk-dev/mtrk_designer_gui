@@ -432,29 +432,40 @@ $(document).ready(function() {
         });
     });
 
+    var selected_trace_number = null;
+    var selected_plot = null;
     $(".dropzone").each(function () {
-        var plot = this;
+        let plot = this;
         plot.on('plotly_click', function(data){
             if (!shiftIsPressed) return;
             $('#parametersModal').modal('toggle');
-            var selected_trace_number = data.points[0].curveNumber;
-            $("#save_changes_btn").on( "click", function(event) {
-                // If the trace is already variable, we return.
-                if (plot.data[selected_trace_number]["mode"]=="markers") return;
-
-                let elements = document.forms["parametersForm"].getElementsByTagName("input");
-                elements = Array.from(elements);
-                elements.forEach((element) => {
-                    console.log(element.id + ":" + element.value);
-                  });
-                 if ($("#variableRadio").is(':checked')) {
-                    // Replot the trace and give it variable appearance.
-                    make_trace_variable(plot, selected_trace_number);
-                    console.log("Variableee");
-                 }
-                $('#parametersModal').modal('toggle');
-            });
+            selected_trace_number = data.points[0].curveNumber;
+            selected_plot = plot;
         });
+    });
+
+    $("#save_changes_btn").on( "click", function(event) {
+        let plot = selected_plot;
+        // If the trace is already variable, we return.
+        if (plot.data[selected_trace_number]["mode"]=="markers") return;
+
+        let elements = document.forms["parametersForm"].getElementsByTagName("input");
+        elements = Array.from(elements);
+        elements.forEach((element) => {
+            console.log(element.id + ":" + element.value);
+          });
+         if ($("#variableRadio").is(':checked')) {
+            // Replot the trace and give it variable appearance.
+            make_trace_variable(plot, selected_trace_number);
+         }
+        $('#parametersModal').modal('toggle');
+    });
+
+    $("#delete_object_btn").on( "click", function(event) {
+        let plot = selected_plot;
+        $('#parametersModal').modal('toggle');
+        Plotly.deleteTraces(plot, selected_trace_number);
+        delete_shapes(plot, (selected_trace_number-1)*2);
     });
 
     $("#kernel-time-btn").click(function () {
@@ -612,6 +623,16 @@ function change_shapes_variable(plot, shape_number) {
     shapes[line_shape_number]["y0"] = -shape_height;
     shapes[box_shape_number]["y0"] = -shape_height;
     shapes[box_shape_number]["fillcolor"] = 'rgba(206 249 113, 0.1)';
+    var update = {
+        shapes: shapes
+        };
+    Plotly.relayout(plot, update);
+}
+
+function delete_shapes(plot, shape_number) {
+    let shapes = JSON.parse(JSON.stringify(plot.layout["shapes"]));
+    // This will delete both vertical and box shape.
+    shapes.splice(shape_number, 2)
     var update = {
         shapes: shapes
         };
