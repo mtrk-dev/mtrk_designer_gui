@@ -153,7 +153,7 @@ const layout = {
         "gridcolor": "rgba(255,255,255,0.05)",
         "zerolinecolor": "rgba(255,255,255,0.1)",
         fixedrange: true,
-        range: [0, 2],
+        range: [-1.75, 1.75],
     },
 };
 
@@ -392,8 +392,7 @@ $(document).ready(function() {
                     let line = plot.data[trace_number]["line"];
                     let hovertemplate = plot.data[trace_number]["hovertemplate"];
                     
-                    // delete the trace from the old location.
-                    Plotly.deleteTraces(plot, trace_number);
+                    
                     
                     // Draw a trace at the new location
                     let x_data = []
@@ -405,6 +404,19 @@ $(document).ready(function() {
                     data["x"] = x_data;
                     data["line"] = line;
                     data["hovertemplate"] = hovertemplate;
+
+                    if (plot.data[trace_number]["mode"]=="markers") {
+                        data["type"] = "scatter";
+                        data["mode"] = "markers";
+                        data["marker"] = {
+                            color: line.color,
+                            size: 4,
+                            }
+                        }
+                                        
+                    // delete the trace from the old location.
+                    Plotly.deleteTraces(plot, trace_number);
+
                     Plotly.addTraces(plot, data, trace_number);
 
                     // Move the vertical line shape to the new location
@@ -424,14 +436,32 @@ $(document).ready(function() {
         var plot = this;
         plot.on('plotly_click', function(data){
             if (!shiftIsPressed) return;
-            $('#exampleModal').modal('toggle');
+            $('#parametersModal').modal('toggle');
+            var selected_trace_number = data.points[0].curveNumber;
+            $("#save_changes_btn").on( "click", function(event) {
+                // If the trace is already variable, we return.
+                if (plot.data[selected_trace_number]["mode"]=="markers") return;
+
+                let elements = document.forms["parametersForm"].getElementsByTagName("input");
+                elements = Array.from(elements);
+                elements.forEach((element) => {
+                    console.log(element.id + ":" + element.value);
+                  });
+                 if ($("#variableRadio").is(':checked')) {
+                    // Replot the trace and give it variable appearance.
+                    make_trace_variable(plot, selected_trace_number);
+                    console.log("Variableee");
+                 }
+                $('#parametersModal').modal('toggle');
+            });
         });
     });
+
     $("#modal_close_btn").on( "click", function() {
-        $('#exampleModal').modal('toggle');
+        $('#parametersModal').modal('toggle');
     });
     $("#modal_close_logo_btn").on( "click", function() {
-        $('#exampleModal').modal('toggle');
+        $('#parametersModal').modal('toggle');
     });
 
     $('#variableAmplitudeGroup').hide();
@@ -475,10 +505,10 @@ var cx = -(mx * xx1) + xy1;
 
 function move_shape_to_zero_line(plot, shape_number) {
     let shapes = JSON.parse(JSON.stringify(plot.layout["shapes"]));
-    let y0 = shapes[shape_number]["y0"];
-    let y1 = shapes[shape_number]["y1"];
-    shapes[shape_number]["y0"] = 0;
-    shapes[shape_number]["y1"] = y1 - y0;
+    let trace_number = (shape_number/2)+1;
+    if (plot.data[trace_number]["mode"]=="markers") shapes[shape_number]["y0"] = -shape_height;
+    else shapes[shape_number]["y0"] = 0;
+    shapes[shape_number]["y1"] = shape_height;
     var update = {
         shapes: shapes
         };
@@ -498,20 +528,66 @@ function move_vertical_line_shape(plot, line_shape_number, starting_point) {
 
 function get_trace_dimensions(plot, trace_number) {
     let x_arr = plot.data[trace_number]["x"];
+    let y_arr = plot.data[trace_number]["y"];
     let width = x_arr.slice(-1)[0] - x_arr[0] + 1;
-    let height = shape_height;
+    let height = Math.max(y_arr) - Math.min(y_arr);
     return [width, height];
 }
 
 function revert_shape_change(plot, shape_number) {
     let shapes = JSON.parse(JSON.stringify(plot.layout["shapes"]));
-    shapes[shape_number]["y0"] = 0;
-    shapes[shape_number]["y1"] = shape_height;
     let trace_number = (shape_number/2)+1;
+    if (plot.data[trace_number]["mode"]=="markers") shapes[shape_number]["y0"] = -shape_height;
+    else shapes[shape_number]["y0"] = 0;
+    shapes[shape_number]["y1"] = shape_height;
     let x_arr = plot.data[trace_number]["x"];
     shapes[shape_number]["x0"] = x_arr[0];
     shapes[shape_number]["x1"] = x_arr.slice(-1)[0];
     let update = {
+        shapes: shapes
+        };
+    Plotly.relayout(plot, update);
+}
+
+function make_trace_variable(plot, trace_number) {
+    let y = plot.data[trace_number]["y"];
+    let x = plot.data[trace_number]["x"];
+    let line = plot.data[trace_number]["line"];
+    let hovertemplate = plot.data[trace_number]["hovertemplate"];
+    
+    // delete the old trace.
+    Plotly.deleteTraces(plot, trace_number);
+    
+    // Draw a trace at the new location
+    let y_data = []
+    for (let i=0; i<y.length; i++) {
+        let val = y[i];
+        if (i % 2 == 0) val = val * -1;
+        y_data.push(val);
+    }
+    let data = {};
+    data["y"] = y_data;
+    data["x"] = x;
+    data["line"] = line;
+    data["hovertemplate"] = hovertemplate;
+    data["type"] = "scatter";
+    data["mode"] = "markers";
+    data["marker"] = {
+        color: line.color,
+        size: 4,
+      },
+    Plotly.addTraces(plot, data, trace_number);
+    change_shapes_variable(plot, (trace_number-1)*2);
+}
+
+function change_shapes_variable(plot, shape_number) {
+    let line_shape_number = shape_number + 1;
+    let box_shape_number = shape_number;
+    let shapes = JSON.parse(JSON.stringify(plot.layout["shapes"])); 
+    shapes[line_shape_number]["y0"] = -shape_height;
+    shapes[box_shape_number]["y0"] = -shape_height;
+    shapes[box_shape_number]["fillcolor"] = 'rgba(206 249 113, 0.1)';
+    var update = {
         shapes: shapes
         };
     Plotly.relayout(plot, update);
