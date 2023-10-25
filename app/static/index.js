@@ -489,17 +489,14 @@ $(document).ready(function() {
     });
 
     $('#variableAmplitudeGroup').hide();
-    $('#inputConstantAmplitude').hide();
 
     $('input[type="radio"]').click(function(){
         if ($(this).is(':checked')) {
           if ($(this).val() == "constant") {
-            $('#inputConstantAmplitude').show();
             $('#variableAmplitudeGroup').hide();
           }
           else if ($(this).val() == "variable") {
             $('#variableAmplitudeGroup').show();
-            $('#inputConstantAmplitude').hide();
           }
         }
     });
@@ -637,4 +634,20 @@ function delete_shapes(plot, shape_number) {
         shapes: shapes
         };
     Plotly.relayout(plot, update);
+}
+
+class Box {
+    type = "";
+    name = "";
+    start_time = 0;
+    anchor_time = 0;
+    amplitude = 0;
+    variable_amplitude = false;
+    step_change = 0;
+    loop_number = 0;
+
+    constructor(type, start_time) {
+        this.type = type;
+        this.start_time = start_time;
+    }
 }
