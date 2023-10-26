@@ -516,6 +516,14 @@ $(document).ready(function() {
           }
         }
     });
+
+    $("#generate-sdl-btn").click(function(){
+        const sdl_objects = [];
+        for (var key in trace_to_box_object) {
+            sdl_objects.push(JSON.stringify(trace_to_box_object[key]));
+        }
+        send_data(sdl_objects);
+    });
 });
 
 // Check whether shift button is pressed
@@ -679,6 +687,21 @@ function save_modal_values(plot, trace_number) {
     boxObj.variable_amplitude = $('#variableRadio').is(':checked');
     boxObj.step_change = $('#inputStepChange').val();
     boxObj.loop_number = $('#inputLoopNumber').val();
+}
+
+function send_data(box_objects) {
+    $.ajax({
+        url: '/process',
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({ 'box_objects': box_objects}),
+        success: function(response) {
+            console.log(response);
+        },
+        error: function(error) {
+            console.log(error);
+        }
+    });
 }
 
 class Box {
