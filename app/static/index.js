@@ -386,7 +386,7 @@ $(document).ready(function() {
 
                     // If the width or height of the shape is changed, it has been stretched/squeezed not moved.
                     var dimensions = get_trace_dimensions(plot, trace_number);
-                    if (Math.abs((ending_point - starting_point) - dimensions[0]) > 2 || Math.abs((y1_val - y0_val) - dimensions[1]) > 0.1) {
+                    if (Math.abs((ending_point - starting_point) - dimensions[0]) > 2 || Math.abs((y1_val - y0_val) - dimensions[1]) > 0.25) {
                         console.log("Stretched/squeezed not moved!!!");
                         // We revert the stretch/squeeze and return.
                         revert_shape_change(plot, shape_number);
@@ -579,7 +579,7 @@ function get_trace_dimensions(plot, trace_number) {
     let x_arr = plot.data[trace_number]["x"];
     let y_arr = plot.data[trace_number]["y"];
     let width = x_arr.slice(-1)[0] - x_arr[0] + 1;
-    let height = Math.max(y_arr) - Math.min(y_arr);
+    let height = Math.max(...y_arr) - Math.min(...y_arr);
     return [width, height];
 }
 
@@ -662,7 +662,10 @@ function load_modal_values(plot, trace_number) {
         $("#variableRadio").prop("checked", true);
         $('#variableAmplitudeGroup').show();
     }
-    else $("#constantRadio").prop("checked", true);
+    else {
+        $("#constantRadio").prop("checked", true);
+        $('#variableAmplitudeGroup').hide();
+    }
     $('#inputStepChange').val(boxObj.step_change);
     $('#inputLoopNumber').val(boxObj.loop_number);
 }
