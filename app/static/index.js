@@ -28,6 +28,12 @@ const object_to_array = {
 
 }
 
+const object_to_type = {
+    "rf_excitation_btn" : "rf",
+    "gradient_btn" : "grad",
+    "adc_readout_btn" : "adc",
+}
+
 const axis_id_to_color = {
     "rf_chart" : "blue",
     "slice_chart" : "orange",
@@ -312,7 +318,12 @@ $(document).ready(function() {
             shapes: added_shapes
             };
         Plotly.relayout(target, update);
-        // starting_point += dragged_array.length;
+        
+        // We create a new Box object and store it.
+        // target.id + trace_number : Box object
+        boxObj = new Box(object_to_type[dragged.id], starting_point);
+        let trace_number = target.data.length - 1; // Trace number is simply the index of current added trace i.e last index.
+        trace_to_box_object[target.id + trace_number] = boxObj
         });
     });
 
@@ -423,6 +434,8 @@ $(document).ready(function() {
                     // Here, shape_number + 1, will give the line shape number, as we are always creating line shape after box shape.
                     move_vertical_line_shape(plot, shape_number+1, starting_point);
 
+                    // Update the starting point in the box object as well.
+                    trace_to_box_object[plot.id + trace_number].start_time = starting_point;
                 }
                 catch (err) {
                     console.log(err);
@@ -438,26 +451,28 @@ $(document).ready(function() {
         let plot = this;
         plot.on('plotly_click', function(data){
             if (!shiftIsPressed) return;
-            $('#parametersModal').modal('toggle');
             selected_trace_number = data.points[0].curveNumber;
             selected_plot = plot;
+            load_modal_values(plot, selected_trace_number);
+            $('#parametersModal').modal('toggle');
         });
     });
 
     $("#save_changes_btn").on( "click", function(event) {
         let plot = selected_plot;
-        // If the trace is already variable, we return.
-        if (plot.data[selected_trace_number]["mode"]=="markers") return;
-
         let elements = document.forms["parametersForm"].getElementsByTagName("input");
         elements = Array.from(elements);
-        elements.forEach((element) => {
-            console.log(element.id + ":" + element.value);
-          });
-         if ($("#variableRadio").is(':checked')) {
+        save_modal_values(plot, selected_trace_number);
+
+        // If the trace is already variable, we return.
+        if (plot.data[selected_trace_number]["mode"]=="markers") {
+            $('#parametersModal').modal('toggle');
+            return;
+        }
+        if ($("#variableRadio").is(':checked')) {
             // Replot the trace and give it variable appearance.
             make_trace_variable(plot, selected_trace_number);
-         }
+        }
         $('#parametersModal').modal('toggle');
     });
 
@@ -466,6 +481,7 @@ $(document).ready(function() {
         $('#parametersModal').modal('toggle');
         Plotly.deleteTraces(plot, selected_trace_number);
         delete_shapes(plot, (selected_trace_number-1)*2);
+        delete trace_to_box_object[plot.id + selected_trace_number];
     });
 
     $("#kernel-time-btn").click(function () {
@@ -636,6 +652,32 @@ function delete_shapes(plot, shape_number) {
     Plotly.relayout(plot, update);
 }
 
+function load_modal_values(plot, trace_number) {
+    boxObj = trace_to_box_object[plot.id + trace_number];
+    $('#inputName').val(boxObj.name);
+    $('#inputStartTime').val(boxObj.start_time);
+    $('#inputAnchorTime').val(boxObj.anchor_time);
+    $('#inputConstantAmplitude').val(boxObj.amplitude);
+    if (boxObj.variable_amplitude) {
+        $("#variableRadio").prop("checked", true);
+        $('#variableAmplitudeGroup').show();
+    }
+    else $("#constantRadio").prop("checked", true);
+    $('#inputStepChange').val(boxObj.step_change);
+    $('#inputLoopNumber').val(boxObj.loop_number);
+}
+
+function save_modal_values(plot, trace_number) {
+    boxObj = trace_to_box_object[plot.id + trace_number];
+    boxObj.name = $('#inputName').val();
+    boxObj.start_time = $('#inputStartTime').val();
+    boxObj.anchor_time = $('#inputAnchorTime').val();
+    boxObj.amplitude = $('#inputConstantAmplitude').val();
+    boxObj.variable_amplitude = $('#variableRadio').is(':checked');
+    boxObj.step_change = $('#inputStepChange').val();
+    boxObj.loop_number = $('#inputLoopNumber').val();
+}
+
 class Box {
     type = "";
     name = "";
@@ -651,3 +693,5 @@ class Box {
         this.start_time = start_time;
     }
 }
+
+const trace_to_box_object = {}
