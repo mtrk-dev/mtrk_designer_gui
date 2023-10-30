@@ -22,7 +22,7 @@
                 </div>
                 <div class="row">
                   <div class="btn-group-vertical" role="group" aria-label="Button group with nested dropdown">
-                    <button id="rf_excitation_btn" type="button" class="btn btn-secondary drag" draggable="true">RF Excitation</button>
+                    <button id="rf_excitation_btn" type="button" class="btn btn-secondary drag" draggable="true">RF</button>
                     <button id="gradient_btn" type="button" class="btn btn-secondary drag" draggable="true">Gradient</button>
                     <button id="adc_readout_btn" type="button" class="btn btn-secondary drag" draggable="true">ADC Readout</button>
                   </div>
@@ -46,16 +46,31 @@
                       </div>
                       <div class="modal-body">
                         <form id="parametersForm" action="">
+                          <div id="rf-parameters-group" class="form-group">
+                            <label for="inputRFType">RF Type</label>
+                            <div class="form-check">
+                              <input class="form-check-input" type="radio" name="exampleRadios" id="rfExcitationRadio" value="excitation" checked>
+                              <label class="form-check-label" for="rfExcitationRadio">
+                                Excitation
+                              </label>
+                            </div>
+                            <div class="form-check">
+                              <input class="form-check-input" type="radio" name="exampleRadios" id="rfRefocusRadio" value="refocus">
+                              <label class="form-check-label" for="rfRefocusRadio">
+                                Refocus
+                              </label>
+                            </div>
+                          </div>
                           <div class="form-group">
                             <label for="inputName">Name</label>
                             <input type="text" class="form-control" id="inputName" placeholder="Ex: Grad Slice Refocus">
                           </div>
                           <div class="form-group">
-                            <label for="inputStartTime">Start Time</label>
+                            <label for="inputStartTime">Start Time (ms)</label>
                             <input type="number" class="form-control" id="inputStartTime" placeholder=0>
                           </div>
                           <div class="form-group">
-                            <label for="inputAnchorTime">Anchor Time</label>
+                            <label for="inputAnchorTime">Anchor Time (ms)</label>
                             <input type="number" class="form-control" id="inputAnchorTime" placeholder=0>
                           </div>
                           <div class="form-group">

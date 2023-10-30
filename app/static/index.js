@@ -662,6 +662,12 @@ function delete_shapes(plot, shape_number) {
 
 function load_modal_values(plot, trace_number) {
     boxObj = trace_to_box_object[plot.id + trace_number];
+    if (boxObj.type == "rf") {
+        $('#rf-parameters-group').show();
+    }
+    else {
+        $('#rf-parameters-group').hide();
+    }
     $('#inputName').val(boxObj.name);
     $('#inputStartTime').val(boxObj.start_time);
     $('#inputAnchorTime').val(boxObj.anchor_time);
