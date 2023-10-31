@@ -528,7 +528,7 @@ $(document).ready(function() {
     $("#generate-sdl-btn").click(function(){
         const sdl_objects = [];
         for (var key in trace_to_box_object) {
-            sdl_objects.push(JSON.stringify(trace_to_box_object[key]));
+            sdl_objects.push(trace_to_box_object[key]);
         }
         send_data(sdl_objects);
     });
