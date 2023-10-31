@@ -42,6 +42,14 @@ const axis_id_to_color = {
     "adc_chart": "violet"
 }
 
+const axis_id_to_axis_name = {
+    "rf_chart" : "rf",
+    "slice_chart" : "slice",
+    "phase_chart" : "phase",
+    "readout_chart": "read",
+    "adc_chart": "adc"
+}
+
 const plot_rf_data = {
 // x: x_standard,
 // y: dummy_data,
@@ -321,7 +329,7 @@ $(document).ready(function() {
         
         // We create a new Box object and store it.
         // target.id + trace_number : Box object
-        boxObj = new Box(object_to_type[dragged.id], starting_point);
+        boxObj = new Box(object_to_type[dragged.id], starting_point, axis_id_to_axis_name[target.id]);
         let trace_number = target.data.length - 1; // Trace number is simply the index of current added trace i.e last index.
         trace_to_box_object[target.id + trace_number] = boxObj
         });
@@ -712,6 +720,7 @@ function send_data(box_objects) {
 
 class Box {
     type = "";
+    axis = "";
     name = "";
     start_time = 0;
     anchor_time = 0;
@@ -720,9 +729,10 @@ class Box {
     step_change = 0;
     loop_number = 0;
 
-    constructor(type, start_time) {
+    constructor(type, start_time, axis) {
         this.type = type;
         this.start_time = start_time;
+        this.axis = axis;
     }
 }
 
