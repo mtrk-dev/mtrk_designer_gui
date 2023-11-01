@@ -14,7 +14,7 @@ def index():
 def process():
     data = json.loads(request.data, strict=False)
     # Sort the objects according to their start time.
-    sorted_boxes = sorted(data['box_objects'], key=lambda x: x['start_time'])
+    sorted_boxes = sorted(data['box_objects'], key=lambda x: int(float(x['start_time'])))
     create_sdl_from_ui_inputs(sorted_boxes)
     return "Success"
 
