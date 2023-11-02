@@ -4,6 +4,8 @@
 
 .objects-group {
     margin-bottom: 5%;
+    height: 120px;
+    overflow-y: scroll;
 }
 
 .accordion-input-label {
