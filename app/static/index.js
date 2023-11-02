@@ -188,6 +188,16 @@ slice_layout["xaxis"]["title"] = "";
 phase_layout["xaxis"]["title"] = "";
 readout_layout["xaxis"]["title"] = "";
 
+rf_layout["title"] = {
+    text:'Block TR',
+    font: {
+        family: 'Courier New, monospace',
+        size: 18,
+        color: 'rgba(255,255,255,0.9)'
+    },
+    yref: 'paper',
+    y: 1
+}
 // We will use the shape template and keep adding to the total shapes in one axis.
 var shapes_array = [];
 const shape_height = 1.1;
