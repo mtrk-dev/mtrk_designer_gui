@@ -330,6 +330,8 @@ $(document).ready(function() {
         // We create a new Box object and store it.
         // target.id + trace_number : Box object
         boxObj = new Box(object_to_type[dragged.id], starting_point, axis_id_to_axis_name[target.id]);
+        // Add the array used in the box as attribute
+        boxObj["array"] = dragged_array
         let trace_number = target.data.length - 1; // Trace number is simply the index of current added trace i.e last index.
         trace_to_box_object[target.id + trace_number] = boxObj
         });
