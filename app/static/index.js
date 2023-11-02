@@ -224,7 +224,7 @@ var line_shape_template = {
 }
 
 // keeping default 10 for now, later to be set by user.
-const anchor_time = 10;
+const anchor_time = 0;
 
 const config = {
     scrollZoom: true,

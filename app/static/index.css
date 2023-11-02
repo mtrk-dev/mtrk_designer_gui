@@ -2,6 +2,18 @@
     margin-bottom: 2%;
 }
 
+.objects-group {
+    margin-bottom: 5%;
+}
+
+.accordion-input-label {
+    margin-bottom: 0% !important;
+}
+
+.accordion-input-item {
+    margin-bottom: 5%;
+}
+
 #generate-sdl-btn {
     margin-bottom: 10%;
 }
