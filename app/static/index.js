@@ -542,7 +542,8 @@ $(document).ready(function() {
         for (var key in trace_to_box_object) {
             sdl_objects.push(trace_to_box_object[key]);
         }
-        send_data(sdl_objects);
+        let configurations = save_configurations();
+        send_data(sdl_objects, configurations);
     });
 });
 
@@ -715,12 +716,49 @@ function save_modal_values(plot, trace_number) {
     boxObj.loop_number = $('#inputLoopNumber').val();
 }
 
-function send_data(box_objects) {
+function save_configurations() {
+    let configs = {};
+    // File configs
+    let format = $('#formatConfigInput').val();
+    let version = $('#versionConfigInput').val();
+    let measurement = $('#measurementConfigInput').val();
+    let system = $('#systemConfigInput').val();
+    // Settings
+    let readout = $('#readoutSettingInput').val();
+    // Info
+    let description = $('#descriptionInfoInput').val();
+    let slices = $('#slicesInfoInput').val();
+    let fov = $('#fovInfoInput').val();
+    let seqstring = $('#seqstringInfoInput').val();
+    let reconstruction = $('#reconstructionInfoInput').val();
+    configs['file'] = {
+        'format': format,
+        'version': version,
+        'measurement': measurement,
+        'system': system
+    }
+    configs['settings'] = {
+        'readout': readout
+    }
+    configs['info'] = {
+        'description': description,
+        'slices': slices,
+        'fov': fov,
+        'seqstring': seqstring,
+        'reconstruction': reconstruction
+    }
+    return configs
+}
+
+function send_data(box_objects, configurations) {
     $.ajax({
         url: '/process',
         type: 'POST',
         contentType: 'application/json',
-        data: JSON.stringify({ 'box_objects': box_objects}),
+        data: JSON.stringify({ 
+            'box_objects': box_objects,
+            'configurations': configurations
+        }),
         success: function(response) {
             console.log(response);
         },
