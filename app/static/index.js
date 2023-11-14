@@ -551,10 +551,12 @@ $(document).ready(function() {
 $(document).keydown(function(event) {
     if (event.which == "16") {
         shiftIsPressed = true;
+        update_plot_config(shiftIsPressed);
     }
 });
 $(document).keyup(function() {
     shiftIsPressed = false;
+    update_plot_config(shiftIsPressed);
 });
 var shiftIsPressed = false;
 
@@ -748,6 +750,16 @@ function save_configurations() {
         'reconstruction': reconstruction
     }
     return configs
+}
+
+function update_plot_config(shiftIsPressed) {
+    // If shift is pressed, we restrict shape movement.
+    if (config["edits"]["shapePosition"] == !shiftIsPressed) return;
+    config["edits"]["shapePosition"] = !shiftIsPressed;
+    $(".dropzone").each(function () {
+        var plot = this;
+        Plotly.react(plot, plot.data, plot.layout, config);
+    });
 }
 
 function send_data(box_objects, configurations) {
