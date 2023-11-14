@@ -346,24 +346,6 @@ $(document).ready(function() {
         trace_to_box_object[target.id + trace_number] = boxObj
         });
     });
-
-    // Delete last drawn trace on the respective axis.
-    // Commenting it out for now- might be better to implement this using edit object popup.
-    // $(".dropzone").each(function () {
-    //     var plot = this;
-    //     plot.on('plotly_doubleclick', function(data) {
-    //         if (shiftIsPressed) {
-    //             try {
-    //                 Plotly.deleteTraces(plot, -1);
-    //                 console.log("Deleted last trace from " + plot.id);
-    //               }
-    //               catch(err) {
-    //                 console.log("No traces to delete!")
-    //               }
-    //         }
-    //     });
-    // });
-
     // sync zoom among all plots.
     // var plots = [rf_chart, slice_chart, phase_chart, readout_chart, adc_chart];
     // function relayout(ed) {
@@ -418,44 +400,10 @@ $(document).ready(function() {
                         console.log("Lifted!");
                         move_shape_to_zero_line(plot, shape_number);
                     }
-                    
-                    let y = plot.data[trace_number]["y"];
-                    let line = plot.data[trace_number]["line"];
-                    let hovertemplate = plot.data[trace_number]["hovertemplate"];
-                    
-                    
-                    
-                    // Draw a trace at the new location
-                    let x_data = []
-                    for (let i=0; i<y.length; i+=1) {
-                        x_data.push(starting_point+i);
-                    }
-                    let data = {};
-                    data["y"] = y;
-                    data["x"] = x_data;
-                    data["line"] = line;
-                    data["hovertemplate"] = hovertemplate;
 
-                    if (plot.data[trace_number]["mode"]=="markers") {
-                        data["type"] = "scatter";
-                        data["mode"] = "markers";
-                        data["marker"] = {
-                            color: line.color,
-                            size: 4,
-                            }
-                        }
-                                        
-                    // delete the trace from the old location.
-                    Plotly.deleteTraces(plot, trace_number);
-
-                    Plotly.addTraces(plot, data, trace_number);
-
-                    // Move the vertical line shape to the new location
-                    // Here, shape_number + 1, will give the line shape number, as we are always creating line shape after box shape.
-                    move_vertical_line_shape(plot, shape_number+1, starting_point);
-
-                    // Update the starting point in the box object as well.
+                    // Update the starting point of the box - both UI and object.
                     trace_to_box_object[plot.id + trace_number].start_time = starting_point;
+                    change_box_start_time(plot, trace_number, parseInt(starting_point));
                 }
                 catch (err) {
                     console.log(err);
@@ -606,6 +554,18 @@ function move_vertical_line_shape(plot, line_shape_number, starting_point) {
     Plotly.relayout(plot, update);
 }
 
+function move_box_shape(plot, box_shape_number, starting_point) {
+    let shapes = JSON.parse(JSON.stringify(plot.layout["shapes"]));
+    let pos = starting_point;
+    let width = shapes[box_shape_number]["x1"] - shapes[box_shape_number]["x0"];
+    shapes[box_shape_number]["x0"] = pos;
+    shapes[box_shape_number]["x1"] = pos + width;
+    var update = {
+        shapes: shapes
+        };
+    Plotly.relayout(plot, update);
+}
+
 function get_trace_dimensions(plot, trace_number) {
     let x_arr = plot.data[trace_number]["x"];
     let y_arr = plot.data[trace_number]["y"];
@@ -710,7 +670,13 @@ function load_modal_values(plot, trace_number) {
 function save_modal_values(plot, trace_number) {
     boxObj = trace_to_box_object[plot.id + trace_number];
     boxObj.name = $('#inputName').val();
-    boxObj.start_time = $('#inputStartTime').val();
+
+    // If the start time has been changed in the modal, we move the box.
+    let input_start_time = $('#inputStartTime').val();
+    if (boxObj.start_time != input_start_time)
+        change_box_start_time(plot, trace_number, parseInt(input_start_time));
+
+    boxObj.start_time = input_start_time;
     boxObj.anchor_time = $('#inputAnchorTime').val();
     boxObj.amplitude = $('#inputConstantAmplitude').val();
     boxObj.variable_amplitude = $('#variableRadio').is(':checked');
@@ -760,6 +726,42 @@ function update_plot_config(shiftIsPressed) {
         var plot = this;
         Plotly.react(plot, plot.data, plot.layout, config);
     });
+}
+
+function change_box_start_time(plot, trace_number, starting_point) {
+    let y = plot.data[trace_number]["y"];
+    let line = plot.data[trace_number]["line"];
+    let hovertemplate = plot.data[trace_number]["hovertemplate"];
+    let shape_number = (trace_number-1)*2;
+
+    // Draw a trace at the new location
+    let x_data = []
+    for (let i=0; i<y.length; i+=1) {
+        x_data.push(starting_point+i);
+    }
+    let data = {};
+    data["y"] = y;
+    data["x"] = x_data;
+    data["line"] = line;
+    data["hovertemplate"] = hovertemplate;
+
+    if (plot.data[trace_number]["mode"]=="markers") {
+        data["type"] = "scatter";
+        data["mode"] = "markers";
+        data["marker"] = {
+            color: line.color,
+            size: 4,
+            }
+        }
+    
+    // delete the trace from the old location and add at new location.
+    Plotly.deleteTraces(plot, trace_number);
+    Plotly.addTraces(plot, data, trace_number);
+
+    // Move the box shape and vertical line shape to the new location
+    // Here, shape_number + 1, will give the line shape number, as we are always creating line shape after box shape.
+    move_box_shape(plot, shape_number, starting_point)
+    move_vertical_line_shape(plot, shape_number+1, starting_point);
 }
 
 function send_data(box_objects, configurations) {
