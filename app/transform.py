@@ -10,7 +10,7 @@ from devtools import debug
 
 from mtrk_sdl_generator_anais.SDL_read_write.pydanticSDLHandler import *
 
-def create_sdl_from_ui_inputs(boxes):
+def create_sdl_from_ui_inputs(boxes, configurations):
     # Initialize SDL file
     # TO DO - need to intialize without loading file
     with open('/vagrant/miniflash.json') as sdlFile:
@@ -18,7 +18,7 @@ def create_sdl_from_ui_inputs(boxes):
         sequence_data = PulseSequence(**sdlData)
     sdlInitialize(sequence_data)
 
-    updateSDLFile(sequence_data, boxes)
+    updateSDLFile(sequence_data, boxes, configurations)
     
     ### writing of json schema to SDL file with formatting options
     with open('output.mtrk', 'w') as sdlFileOut:
@@ -37,10 +37,39 @@ def sdlInitialize(sequence_data):
     sequence_data.arrays = {}
     sequence_data.equations = {}
     
-def updateSDLFile(sequence_data, boxes):
-    instructionName = "dummy_instruction_name"
+def updateSDLFile(sequence_data, boxes, configurations):
+    completeFileInformation(sequence_data, configurations['file'])
+    completeSequenceSettings(sequence_data, configurations['settings'])
+    completeSequenceInformation(sequence_data, configurations['info'])
+    instructionName = "Block_TR"
     addInstruction(sequence_data, instructionName)
     completeInstructionInformation(sequence_data, sequence_data.instructions[instructionName], boxes)
+
+def completeFileInformation(sequence_data, config_data):
+    if config_data['format']:
+        sequence_data.file.format = config_data['format']
+    if config_data['version']:
+        sequence_data.file.version = int(config_data['version'])
+    if config_data['measurement']:
+        sequence_data.file.measurement = config_data['measurement']
+    if config_data['system']:
+        sequence_data.file.system = config_data['system']
+
+def completeSequenceSettings(sequence_data, config_data):
+    if config_data['readout']:
+        sequence_data.settings.readout_os = config_data['readout']
+
+def completeSequenceInformation(sequence_data, config_data):
+    if config_data['description']:
+        sequence_data.infos.description = config_data['description']
+    if config_data['slices']:
+        sequence_data.infos.slices = int(config_data['slices'])
+    if config_data['fov']:
+        sequence_data.infos.fov = int(config_data['fov'])
+    if config_data['seqstring']:
+        sequence_data.infos.seqstring = config_data['seqstring']
+    if config_data['reconstruction']:
+        sequence_data.infos.reconstruction = config_data['reconstruction']
         
 def addInstruction(sequence_data, instructionName):
     sequence_data.instructions[instructionName] = Instruction(steps=[])
