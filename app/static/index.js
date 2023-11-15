@@ -21,6 +21,19 @@ for (let i=0; i < 128; i++) {
     rf_pulse_array.push(rf_array[2*i]);
 }
 
+// Dummy arrays dictionary for array selection.
+const grad_100_2660_100 = [];
+const grad_220_10_220 = [];
+const grad_220_80_220 = [];
+const grad_30_3840_30 = [];
+const array_name_to_array = {
+    "RF Pulse": rf_pulse_array,
+    "grad_100_2660_100": grad_100_2660_100,
+    "grad_220_10_220": grad_220_10_220,
+    "grad_220_80_220": grad_220_80_220,
+    "grad_30_3840_30": grad_30_3840_30
+}
+
 const object_to_array = {
     "rf_excitation_btn" : rf_pulse_array,
     "gradient_btn" : grad_slice_select_array,
@@ -273,6 +286,8 @@ window.onresize = function() {
     Plotly.relayout(adc_chart, update);
 };
 
+load_array_select();
+
 $(document).ready(function() {
     let dragged = null;
 
@@ -492,6 +507,10 @@ $(document).ready(function() {
         }
         let configurations = save_configurations();
         send_data(sdl_objects, configurations);
+    });
+
+    $('.array-dropdown').click(function () {
+        $('#array-selection-btn').text($(this).text());
     });
 });
 
@@ -762,6 +781,19 @@ function change_box_start_time(plot, trace_number, starting_point) {
     // Here, shape_number + 1, will give the line shape number, as we are always creating line shape after box shape.
     move_box_shape(plot, shape_number, starting_point)
     move_vertical_line_shape(plot, shape_number+1, starting_point);
+}
+
+function load_array_select() {
+    let ul = document.getElementById("array-dropdown-menu");
+    for (const [key, value] of Object.entries(array_name_to_array)) {
+        let li = document.createElement("li");
+        li.appendChild(document.createTextNode(key));
+        li.setAttribute("id", key + "-array-item");
+        li.setAttribute("class", "dropdown-item array-dropdown")
+        ul.appendChild(li);
+    }
+    ul.innerHTML += '<li><hr class="dropdown-divider"></li> \
+    <li id="add-new-array-item"><a class="dropdown-item" href="#">&#43;</a></li>';
 }
 
 function send_data(box_objects, configurations) {
