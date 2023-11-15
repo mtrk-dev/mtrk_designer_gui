@@ -512,6 +512,13 @@ $(document).ready(function() {
     $('.array-dropdown').click(function () {
         $('#array-selection-btn').text($(this).text());
     });
+    $('#add-new-array-item').click(function () {
+        $('#parametersModal').addClass('blurred');
+        $('#addArrayModal').modal('toggle');
+    })
+    $('#addArrayModal').on('hidden.bs.modal', function () {
+        $('#parametersModal').removeClass('blurred');
+    });
 });
 
 // Check whether shift button is pressed
@@ -793,7 +800,7 @@ function load_array_select() {
         ul.appendChild(li);
     }
     ul.innerHTML += '<li><hr class="dropdown-divider"></li> \
-    <li id="add-new-array-item"><a class="dropdown-item" href="#">&#43;</a></li>';
+    <li id="add-new-array-item"><a class="dropdown-item">&#43;</a></li>';
 }
 
 function send_data(box_objects, configurations) {

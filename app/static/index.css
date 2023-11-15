@@ -37,3 +37,7 @@
     height: 180px;
     overflow-y: scroll;
 }
+
+.blurred {
+    filter: blur(5px);
+}
