@@ -180,7 +180,7 @@ const layout = {
         "gridcolor": "rgba(255,255,255,0.05)",
         "zerolinecolor": "rgba(255,255,255,0.1)",
         fixedrange: true,
-        range: [-1.75, 1.75],
+        range: [0, 1.75],
     },
 };
 
@@ -509,15 +509,53 @@ $(document).ready(function() {
         send_data(sdl_objects, configurations);
     });
 
-    $('.array-dropdown').click(function () {
+    $(document).on('click', '.array-dropdown', function () {
         $('#array-selection-btn').text($(this).text());
     });
-    $('#add-new-array-item').click(function () {
+    $(document).on('click', '#add-new-array-item', function () {
         $('#parametersModal').addClass('blurred');
         $('#addArrayModal').modal('toggle');
     })
     $('#addArrayModal').on('hidden.bs.modal', function () {
         $('#parametersModal').removeClass('blurred');
+        $('#inputArrayName').val("");
+        $('#inputArrayValues').val("");
+        $('#inputArrayName').removeClass('is-invalid');
+        $('#inputArrayName').removeClass('is-valid');
+        $('#inputArrayValues').removeClass('is-invalid')
+        $('#inputArrayValues').removeClass('is-valid')
+        $('#inputArrayNameInvalidFeedback').hide();
+        $('#inputArrayValuesInvalidFeedback').hide();
+        $('#addArrayValidFeedback').hide();
+    });
+
+    $('#save-array-btn').click(function () {
+        let arrayName = $('#inputArrayName').val();
+        let arrayValues = $('#inputArrayValues').val();
+        isNameValid = validateArrayName(arrayName);
+        const [areValuesValid, array] = validateArrayValues(arrayValues);
+        if (!isNameValid) {
+            $('#inputArrayNameInvalidFeedback').show();
+            $('#inputArrayName').removeClass('is-valid').addClass('is-invalid');
+        }
+        if (!areValuesValid) {
+            $('#inputArrayValuesInvalidFeedback').show();
+            $('#inputArrayValues').removeClass('is-valid').addClass('is-invalid');
+        }
+        if (isNameValid) {
+            $('#inputArrayNameInvalidFeedback').hide();
+            $('#inputArrayName').removeClass('is-invalid').addClass('is-valid');
+        }
+        if (areValuesValid) {
+            $('#inputArrayValuesInvalidFeedback').hide();
+            $('#inputArrayValues').removeClass('is-invalid').addClass('is-valid');
+        }
+        if (isNameValid && areValuesValid) {
+            $('#addArrayValidFeedback').show();
+        }
+        array_name_to_array[arrayName] = array;
+        // populate the array selection again with the addition of new array.
+        load_array_select();
     });
 });
 
@@ -792,6 +830,8 @@ function change_box_start_time(plot, trace_number, starting_point) {
 
 function load_array_select() {
     let ul = document.getElementById("array-dropdown-menu");
+    ul.innerHTML = '';
+    ul.innerHTML += '<li><a class="dropdown-item array-dropdown">Default Array</a></li>';
     for (const [key, value] of Object.entries(array_name_to_array)) {
         let li = document.createElement("li");
         li.appendChild(document.createTextNode(key));
@@ -801,6 +841,30 @@ function load_array_select() {
     }
     ul.innerHTML += '<li><hr class="dropdown-divider"></li> \
     <li id="add-new-array-item"><a class="dropdown-item">&#43;</a></li>';
+}
+
+function validateArrayName(arrayName) {
+    return !(arrayName == "");
+}
+
+function validateArrayValues(arrayValues) {
+    if (arrayValues.length <  1) {
+        return [false, -1]
+    }
+    let stringVals = arrayValues.split(",");
+    let floatVals = [];
+    for (i=0; i<stringVals.length; i++) {
+        let trimVal = stringVals[i].trim()
+        try {
+            let floatVal = parseFloat(trimVal);
+            if (isNaN(floatVal)) return [false, -1]
+            floatVals.push(floatVal)
+        } catch (exception) {
+            console.log(exception);
+            return [false, -1]
+        }
+    }
+    return [true, floatVals]
 }
 
 function send_data(box_objects, configurations) {

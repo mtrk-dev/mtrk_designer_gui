@@ -232,7 +232,6 @@
                                 Default Array
                               </button>
                               <ul id="array-dropdown-menu" class="dropdown-menu">
-                                <li><a class="dropdown-item array-dropdown">Default Array</a></li>
                               </ul>
                             </div>
                           </div>
@@ -250,18 +249,33 @@
                   <div class="modal-dialog">
                     <div class="modal-content">
                       <div class="modal-header">
-                        <h5 class="modal-title" id="addArrayModalLabel">Enter Values</h5>
-                        <h10>&nbsp;(seperated by comma)</h10>
+                        <h5 class="modal-title" id="addArrayModalLabel">Array Details</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                       </div>
                       <div class="modal-body">
-                        <div class="input-group">
-                          <textarea class="form-control" aria-label="With textarea"></textarea>
-                        </div>
+                        <form id="addArrayForm" action="">
+                          <div class="form-group">
+                            <label for="inputArrayName">Name</label>
+                            <input type="text" class="form-control" id="inputArrayName" placeholder="Ex: grad_100_2660_100">
+                            <div id="inputArrayNameInvalidFeedback" class="invalid-feedback">
+                              Please add a name.
+                            </div>
+                          </div>
+                          <div class="form-group">
+                            <label for="inputArrayValues">Values (numbers seperated by comma)</label>
+                            <textarea id="inputArrayValues" class="form-control" aria-label="With textarea" placeholder="Ex: 0.1, 0.2, 0.3, 0.4, 0.5"></textarea>
+                            <div id="inputArrayValuesInvalidFeedback" class="invalid-feedback">
+                              Please add values in the required format.
+                            </div>
+                          </div>
+                          <div id="addArrayValidFeedback" class="valid-feedback">
+                            New array added!
+                          </div>
+                        </form>
                       </div>
                       <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-primary">Save Array</button>
+                        <button id="save-array-btn" type="button" class="btn btn-primary">Save Array</button>
                       </div>
                     </div>
                   </div>
