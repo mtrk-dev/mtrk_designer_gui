@@ -22,10 +22,10 @@ for (let i=0; i < 128; i++) {
 }
 
 // Dummy arrays dictionary for array selection.
-const grad_100_2660_100 = [];
-const grad_220_10_220 = [];
-const grad_220_80_220 = [];
-const grad_30_3840_30 = [];
+const grad_100_2660_100 = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1, 0.0];
+const grad_220_10_220 = [0.0, 0.0455, 0.0909, 0.1364, 0.1818, 0.2273, 0.2727, 0.3182, 0.3636, 0.4091, 0.4545, 0.5, 0.5455, 0.5909, 0.6364, 0.6818, 0.7273, 0.7727, 0.8182, 0.8636, 0.9091, 0.9545, 1.0, 1.0, 0.9545, 0.9091, 0.8636, 0.8182, 0.7727, 0.7273, 0.6818, 0.6364, 0.5909, 0.5455, 0.5, 0.4545, 0.4091, 0.3636, 0.3182, 0.2727, 0.2273, 0.1818, 0.1364, 0.0909, 0.0455, 0.0];
+const grad_220_80_220 = [0.0, 0.0455, 0.0909, 0.1364, 0.1818, 0.2273, 0.2727, 0.3182, 0.3636, 0.4091, 0.4545, 0.5, 0.5455, 0.5909, 0.6364, 0.6818, 0.7273, 0.7727, 0.8182, 0.8636, 0.9091, 0.9545, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.9545, 0.9091, 0.8636, 0.8182, 0.7727, 0.7273, 0.6818, 0.6364, 0.5909, 0.5455, 0.5, 0.4545, 0.4091, 0.3636, 0.3182, 0.2727, 0.2273, 0.1818, 0.1364, 0.0909, 0.0455, 0.0];
+const grad_30_3840_30 = [0.0, 0.3333, 0.6667, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.6667, 0.3333, 0.0];
 const array_name_to_array = {
     "RF Pulse": rf_pulse_array,
     "grad_100_2660_100": grad_100_2660_100,
@@ -61,6 +61,14 @@ const axis_id_to_axis_name = {
     "phase_chart" : "phase",
     "readout_chart": "read",
     "adc_chart": "adc"
+}
+
+const axis_id_to_default_array = {
+    "rf_chart" : rf_pulse_array,
+    "slice_chart" : grad_slice_select_array,
+    "phase_chart" : grad_slice_select_array,
+    "readout_chart": grad_slice_select_array,
+    "adc_chart": adc_readout_array
 }
 
 const plot_rf_data = {
@@ -354,9 +362,7 @@ $(document).ready(function() {
         
         // We create a new Box object and store it.
         // target.id + trace_number : Box object
-        boxObj = new Box(object_to_type[dragged.id], starting_point, axis_id_to_axis_name[target.id]);
-        // Add the array used in the box as attribute
-        boxObj["array"] = dragged_array
+        boxObj = new Box(object_to_type[dragged.id], starting_point, axis_id_to_axis_name[target.id], dragged_array);
         let trace_number = target.data.length - 1; // Trace number is simply the index of current added trace i.e last index.
         trace_to_box_object[target.id + trace_number] = boxObj
         });
@@ -630,6 +636,16 @@ function move_box_shape(plot, box_shape_number, starting_point) {
     Plotly.relayout(plot, update);
 }
 
+function update_box_shape(plot, box_shape_number, starting_point, ending_point) {
+    let shapes = JSON.parse(JSON.stringify(plot.layout["shapes"]));
+    shapes[box_shape_number]["x0"] = starting_point;
+    shapes[box_shape_number]["x1"] = ending_point;
+    var update = {
+        shapes: shapes
+        };
+    Plotly.relayout(plot, update);
+}
+
 function get_trace_dimensions(plot, trace_number) {
     let x_arr = plot.data[trace_number]["x"];
     let y_arr = plot.data[trace_number]["y"];
@@ -740,12 +756,22 @@ function save_modal_values(plot, trace_number) {
     if (boxObj.start_time != input_start_time)
         change_box_start_time(plot, trace_number, parseInt(input_start_time));
 
+    let selected_box_array_name = $('#array-selection-btn').text();
+    if (selected_box_array_name != boxObj.array_info.name) {
+        let new_array = [];
+        if (selected_box_array_name == "Default Array") new_array = axis_id_to_default_array[plot.id]
+        else new_array = array_name_to_array[selected_box_array_name]
+        change_box_array(plot, trace_number, parseInt(input_start_time), new_array);
+    }
+
     boxObj.start_time = input_start_time;
     boxObj.anchor_time = $('#inputAnchorTime').val();
     boxObj.amplitude = $('#inputConstantAmplitude').val();
     boxObj.variable_amplitude = $('#variableRadio').is(':checked');
     boxObj.step_change = $('#inputStepChange').val();
     boxObj.loop_number = $('#inputLoopNumber').val();
+    boxObj.array_info.name = selected_box_array_name;
+    boxObj.array_info.array = array_name_to_array[selected_box_array_name];
 }
 
 function save_configurations() {
@@ -828,6 +854,32 @@ function change_box_start_time(plot, trace_number, starting_point) {
     move_vertical_line_shape(plot, shape_number+1, starting_point);
 }
 
+function change_box_array(plot, trace_number, starting_point, new_array) {
+    let y = new_array;
+    let line = plot.data[trace_number]["line"];
+    let hovertemplate = plot.data[trace_number]["hovertemplate"];
+    let shape_number = (trace_number-1)*2;
+
+    let x_data = []
+    for (let i=0; i<y.length; i+=1) {
+        x_data.push(starting_point+i);
+    }
+    let data = {};
+    data["y"] = y;
+    data["x"] = x_data;
+    data["line"] = line;
+    data["hovertemplate"] = hovertemplate;
+
+    // delete the trace from the old location and add at new location.
+    Plotly.deleteTraces(plot, trace_number);
+    Plotly.addTraces(plot, data, trace_number);
+
+    // Update the box shape according to the new trace array
+    let ending_point = starting_point + y.length - 1
+    update_box_shape(plot, shape_number, starting_point, ending_point);
+    move_vertical_line_shape(plot, shape_number+1, starting_point);
+}
+
 function load_array_select() {
     let ul = document.getElementById("array-dropdown-menu");
     ul.innerHTML = '';
@@ -895,11 +947,16 @@ class Box {
     variable_amplitude = false;
     step_change = 0;
     loop_number = 0;
+    array_info = {
+        name: "Default Array",
+        array: []
+    }
 
-    constructor(type, start_time, axis) {
+    constructor(type, start_time, axis, array) {
         this.type = type;
         this.start_time = start_time;
         this.axis = axis;
+        this.array_info.array = array;
     }
 }
 
