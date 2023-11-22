@@ -190,6 +190,7 @@ const layout = {
         fixedrange: true,
         range: [0, 1.75],
     },
+    dragmode: "pan"
 };
 
 var rf_layout = JSON.parse(JSON.stringify(layout));
@@ -258,16 +259,16 @@ var line_shape_template = {
 const anchor_time = 0;
 
 const config = {
-    scrollZoom: true,
+    // scrollZoom: true,
     responsive: true,
     editable: true,
     edits: {
         axisTitleText: false,
         titleText: false,
-        // shapePosition: false
+        shapePosition: false
     },
-    // doubleClick: false,
-    // displayModeBar: false,
+    doubleClick: false,
+    displayModeBar: false,
 }
 
 Plotly.newPlot('rf_chart', [plot_rf_data], rf_layout, config);
@@ -439,7 +440,6 @@ $(document).ready(function() {
     $(".dropzone").each(function () {
         let plot = this;
         plot.on('plotly_click', function(data){
-            if (!shiftIsPressed) return;
             selected_trace_number = data.points[0].curveNumber;
             selected_plot = plot;
             load_modal_values(plot, selected_trace_number);
@@ -604,8 +604,8 @@ function recalculate_mouse_to_plot_conversion_variables() {
 function move_shape_to_zero_line(plot, shape_number) {
     let shapes = JSON.parse(JSON.stringify(plot.layout["shapes"]));
     let trace_number = (shape_number/2)+1;
-    if (plot.data[trace_number]["mode"]=="markers") shapes[shape_number]["y0"] = -shape_height;
-    else shapes[shape_number]["y0"] = 0;
+    // if (plot.data[trace_number]["mode"]=="markers") shapes[shape_number]["y0"] = -shape_height;
+    shapes[shape_number]["y0"] = 0;
     shapes[shape_number]["y1"] = shape_height;
     var update = {
         shapes: shapes
@@ -682,7 +682,7 @@ function make_trace_variable(plot, trace_number) {
     let y_data = []
     for (let i=0; i<y.length; i++) {
         let val = y[i];
-        if (i % 2 == 0) val = val * -1;
+        if (i % 2 == 0) val = val * 0.5;
         y_data.push(val);
     }
     let data = {};
@@ -704,8 +704,8 @@ function change_shapes_variable(plot, shape_number) {
     let line_shape_number = shape_number + 1;
     let box_shape_number = shape_number;
     let shapes = JSON.parse(JSON.stringify(plot.layout["shapes"])); 
-    shapes[line_shape_number]["y0"] = -shape_height;
-    shapes[box_shape_number]["y0"] = -shape_height;
+    // shapes[line_shape_number]["y0"] = -shape_height;
+    // shapes[box_shape_number]["y0"] = -shape_height;
     shapes[box_shape_number]["fillcolor"] = 'rgba(206 249 113, 0.1)';
     var update = {
         shapes: shapes
@@ -810,8 +810,8 @@ function save_configurations() {
 
 function update_plot_config(shiftIsPressed) {
     // If shift is pressed, we restrict shape movement.
-    if (config["edits"]["shapePosition"] == !shiftIsPressed) return;
-    config["edits"]["shapePosition"] = !shiftIsPressed;
+    if (config["edits"]["shapePosition"] == shiftIsPressed) return;
+    config["edits"]["shapePosition"] = shiftIsPressed;
     $(".dropzone").each(function () {
         var plot = this;
         Plotly.react(plot, plot.data, plot.layout, config);
