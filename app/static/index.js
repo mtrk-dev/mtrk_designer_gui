@@ -407,14 +407,15 @@ $(document).ready(function() {
                         }
                     }
 
+                    // Not needed for now as we have disabled stretching/squeezing.
                     // If the width or height of the shape is changed, it has been stretched/squeezed not moved.
-                    var dimensions = get_trace_dimensions(plot, trace_number);
-                    if (Math.abs((ending_point - starting_point) - dimensions[0]) > 2 || Math.abs((y1_val - y0_val) - dimensions[1]) > 0.25) {
-                        console.log("Stretched/squeezed not moved!!!");
-                        // We revert the stretch/squeeze and return.
-                        revert_shape_change(plot, shape_number);
-                        return;
-                    }
+                    // var dimensions = get_trace_dimensions(plot, trace_number);
+                    // if (Math.abs((ending_point - starting_point) - dimensions[0]) > 2 || Math.abs((y1_val - y0_val) - dimensions[1]) > 0.25) {
+                    //     console.log("Stretched/squeezed not moved!!!");
+                    //     // We revert the stretch/squeeze and return.
+                    //     revert_shape_change(plot, shape_number);
+                    //     return;
+                    // }
 
                     // If the y0 value is not zero after moving for a shape, we want to move the shape to zero.
                     if (Math.abs(y0_val) != 0) {
