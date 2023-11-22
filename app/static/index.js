@@ -16,10 +16,9 @@ const adc_readout_array = [0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
 
 const rf_pulse_array = [];
 for (let i=0; i < 128; i++) {
-    if (i < 20) continue;
-    if (i > 108) break;
     rf_pulse_array.push(rf_array[2*i]);
 }
+const step_size = 10;
 
 // Dummy arrays dictionary for array selection.
 const grad_100_2660_100 = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1, 0.0];
@@ -172,7 +171,7 @@ const layout = {
         },
         "gridcolor": "rgba(255,255,255,0.05)",
         "zerolinecolor": "rgba(255,255,255,0.1)",
-        range: [0, 200],
+        range: [0, 100],
         // fixedrange: true,
     },
     yaxis: {
@@ -333,7 +332,7 @@ $(document).ready(function() {
         // }
         let x_data = []
         for (let i=0; i<dragged_array.length; i+=1) {
-            x_data.push(starting_point+i);
+            x_data.push(starting_point + (i/step_size));
         }
         let data = {};
         data["y"] = dragged_array;
@@ -345,7 +344,7 @@ $(document).ready(function() {
         // Update the trace by adding a box around it.
         var shape = JSON.parse(JSON.stringify(shape_template));
         shape["x0"] = starting_point;
-        shape["x1"] = starting_point + dragged_array.length;
+        shape["x1"] = starting_point + (dragged_array.length/step_size);
         let added_shapes=[];
         if ("shapes" in target.layout) { added_shapes = target.layout.shapes;}
         added_shapes.push(shape);
@@ -827,7 +826,7 @@ function change_box_start_time(plot, trace_number, starting_point) {
     // Draw a trace at the new location
     let x_data = []
     for (let i=0; i<y.length; i+=1) {
-        x_data.push(starting_point+i);
+        x_data.push(starting_point+(i/step_size));
     }
     let data = {};
     data["y"] = y;
@@ -862,7 +861,7 @@ function change_box_array(plot, trace_number, starting_point, new_array) {
 
     let x_data = []
     for (let i=0; i<y.length; i+=1) {
-        x_data.push(starting_point+i);
+        x_data.push(starting_point+(i/step_size));
     }
     let data = {};
     data["y"] = y;
@@ -875,7 +874,7 @@ function change_box_array(plot, trace_number, starting_point, new_array) {
     Plotly.addTraces(plot, data, trace_number);
 
     // Update the box shape according to the new trace array
-    let ending_point = starting_point + y.length - 1
+    let ending_point = starting_point + (y.length/step_size)
     update_box_shape(plot, shape_number, starting_point, ending_point);
     move_vertical_line_shape(plot, shape_number+1, starting_point);
 }
