@@ -679,22 +679,29 @@ function make_trace_variable(plot, trace_number) {
     Plotly.deleteTraces(plot, trace_number);
     
     // Draw a trace at the new location
-    let y_data = []
+    let y_data = [];
+    let x_data = [];
     for (let i=0; i<y.length; i++) {
         let val = y[i];
-        if (i % 2 == 0) val = val * 0.5;
+        x_data.push(x[i]);
+        x_data.push(x[i] + 0.0001);
+        x_data.push(x[i] + 0.0002);
+        x_data.push(x[i] + 0.0003);
         y_data.push(val);
+        y_data.push(val*0.75);
+        y_data.push(val*0.5);
+        y_data.push(val*0.25);
     }
     let data = {};
     data["y"] = y_data;
-    data["x"] = x;
+    data["x"] = x_data;
     data["line"] = line;
     data["hovertemplate"] = hovertemplate;
     data["type"] = "scatter";
     data["mode"] = "markers";
     data["marker"] = {
         color: line.color,
-        size: 4,
+        size: 2,
       },
     Plotly.addTraces(plot, data, trace_number);
     change_shapes_variable(plot, (trace_number-1)*2);
@@ -819,6 +826,7 @@ function update_plot_config(shiftIsPressed) {
 }
 
 function change_box_start_time(plot, trace_number, starting_point) {
+    let x = plot.data[trace_number]["x"];
     let y = plot.data[trace_number]["y"];
     let line = plot.data[trace_number]["line"];
     let hovertemplate = plot.data[trace_number]["hovertemplate"];
@@ -826,8 +834,10 @@ function change_box_start_time(plot, trace_number, starting_point) {
 
     // Draw a trace at the new location
     let x_data = []
-    for (let i=0; i<y.length; i+=1) {
-        x_data.push(starting_point+(i/step_size));
+    let offset = x[0] - starting_point;
+    for (let i=0; i<x.length; i+=1) {
+        // x_data.push(starting_point+(i/step_size));
+        x_data.push(x[i] - offset);
     }
     let data = {};
     data["y"] = y;
@@ -840,7 +850,7 @@ function change_box_start_time(plot, trace_number, starting_point) {
         data["mode"] = "markers";
         data["marker"] = {
             color: line.color,
-            size: 4,
+            size: 2,
             }
         }
     
