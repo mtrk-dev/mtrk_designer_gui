@@ -563,6 +563,23 @@ $(document).ready(function() {
         // populate the array selection again with the addition of new array.
         load_array_select();
     });
+
+    $('input[type="checkbox"]').click(function(){
+        if (document.documentElement.getAttribute('data-bs-theme') == 'dark') {
+            document.documentElement.setAttribute('data-bs-theme','light')
+            $(".btn").each(function(){
+                $(this).removeClass("btn-secondary");
+                $(this).addClass("btn-light");
+            });
+        }
+        else {
+            document.documentElement.setAttribute('data-bs-theme','dark')
+            $(".btn").each(function(){
+                $(this).removeClass("btn-light");
+                $(this).addClass("btn-secondary");
+            });
+        }
+    });
 });
 
 // Check whether shift button is pressed
