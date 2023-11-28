@@ -189,7 +189,7 @@ const layout = {
         fixedrange: true,
         range: [0, 1.75],
     },
-    dragmode: "pan"
+    dragmode: false
 };
 
 var rf_layout = JSON.parse(JSON.stringify(layout));
@@ -268,6 +268,11 @@ const config = {
     },
     doubleClick: false,
     displayModeBar: false,
+    // modeBarButtonsToAdd: ['select2d'],
+    // modeBarButtonsToRemove: ['pan2d','lasso2d','resetScale2d','zoomOut2d', 
+    // "hoverClosestGl2d", "hoverClosestPie", "toggleHover", "resetViews", "toImage", "sendDataToCloud", "toggleSpikelines", "resetViewMapbox",
+    // "hoverClosestCartesian", "hoverCompareCartesian", "zoom2d", "pan2d", "lasso2d", "zoomIn2d", "zoomOut2d", "autoScale2d", "resetScale2d"],
+    // displaylogo: false,
 }
 
 Plotly.newPlot('rf_chart', [plot_rf_data], rf_layout, config);
@@ -442,6 +447,10 @@ $(document).ready(function() {
         plot.on('plotly_click', function(data){
             selected_trace_number = data.points[0].curveNumber;
             selected_plot = plot;
+            if (controlIsPressed) {
+                select_box(selected_trace_number, selected_plot);
+                return;
+            }
             load_modal_values(plot, selected_trace_number);
             $('#parametersModal').modal('toggle');
         });
@@ -591,12 +600,17 @@ $(document).keydown(function(event) {
         shiftIsPressed = true;
         update_plot_config(shiftIsPressed);
     }
+    if (event.which == "17") {
+        controlIsPressed = true;
+    }
 });
 $(document).keyup(function() {
     shiftIsPressed = false;
     update_plot_config(shiftIsPressed);
+    controlIsPressed = false;
 });
 var shiftIsPressed = false;
+var controlIsPressed = false;
 
 // Pre processing code to convert the mouse point x-value to plot's xaxis value.
 var xaxis = rf_chart._fullLayout.xaxis;
@@ -953,7 +967,7 @@ function toggle_plot_color(isDark) {
     if (isDark) {
         var update = {
             "plot_bgcolor":"rgba(255,255,255,0.1)",
-            "paper_bgcolor":"rgba(235,235,235,0.1)",
+            "paper_bgcolor":"rgba(215,215,215,0.1)",
             "xaxis.titlefont.color": "rgba(0,0,0,0.9)",
             "xaxis.tickfont.color": "rgba(0,0,0,0.9)",
             "xaxis.gridcolor": "rgba(0,0,0,0.05)",
@@ -985,6 +999,31 @@ function toggle_plot_color(isDark) {
     Plotly.relayout(phase_chart, update);
     Plotly.relayout(readout_chart, update);
     Plotly.relayout(adc_chart, update);
+}
+
+function select_box(trace_number, plot) {
+    let shape_number = (trace_number-1)*2;
+    let shapes = JSON.parse(JSON.stringify(plot.layout["shapes"]));
+
+    // If previously not selected, we select it. Otherwise, unselect it.
+    if (!shapes[shape_number]["isSelected"]) {
+        shapes[shape_number]["line"] = {
+            color: 'rgb(37, 122, 253)',
+            width: 2
+        };
+        shapes[shape_number]["isSelected"] = true;
+    } else {
+        shapes[shape_number]["line"] =  {
+            color: 'rgb(129, 133, 137)',
+            width: 1
+          };
+          shapes[shape_number]["isSelected"] = false;
+    }
+
+    var update = {
+        shapes: shapes
+        };
+    Plotly.relayout(plot, update);
 }
 
 function send_data(box_objects, configurations) {
