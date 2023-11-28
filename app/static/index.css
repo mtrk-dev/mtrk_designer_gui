@@ -45,5 +45,15 @@
 }
 
 .theme-icon {
-    font-size: 14px !important;
+    font-size: 13px !important;
+}
+
+#flexSwitchCheckChecked {
+    height: 20px;
+    width: 35px;
+}
+
+#flexSwitchCheckChecked:checked {
+    background-color: #5e2669;
+    border-color: #7d2381;
 }

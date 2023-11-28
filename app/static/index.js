@@ -571,6 +571,8 @@ $(document).ready(function() {
                 $(this).removeClass("btn-secondary");
                 $(this).addClass("btn-light");
             });
+            toggle_plot_color(true);
+
         }
         else {
             document.documentElement.setAttribute('data-bs-theme','dark')
@@ -578,6 +580,7 @@ $(document).ready(function() {
                 $(this).removeClass("btn-light");
                 $(this).addClass("btn-secondary");
             });
+            toggle_plot_color(false);
         }
     });
 });
@@ -944,6 +947,44 @@ function validateArrayValues(arrayValues) {
         }
     }
     return [true, floatVals]
+}
+
+function toggle_plot_color(isDark) {
+    if (isDark) {
+        var update = {
+            "plot_bgcolor":"rgba(255,255,255,0.1)",
+            "paper_bgcolor":"rgba(235,235,235,0.1)",
+            "xaxis.titlefont.color": "rgba(0,0,0,0.9)",
+            "xaxis.tickfont.color": "rgba(0,0,0,0.9)",
+            "xaxis.gridcolor": "rgba(0,0,0,0.05)",
+            "xaxis.zerolinecolor": "rgba(0,0,0,0.1)",
+            "yaxis.titlefont.color": "rgba(0,0,0,0.9)",
+            "yaxis.tickfont.color": "rgba(0,0,0,0.9)",
+            "yaxis.gridcolor": "rgba(0,0,0,0.05)",
+            "yaxis.zerolinecolor": "rgba(0,0,0,0.1)",
+            "title.font.color": 'rgba(0,0,0,0.9)'
+        }
+    } else {
+        var update = {
+            "plot_bgcolor":"rgba(0,0,0,0.1)",
+            "paper_bgcolor":"rgba(0,0,0,0.6)",
+            "xaxis.titlefont.color": "rgba(255,255,255,0.9)",
+            "xaxis.tickfont.color": "rgba(255,255,255,0.9)",
+            "xaxis.gridcolor": "rgba(255,255,255,0.05)",
+            "xaxis.zerolinecolor": "rgba(255,255,255,0.1)",
+            "yaxis.titlefont.color": "rgba(255,255,255,0.9)",
+            "yaxis.tickfont.color": "rgba(255,255,255,0.9)",
+            "yaxis.gridcolor": "rgba(255,255,255,0.05)",
+            "yaxis.zerolinecolor": "rgba(255,255,255,0.1)",
+            "title.font.color": 'rgba(255,255,255,0.9)'
+        }
+    }
+
+    Plotly.relayout(rf_chart, update);
+    Plotly.relayout(slice_chart, update);
+    Plotly.relayout(phase_chart, update);
+    Plotly.relayout(readout_chart, update);
+    Plotly.relayout(adc_chart, update);
 }
 
 function send_data(box_objects, configurations) {
