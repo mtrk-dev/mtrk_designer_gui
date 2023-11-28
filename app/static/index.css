@@ -22,11 +22,11 @@
     bottom: 0
 }
 
-#loopsAccordion {
+#loopsAccordion, #blocksAccordion {
     margin-top: 5%;
 }
 
-#add-loop-btn {
+#add-loop-btn, #add-block-btn {
     margin-top: 5%;
     margin-left: 70%;
 }

@@ -369,7 +369,7 @@ $(document).ready(function() {
         // target.id + trace_number : Box object
         boxObj = new Box(object_to_type[dragged.id], starting_point, axis_id_to_axis_name[target.id], dragged_array);
         let trace_number = target.data.length - 1; // Trace number is simply the index of current added trace i.e last index.
-        trace_to_box_object[target.id + trace_number] = boxObj
+        trace_to_box_object[target.id + "-" + trace_number] = boxObj
         });
     });
     // sync zoom among all plots.
@@ -429,7 +429,7 @@ $(document).ready(function() {
                     }
 
                     // Update the starting point of the box - both UI and object.
-                    trace_to_box_object[plot.id + trace_number].start_time = starting_point;
+                    trace_to_box_object[plot.id + "-" + trace_number].start_time = starting_point;
                     change_box_start_time(plot, trace_number, parseInt(starting_point));
                 }
                 catch (err) {
@@ -479,7 +479,7 @@ $(document).ready(function() {
         $('#parametersModal').modal('toggle');
         Plotly.deleteTraces(plot, selected_trace_number);
         delete_shapes(plot, (selected_trace_number-1)*2);
-        delete trace_to_box_object[plot.id + selected_trace_number];
+        delete trace_to_box_object[plot.id + "-" + selected_trace_number];
     });
 
     $("#kernel-time-btn").click(function () {
@@ -591,6 +591,10 @@ $(document).ready(function() {
             });
             toggle_plot_color(false);
         }
+    });
+
+    $('#add-block-btn').click(function(){
+        add_block_with_selected_boxes();
     });
 });
 
@@ -765,7 +769,7 @@ function delete_shapes(plot, shape_number) {
 }
 
 function load_modal_values(plot, trace_number) {
-    boxObj = trace_to_box_object[plot.id + trace_number];
+    boxObj = trace_to_box_object[plot.id + "-" + trace_number];
     if (boxObj.type == "rf") {
         $('#rf-parameters-group').show();
     }
@@ -789,7 +793,7 @@ function load_modal_values(plot, trace_number) {
 }
 
 function save_modal_values(plot, trace_number) {
-    boxObj = trace_to_box_object[plot.id + trace_number];
+    boxObj = trace_to_box_object[plot.id + "-" + trace_number];
     boxObj.name = $('#inputName').val();
 
     // If the start time has been changed in the modal, we move the box.
@@ -1004,26 +1008,36 @@ function toggle_plot_color(isDark) {
 function select_box(trace_number, plot) {
     let shape_number = (trace_number-1)*2;
     let shapes = JSON.parse(JSON.stringify(plot.layout["shapes"]));
+    boxObj = trace_to_box_object[plot.id + "-" + trace_number];
 
     // If previously not selected, we select it. Otherwise, unselect it.
-    if (!shapes[shape_number]["isSelected"]) {
+    if (!boxObj.isSelected) {
         shapes[shape_number]["line"] = {
-            color: 'rgb(37, 122, 253)',
-            width: 2
+            color: 'rgba(37, 122, 253, 0.6)',
+            width: 3
         };
-        shapes[shape_number]["isSelected"] = true;
+        boxObj.isSelected = true;
     } else {
         shapes[shape_number]["line"] =  {
             color: 'rgb(129, 133, 137)',
             width: 1
           };
-          shapes[shape_number]["isSelected"] = false;
+          boxObj.isSelected = false;
     }
 
     var update = {
         shapes: shapes
         };
     Plotly.relayout(plot, update);
+}
+
+function add_block_with_selected_boxes() {
+    for (var key in trace_to_box_object) {
+        boxObj = trace_to_box_object[key];
+        if (boxObj.isSelected) {
+            boxObj.isDisabled = true;
+        }
+    }
 }
 
 function send_data(box_objects, configurations) {
@@ -1054,6 +1068,8 @@ class Box {
     variable_amplitude = false;
     step_change = 0;
     loop_number = 0;
+    isSelected = false;
+    isDisabled = false;
     array_info = {
         name: "Default Array",
         array: []
