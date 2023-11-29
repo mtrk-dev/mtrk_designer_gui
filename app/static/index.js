@@ -172,7 +172,7 @@ const layout = {
         "gridcolor": "rgba(255,255,255,0.05)",
         "zerolinecolor": "rgba(255,255,255,0.1)",
         range: [0, 100],
-        // fixedrange: true,
+        fixedrange: true,
     },
     yaxis: {
         title: "RF (V)",
@@ -254,13 +254,27 @@ var line_shape_template = {
     },
 }
 
+var annotation_template = {
+    x: 0,
+    y: 1.2,
+    xref: 'x',
+    yref: 'y',
+    text: '',
+    showarrow: false,
+    font: {
+      family: 'Courier New, monospace',
+      size: 12,
+      color: '#ffffff'
+    },
+  }
+
 // keeping default 10 for now, later to be set by user.
 const anchor_time = 0;
 
 const config = {
     // scrollZoom: true,
     responsive: true,
-    editable: true,
+    editable: false,
     edits: {
         axisTitleText: false,
         titleText: false,
@@ -360,8 +374,16 @@ $(document).ready(function() {
         line_shape["x1"] = starting_point+anchor_time;
         added_shapes.push(line_shape);
 
+        // add a dummy annotation
+        var annotation = JSON.parse(JSON.stringify(annotation_template));
+        annotation["x"] = starting_point+2.5;
+        let added_annotations=[];
+        if ("annotations" in target.layout) { added_annotations = target.layout.annotations;}
+        added_annotations.push(annotation);
+
         var update = {
-            shapes: added_shapes
+            shapes: added_shapes,
+            annotations: added_annotations
             };
         Plotly.relayout(target, update);
         
@@ -1031,13 +1053,43 @@ function select_box(trace_number, plot) {
     Plotly.relayout(plot, update);
 }
 
+function update_box(toBlock, trace_number, plot) {
+    let shape_number = (trace_number-1)*2;
+    let shapes = JSON.parse(JSON.stringify(plot.layout["shapes"]));
+    let annotation_number = trace_number - 1;
+    let annotations = JSON.parse(JSON.stringify(plot.layout["annotations"]));
+
+    if (toBlock) {
+        annotations[annotation_number]["text"] = "Block1";
+    }
+    var update = {
+        annotations: annotations
+        };
+    Plotly.relayout(plot, update);
+}
+
 function add_block_with_selected_boxes() {
+    let selected_boxes = [];
+    let start_time = Number.MAX_VALUE;
     for (var key in trace_to_box_object) {
         boxObj = trace_to_box_object[key];
         if (boxObj.isSelected) {
             boxObj.isDisabled = true;
+            selected_boxes.push(boxObj);
+
+            // Storing the earliest start time- it will be our block start time.
+            start_time = Math.min(start_time, boxObj.start_time);
+
+            // We unselect the box now by calling the function again and update it.
+            let arr = key.split("-");
+            let plotName = arr[0];
+            let plot = document.getElementById(plotName);
+            let trace_number = parseInt(arr[1]);
+            select_box(trace_number, plot);
+            update_box(true, trace_number, plot);
         }
     }
+    blockObj = new Block("dummy_block_name", start_time, selected_boxes);
 }
 
 function send_data(box_objects, configurations) {
@@ -1084,3 +1136,15 @@ class Box {
 }
 
 const trace_to_box_object = {}
+
+class Block {
+    name = "";
+    start_time = 0;
+    boxes = [];
+
+    constructor(name, start_time, box_array) {
+        this.name = name;
+        this.start_time = start_time;
+        this.boxes = box_array;
+    }
+}
