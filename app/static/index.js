@@ -62,6 +62,14 @@ const axis_id_to_axis_name = {
     "adc_chart": "adc"
 }
 
+const axis_name_to_axis_id = {
+    "rf": "rf_chart",
+    "slice": "slice_chart",
+    "phase": "phase_chart",
+    "read": "readout_chart",
+    "adc": "adc_chart"
+}
+
 const axis_id_to_default_array = {
     "rf_chart" : rf_pulse_array,
     "slice_chart" : grad_slice_select_array,
@@ -388,10 +396,10 @@ $(document).ready(function() {
         Plotly.relayout(target, update);
         
         // We create a new Box object and store it.
-        // target.id + trace_number : Box object
+        // [target.id][trace_number-1] : Box object
+        // let trace_number = target.data.length - 1; // Trace number is simply the index of current added trace i.e last index.
         boxObj = new Box(object_to_type[dragged.id], starting_point, axis_id_to_axis_name[target.id], dragged_array);
-        let trace_number = target.data.length - 1; // Trace number is simply the index of current added trace i.e last index.
-        trace_to_box_object[target.id + "-" + trace_number] = boxObj
+        trace_to_box_object[target.id].push(boxObj);
         });
     });
     // sync zoom among all plots.
@@ -451,7 +459,7 @@ $(document).ready(function() {
                     }
 
                     // Update the starting point of the box - both UI and object.
-                    trace_to_box_object[plot.id + "-" + trace_number].start_time = starting_point;
+                    trace_to_box_object[plot.id][trace_number-1].start_time = starting_point;
                     change_box_start_time(plot, trace_number, parseInt(starting_point));
                 }
                 catch (err) {
@@ -501,7 +509,8 @@ $(document).ready(function() {
         $('#parametersModal').modal('toggle');
         Plotly.deleteTraces(plot, selected_trace_number);
         delete_shapes(plot, (selected_trace_number-1)*2);
-        delete trace_to_box_object[plot.id + "-" + selected_trace_number];
+        delete_annotation(plot, selected_trace_number-1);
+        trace_to_box_object[plot.id].splice(selected_trace_number-1, 1);
     });
 
     $("#kernel-time-btn").click(function () {
@@ -540,7 +549,7 @@ $(document).ready(function() {
     $("#generate-sdl-btn").click(function(){
         const sdl_objects = [];
         for (var key in trace_to_box_object) {
-            sdl_objects.push(trace_to_box_object[key]);
+            sdl_objects.push(...trace_to_box_object[key]);
         }
         let configurations = save_configurations();
         send_data(sdl_objects, configurations);
@@ -696,6 +705,15 @@ function move_box_shape(plot, box_shape_number, starting_point) {
     Plotly.relayout(plot, update);
 }
 
+function move_annotation(plot, annotation_number, starting_point) {
+    let annotations = JSON.parse(JSON.stringify(plot.layout["annotations"]));
+    annotations[annotation_number]["x"] = starting_point+2.5;
+    var update = {
+        annotations: annotations
+        };
+    Plotly.relayout(plot, update);
+}
+
 function update_box_shape(plot, box_shape_number, starting_point, ending_point) {
     let shapes = JSON.parse(JSON.stringify(plot.layout["shapes"]));
     shapes[box_shape_number]["x0"] = starting_point;
@@ -790,8 +808,17 @@ function delete_shapes(plot, shape_number) {
     Plotly.relayout(plot, update);
 }
 
+function delete_annotation(plot, annotation_number) {
+    let annotations = JSON.parse(JSON.stringify(plot.layout["annotations"]));
+    annotations.splice(annotation_number, 1);
+    var update = {
+        annotations: annotations
+        };
+    Plotly.relayout(plot, update);
+}
+
 function load_modal_values(plot, trace_number) {
-    boxObj = trace_to_box_object[plot.id + "-" + trace_number];
+    boxObj = trace_to_box_object[plot.id][trace_number-1];
     if (boxObj.type == "rf") {
         $('#rf-parameters-group').show();
     }
@@ -815,7 +842,7 @@ function load_modal_values(plot, trace_number) {
 }
 
 function save_modal_values(plot, trace_number) {
-    boxObj = trace_to_box_object[plot.id + "-" + trace_number];
+    boxObj = trace_to_box_object[plot.id][trace_number-1];
     boxObj.name = $('#inputName').val();
 
     // If the start time has been changed in the modal, we move the box.
@@ -922,6 +949,7 @@ function change_box_start_time(plot, trace_number, starting_point) {
     // Here, shape_number + 1, will give the line shape number, as we are always creating line shape after box shape.
     move_box_shape(plot, shape_number, starting_point)
     move_vertical_line_shape(plot, shape_number+1, starting_point);
+    move_annotation(plot, trace_number-1, starting_point);
 }
 
 function change_box_array(plot, trace_number, starting_point, new_array) {
@@ -1030,7 +1058,7 @@ function toggle_plot_color(isDark) {
 function select_box(trace_number, plot) {
     let shape_number = (trace_number-1)*2;
     let shapes = JSON.parse(JSON.stringify(plot.layout["shapes"]));
-    boxObj = trace_to_box_object[plot.id + "-" + trace_number];
+    boxObj = trace_to_box_object[plot.id][trace_number-1];
 
     // If previously not selected, we select it. Otherwise, unselect it.
     if (!boxObj.isSelected) {
@@ -1072,22 +1100,23 @@ function add_block_with_selected_boxes() {
     let selected_boxes = [];
     let start_time = Number.MAX_VALUE;
     for (var key in trace_to_box_object) {
-        boxObj = trace_to_box_object[key];
-        if (boxObj.isSelected) {
-            boxObj.isDisabled = true;
-            selected_boxes.push(boxObj);
+        trace_to_box_object[key].forEach(function (boxObj, index) {
+            if (boxObj.isSelected) {
+                boxObj.isDisabled = true;
+                selected_boxes.push(boxObj);
 
-            // Storing the earliest start time- it will be our block start time.
-            start_time = Math.min(start_time, boxObj.start_time);
+                // Storing the earliest start time- it will be our block start time.
+                start_time = Math.min(start_time, boxObj.start_time);
 
-            // We unselect the box now by calling the function again and update it.
-            let arr = key.split("-");
-            let plotName = arr[0];
-            let plot = document.getElementById(plotName);
-            let trace_number = parseInt(arr[1]);
-            select_box(trace_number, plot);
-            update_box(true, trace_number, plot);
-        }
+                // We unselect the box now by calling the function again and update it.
+                // Here, index of the object in the array plus 1 will give us the trace number.
+                let trace_number = index + 1
+                let plot_id = axis_name_to_axis_id[boxObj.axis];
+                let plot = document.getElementById(plot_id);
+                select_box(trace_number, plot);
+                update_box(true, trace_number, plot);
+            }
+        });
     }
     blockObj = new Block("dummy_block_name", start_time, selected_boxes);
 }
@@ -1135,7 +1164,13 @@ class Box {
     }
 }
 
-const trace_to_box_object = {}
+const trace_to_box_object = {
+    'rf_chart': [],
+    'slice_chart': [],
+    'phase_chart': [],
+    'readout_chart': [],
+    'adc_chart': []
+}
 
 class Block {
     name = "";
