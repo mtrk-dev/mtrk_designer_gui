@@ -20,6 +20,9 @@ for (let i=0; i < 128; i++) {
 }
 const step_size = 10;
 
+const block_colors = ["#ff0065", "#cf7856", "#978eff", "#5343ff", "#ff7f50", "#77b6df", "#457480", "#ba029c", "#31e658"]
+var block_color_counter = 0;
+
 // Dummy arrays dictionary for array selection.
 const grad_100_2660_100 = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1, 0.0];
 const grad_220_10_220 = [0.0, 0.0455, 0.0909, 0.1364, 0.1818, 0.2273, 0.2727, 0.3182, 0.3636, 0.4091, 0.4545, 0.5, 0.5455, 0.5909, 0.6364, 0.6818, 0.7273, 0.7727, 0.8182, 0.8636, 0.9091, 0.9545, 1.0, 1.0, 0.9545, 0.9091, 0.8636, 0.8182, 0.7727, 0.7273, 0.6818, 0.6364, 0.5909, 0.5455, 0.5, 0.4545, 0.4091, 0.3636, 0.3182, 0.2727, 0.2273, 0.1818, 0.1364, 0.0909, 0.0455, 0.0];
@@ -272,7 +275,7 @@ var annotation_template = {
     font: {
       family: 'Courier New, monospace',
       size: 12,
-      color: '#ffffff'
+      color: '#777'
     },
   }
 
@@ -418,7 +421,7 @@ $(document).ready(function() {
     $(".dropzone").each(function () {
         var plot = this;
         plot.on("plotly_relayout", function(ed) {
-            if ("shapes" in ed || "xaxis.range[0]" in ed) {
+            if ("shapes" in ed || "xaxis.range[0]" in ed || "annotations" in ed || "plot_bgcolor" in ed) {
                 console.log("Not moved!");
             } else {
                 try {
@@ -1081,17 +1084,29 @@ function select_box(trace_number, plot) {
     Plotly.relayout(plot, update);
 }
 
-function update_box(toBlock, trace_number, plot) {
+function update_block_boxes(toBlock, trace_number, plot) {
     let shape_number = (trace_number-1)*2;
     let shapes = JSON.parse(JSON.stringify(plot.layout["shapes"]));
     let annotation_number = trace_number - 1;
     let annotations = JSON.parse(JSON.stringify(plot.layout["annotations"]));
 
     if (toBlock) {
-        annotations[annotation_number]["text"] = "Block1";
+        annotations[annotation_number]["text"] = "Block "+(block_color_counter+1);
+        let block_color = block_colors[block_color_counter];
+        shapes[shape_number]["line"] =  {
+            color: block_color+"FF",
+            width: 1,
+          };
+    } else {
+        annotations[annotation_number]["text"] = "";
+        shapes[shape_number]["line"] =  {
+            color: 'rgb(129, 133, 137)',
+            width: 1
+          };
     }
     var update = {
-        annotations: annotations
+        annotations: annotations,
+        shapes: shapes,
         };
     Plotly.relayout(plot, update);
 }
@@ -1114,11 +1129,13 @@ function add_block_with_selected_boxes() {
                 let plot_id = axis_name_to_axis_id[boxObj.axis];
                 let plot = document.getElementById(plot_id);
                 select_box(trace_number, plot);
-                update_box(true, trace_number, plot);
+                update_block_boxes(true, trace_number, plot);
             }
         });
     }
     blockObj = new Block("dummy_block_name", start_time, selected_boxes);
+    block_color_counter += 1;
+    if (block_color_counter >= block_color_counter.length) block_color_counter = 0;
 }
 
 function send_data(box_objects, configurations) {
