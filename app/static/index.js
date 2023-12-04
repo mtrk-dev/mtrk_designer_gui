@@ -462,8 +462,15 @@ $(document).ready(function() {
                     }
 
                     // Update the starting point of the box - both UI and object.
-                    trace_to_box_object[plot.id][trace_number-1].start_time = starting_point;
-                    change_box_start_time(plot, trace_number, parseInt(starting_point));
+                    boxObj = trace_to_box_object[plot.id][trace_number-1]
+                    let shift_value =  starting_point - boxObj.start_time;
+                    // If the box is part of a block, shift all the boxes in that block.
+                    if (boxObj.block != null) {
+                        move_block_boxes(boxObj.block, shift_value);
+                    } else {
+                        boxObj.start_time = starting_point;
+                        change_box_start_time(plot, trace_number, parseInt(starting_point));
+                    }
                 }
                 catch (err) {
                     console.log(err);
@@ -479,6 +486,11 @@ $(document).ready(function() {
         let plot = this;
         plot.on('plotly_click', function(data){
             selected_trace_number = data.points[0].curveNumber;
+
+            // return if the box is a part of a block.
+            boxObj = trace_to_box_object[plot.id][selected_trace_number-1];
+            if (boxObj.block != null) return;
+
             selected_plot = plot;
             if (controlIsPressed) {
                 select_box(selected_trace_number, selected_plot);
@@ -1117,7 +1129,7 @@ function add_block_with_selected_boxes() {
     for (var key in trace_to_box_object) {
         trace_to_box_object[key].forEach(function (boxObj, index) {
             if (boxObj.isSelected) {
-                boxObj.isDisabled = true;
+                boxObj.block = block_color_counter;
                 selected_boxes.push(boxObj);
 
                 // Storing the earliest start time- it will be our block start time.
@@ -1134,8 +1146,26 @@ function add_block_with_selected_boxes() {
         });
     }
     blockObj = new Block("dummy_block_name", start_time, selected_boxes);
+    block_number_to_block_object[block_color_counter] = blockObj;
     block_color_counter += 1;
-    if (block_color_counter >= block_color_counter.length) block_color_counter = 0;
+    if (block_color_counter >= block_colors.length) block_color_counter = 0;
+}
+
+function move_block_boxes(block_number, shift_value) {
+    for (var key in trace_to_box_object) {
+        trace_to_box_object[key].forEach(function (boxObj, index) {
+                if (boxObj.block == block_number) {
+                    let trace_number = index + 1
+                    let plot_id = axis_name_to_axis_id[boxObj.axis];
+                    let plot = document.getElementById(plot_id);
+                    let starting_point = boxObj.start_time + shift_value;
+                    change_box_start_time(plot, trace_number, starting_point);
+                    boxObj.start_time = starting_point;
+                }
+        });
+    }
+    blockObj = block_number_to_block_object[block_number];
+    blockObj.start_time += shift_value;
 }
 
 function send_data(box_objects, configurations) {
@@ -1167,7 +1197,7 @@ class Box {
     step_change = 0;
     loop_number = 0;
     isSelected = false;
-    isDisabled = false;
+    block = null;
     array_info = {
         name: "Default Array",
         array: []
@@ -1200,3 +1230,5 @@ class Block {
         this.boxes = box_array;
     }
 }
+
+const block_number_to_block_object = {}
