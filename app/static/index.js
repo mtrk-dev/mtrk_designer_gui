@@ -506,16 +506,6 @@ $(document).ready(function() {
         let elements = document.forms["parametersForm"].getElementsByTagName("input");
         elements = Array.from(elements);
         save_modal_values(plot, selected_trace_number);
-
-        // If the trace is already variable, we return.
-        if (plot.data[selected_trace_number]["mode"]=="markers") {
-            $('#parametersModal').modal('toggle');
-            return;
-        }
-        if ($("#variableRadio").is(':checked')) {
-            // Replot the trace and give it variable appearance.
-            make_trace_variable(plot, selected_trace_number);
-        }
         $('#parametersModal').modal('toggle');
     });
 
@@ -762,7 +752,7 @@ function revert_shape_change(plot, shape_number) {
     Plotly.relayout(plot, update);
 }
 
-function make_trace_variable(plot, trace_number) {
+function change_trace_type(plot, trace_number, toVariable) {
     let y = plot.data[trace_number]["y"];
     let x = plot.data[trace_number]["x"];
     let line = plot.data[trace_number]["line"];
@@ -774,39 +764,49 @@ function make_trace_variable(plot, trace_number) {
     // Draw a trace at the new location
     let y_data = [];
     let x_data = [];
-    for (let i=0; i<y.length; i++) {
-        let val = y[i];
-        x_data.push(x[i]);
-        x_data.push(x[i] + 0.0001);
-        x_data.push(x[i] + 0.0002);
-        x_data.push(x[i] + 0.0003);
-        y_data.push(val);
-        y_data.push(val*0.75);
-        y_data.push(val*0.5);
-        y_data.push(val*0.25);
-    }
     let data = {};
+
+    if (toVariable) {
+        for (let i=0; i<y.length; i++) {
+            let val = y[i];
+            x_data.push(x[i]);
+            x_data.push(x[i] + 0.0001);
+            x_data.push(x[i] + 0.0002);
+            x_data.push(x[i] + 0.0003);
+            y_data.push(val);
+            y_data.push(val*0.75);
+            y_data.push(val*0.5);
+            y_data.push(val*0.25);
+        }
+        data["type"] = "scatter";
+        data["mode"] = "markers";
+        data["marker"] = {
+            color: line.color,
+            size: 2,
+        };
+    } else {
+        for (let i=0; i<y.length; i+=4) {
+            x_data.push(x[i]);
+            y_data.push(y[i]);
+        }
+    }
+
     data["y"] = y_data;
     data["x"] = x_data;
     data["line"] = line;
     data["hovertemplate"] = hovertemplate;
-    data["type"] = "scatter";
-    data["mode"] = "markers";
-    data["marker"] = {
-        color: line.color,
-        size: 2,
-      },
     Plotly.addTraces(plot, data, trace_number);
-    change_shapes_variable(plot, (trace_number-1)*2);
+    change_shapes_variable(plot, (trace_number-1)*2, toVariable);
 }
 
-function change_shapes_variable(plot, shape_number) {
+function change_shapes_variable(plot, shape_number, toVariable) {
     let line_shape_number = shape_number + 1;
     let box_shape_number = shape_number;
     let shapes = JSON.parse(JSON.stringify(plot.layout["shapes"])); 
     // shapes[line_shape_number]["y0"] = -shape_height;
     // shapes[box_shape_number]["y0"] = -shape_height;
-    shapes[box_shape_number]["fillcolor"] = 'rgba(206 249 113, 0.1)';
+    if (toVariable) shapes[box_shape_number]["fillcolor"] = 'rgba(206 249 113, 0.1)';
+    else shapes[box_shape_number]["fillcolor"] = 'rgba(129, 133, 137, 0.2)';
     var update = {
         shapes: shapes
         };
@@ -859,6 +859,17 @@ function load_modal_values(plot, trace_number) {
 function save_modal_values(plot, trace_number) {
     boxObj = trace_to_box_object[plot.id][trace_number-1];
     boxObj.name = $('#inputName').val();
+
+    // If the selected trace type is different than what it already is we change trace - fixed/variable.
+    if ($("#variableRadio").is(':checked')) {
+        if (!boxObj.variable_amplitude) {
+            change_trace_type(plot, trace_number, true);
+        }
+    } else {
+        if (boxObj.variable_amplitude) {
+            change_trace_type(plot, trace_number, false);
+        }
+    }
 
     // If the start time has been changed in the modal, we move the box.
     let input_start_time = $('#inputStartTime').val();
