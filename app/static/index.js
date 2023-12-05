@@ -1156,6 +1156,10 @@ function add_block_with_selected_boxes() {
             }
         });
     }
+    if (!selected_boxes.length) {
+        alert("no boxes selected!")
+        return;
+    }
     blockObj = new Block("dummy_block_name", start_time, selected_boxes);
     block_number_to_block_object[block_color_counter] = blockObj;
     block_color_counter += 1;
