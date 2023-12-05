@@ -854,6 +854,7 @@ function load_modal_values(plot, trace_number) {
     }
     $('#inputStepChange').val(boxObj.step_change);
     $('#inputLoopNumber').val(boxObj.loop_number);
+    $('#array-selection-btn').text(boxObj.array_info.name);
 }
 
 function save_modal_values(plot, trace_number) {
@@ -891,7 +892,11 @@ function save_modal_values(plot, trace_number) {
     boxObj.step_change = $('#inputStepChange').val();
     boxObj.loop_number = $('#inputLoopNumber').val();
     boxObj.array_info.name = selected_box_array_name;
-    boxObj.array_info.array = array_name_to_array[selected_box_array_name];
+    if (selected_box_array_name == "Default Array") {
+        boxObj.array_info.array = axis_id_to_default_array[plot.id];
+    } else {
+        boxObj.array_info.array = array_name_to_array[selected_box_array_name];
+    }
 }
 
 function save_configurations() {

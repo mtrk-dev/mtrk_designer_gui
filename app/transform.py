@@ -190,10 +190,12 @@ def completeStepInformation(sequence_data, stepToModify, instructionOrLoop, box)
             
 def completeObjectInformation(sequence_data, objectName, box):
     typeInfo = sequence_data.objects[objectName].type
-    durationInfo = len(box["array"])
+    durationInfo = len(box["array_info"]["array"])
     match typeInfo:
         case "rf":
-            arrayInfo = typeInfo + "_default_array"
+            arrayInfo = box["array_info"]["name"]
+            if arrayInfo == "Default Array":
+                arrayInfo = typeInfo + "_default_array"
             if arrayInfo not in sequence_data.arrays:
                 addArray(sequence_data=sequence_data, arrayName=arrayInfo)
             completeArrayInformation(sequence_data=sequence_data, arrayName=arrayInfo, box=box)
@@ -208,7 +210,9 @@ def completeObjectInformation(sequence_data, objectName, box):
             sequence_data.objects[objectName]=RfExcitation( \
                 duration = durationInfo, array = arrayInfo)
         case "grad":
-            arrayInfo = typeInfo + "_default_array"
+            arrayInfo = box["array_info"]["name"]
+            if arrayInfo == "Default Array":
+                arrayInfo = typeInfo + "_default_array"
             if arrayInfo not in sequence_data.arrays:
                 addArray(sequence_data=sequence_data, arrayName=arrayInfo)
             completeArrayInformation(sequence_data=sequence_data, arrayName=arrayInfo, box=box)
@@ -240,7 +244,7 @@ def completeArrayInformation(sequence_data, arrayName, box):
     # TO DO: change the fixed encoding and type info.
     encodingInfo = "text"
     typeInfo = "float"
-    array = box['array']
+    array = box['array_info']['array']
     sizeInfo = len(array)
     dataInfo = array
     sequence_data.arrays[arrayName] = GradientTemplate(
