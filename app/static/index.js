@@ -51,10 +51,10 @@ const object_to_type = {
 
 const axis_id_to_color = {
     "rf_chart" : "blue",
-    "slice_chart" : "orange",
-    "phase_chart" : "green",
-    "readout_chart": "red",
-    "adc_chart": "violet"
+    "slice_chart" : "blue",
+    "phase_chart" : "blue",
+    "readout_chart": "blue",
+    "adc_chart": "blue"
 }
 
 const axis_id_to_axis_name = {
@@ -1137,6 +1137,14 @@ function update_block_boxes(toBlock, trace_number, plot) {
         shapes: shapes,
         };
     Plotly.relayout(plot, update);
+    update_trace(trace_number, plot);
+}
+
+function update_trace(trace_number, plot) {
+    let update = {
+        'line.color': block_colors[block_color_counter]
+    };
+    Plotly.restyle(plot, update, trace_number);
 }
 
 function add_block_with_selected_boxes() {
