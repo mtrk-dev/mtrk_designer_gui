@@ -925,8 +925,10 @@ function save_block_modal_values(plot, trace_number) {
 
     // TODO: If the start time has been changed in the modal, we move the block.
     let block_start_time = $('#blockStartTime').val();
-    // if (boxObj.start_time != input_start_time)
-    //     change_box_start_time(plot, trace_number, parseInt(input_start_time));
+    if (blockObj.start_time != block_start_time) {
+        let shift_value =  parseInt(block_start_time) - parseInt(blockObj.start_time);
+        move_block_boxes(boxObj.block, shift_value);
+    }
 
     blockObj.name = $('#inputBlockName').val();
     blockObj.start_time = block_start_time;
