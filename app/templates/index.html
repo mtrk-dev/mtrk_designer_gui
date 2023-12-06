@@ -320,6 +320,33 @@
                     </div>
                   </div>
                 </div>
+                <div class="modal fade" id="blockModal" tabindex="-1" aria-labelledby="blockModalLabel" aria-hidden="true">
+                  <div class="modal-dialog">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5 class="modal-title" id="blockModalLabel">Block Details</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                      </div>
+                      <div class="modal-body">
+                        <form id="blockForm" action="">
+                          <div class="form-group">
+                            <label for="inputBlockName">Name</label>
+                            <input type="text" class="form-control" id="inputBlockName" placeholder="Ex: Block 1">
+                          </div>
+                          <div class="form-group">
+                            <label for="blockStartTime">Start Time (ms)</label>
+                            <input type="number" class="form-control" id="blockStartTime" placeholder=0>
+                          </div>
+                        </form>
+                      </div>
+                      <div class="modal-footer">
+                        <button id="block_delete_object_btn" type="button" class="btn btn-danger">Delete Block</button>
+                        <button id="block_modal_close_btn" type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button id="block_save_changes_btn" type="button" class="btn btn-primary">Save changes</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
               <div class="col-lg-1">
                 <div id="modeSwitch" class="form-check form-switch">

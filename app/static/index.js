@@ -463,12 +463,12 @@ $(document).ready(function() {
 
                     // Update the starting point of the box - both UI and object.
                     boxObj = trace_to_box_object[plot.id][trace_number-1]
-                    let shift_value =  starting_point - boxObj.start_time;
+                    let shift_value =  parseInt(starting_point) - parseInt(boxObj.start_time);
                     // If the box is part of a block, shift all the boxes in that block.
                     if (boxObj.block != null) {
                         move_block_boxes(boxObj.block, shift_value);
                     } else {
-                        boxObj.start_time = starting_point;
+                        boxObj.start_time = parseInt(starting_point);
                         change_box_start_time(plot, trace_number, parseInt(starting_point));
                     }
                 }
@@ -486,12 +486,16 @@ $(document).ready(function() {
         let plot = this;
         plot.on('plotly_click', function(data){
             selected_trace_number = data.points[0].curveNumber;
-
-            // return if the box is a part of a block.
-            boxObj = trace_to_box_object[plot.id][selected_trace_number-1];
-            if (boxObj.block != null) return;
-
             selected_plot = plot;
+
+            // box is part of a block.
+            boxObj = trace_to_box_object[plot.id][selected_trace_number-1];
+            if (boxObj.block != null) {
+                load_block_modal_values(plot, selected_trace_number)
+                $('#blockModal').modal('toggle');
+                return;
+            }
+
             if (controlIsPressed) {
                 select_box(selected_trace_number, selected_plot);
                 return;
@@ -507,6 +511,12 @@ $(document).ready(function() {
         elements = Array.from(elements);
         save_modal_values(plot, selected_trace_number);
         $('#parametersModal').modal('toggle');
+    });
+
+    $("#block_save_changes_btn").on( "click", function(event) {
+        let plot = selected_plot;
+        save_block_modal_values(plot, selected_trace_number);
+        $('#blockModal').modal('toggle');
     });
 
     $("#delete_object_btn").on( "click", function(event) {
@@ -533,6 +543,9 @@ $(document).ready(function() {
 
     $("#modal_close_btn").on( "click", function() {
         $('#parametersModal').modal('toggle');
+    });
+    $("#block_modal_close_btn").on( "click", function() {
+        $('#blockModal').modal('toggle');
     });
     $("#modal_close_logo_btn").on( "click", function() {
         $('#parametersModal').modal('toggle');
@@ -857,6 +870,13 @@ function load_modal_values(plot, trace_number) {
     $('#array-selection-btn').text(boxObj.array_info.name);
 }
 
+function load_block_modal_values(plot, trace_number) {
+    boxObj = trace_to_box_object[plot.id][trace_number-1];
+    blockObj = block_number_to_block_object[boxObj.block];
+    $('#inputBlockName').val(blockObj.name);
+    $('#blockStartTime').val(blockObj.start_time);
+}
+
 function save_modal_values(plot, trace_number) {
     boxObj = trace_to_box_object[plot.id][trace_number-1];
     boxObj.name = $('#inputName').val();
@@ -897,6 +917,19 @@ function save_modal_values(plot, trace_number) {
     } else {
         boxObj.array_info.array = array_name_to_array[selected_box_array_name];
     }
+}
+
+function save_block_modal_values(plot, trace_number) {
+    boxObj = trace_to_box_object[plot.id][trace_number-1];
+    blockObj = block_number_to_block_object[boxObj.block];
+
+    // TODO: If the start time has been changed in the modal, we move the block.
+    let block_start_time = $('#blockStartTime').val();
+    // if (boxObj.start_time != input_start_time)
+    //     change_box_start_time(plot, trace_number, parseInt(input_start_time));
+
+    blockObj.name = $('#inputBlockName').val();
+    blockObj.start_time = block_start_time;
 }
 
 function save_configurations() {
@@ -1193,7 +1226,7 @@ function move_block_boxes(block_number, shift_value) {
         });
     }
     blockObj = block_number_to_block_object[block_number];
-    blockObj.start_time += shift_value;
+    blockObj.start_time = parseInt(blockObj.start_time) + shift_value;
 }
 
 function send_data(box_objects, configurations) {
