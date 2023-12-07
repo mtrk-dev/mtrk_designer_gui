@@ -480,6 +480,11 @@ $(document).ready(function() {
         });
     });
 
+    var popover = new bootstrap.Popover(document.querySelector('.shortcuts-popover'), {
+        container: 'body',
+        html: true,
+        content: $('[data-name="popover-content"]')
+      })
     var selected_trace_number = null;
     var selected_plot = null;
     $(".dropzone").each(function () {
