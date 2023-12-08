@@ -23,6 +23,8 @@ const step_size = 10;
 const block_colors = ["#ff0065", "#cf7856", "#978eff", "#5343ff", "#ff7f50", "#77b6df", "#457480", "#ba029c", "#31e658"]
 var block_color_counter = 0;
 
+var kernel_time = 100;
+
 // Dummy arrays dictionary for array selection.
 const grad_100_2660_100 = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1, 0.0];
 const grad_220_10_220 = [0.0, 0.0455, 0.0909, 0.1364, 0.1818, 0.2273, 0.2727, 0.3182, 0.3636, 0.4091, 0.4545, 0.5, 0.5455, 0.5909, 0.6364, 0.6818, 0.7273, 0.7727, 0.8182, 0.8636, 0.9091, 0.9545, 1.0, 1.0, 0.9545, 0.9091, 0.8636, 0.8182, 0.7727, 0.7273, 0.6818, 0.6364, 0.5909, 0.5455, 0.5, 0.4545, 0.4091, 0.3636, 0.3182, 0.2727, 0.2273, 0.1818, 0.1364, 0.0909, 0.0455, 0.0];
@@ -182,7 +184,7 @@ const layout = {
         },
         "gridcolor": "rgba(255,255,255,0.05)",
         "zerolinecolor": "rgba(255,255,255,0.1)",
-        range: [0, 100],
+        range: [0, kernel_time],
         fixedrange: true,
     },
     yaxis: {
@@ -356,10 +358,11 @@ $(document).ready(function() {
         
         let dragged_array = object_to_array[dragged.id];
         let starting_point = xInDataCoord;
-        // if ("shapes" in target.layout) {
-        //     // If a trace is added previously, retrieving its end time.
-        //     starting_point = target.layout.shapes.slice(-1)[0]["x1"]+10;
-        // }
+
+        if (starting_point < 0 || starting_point > kernel_time) {
+            alert("Invalid drop location");
+            return;
+        }
         let x_data = []
         for (let i=0; i<dragged_array.length; i+=1) {
             x_data.push(starting_point + (i/step_size));
@@ -421,7 +424,7 @@ $(document).ready(function() {
     $(".dropzone").each(function () {
         var plot = this;
         plot.on("plotly_relayout", function(ed) {
-            if ("shapes" in ed || "xaxis.range[0]" in ed || "annotations" in ed || "plot_bgcolor" in ed) {
+            if ("shapes" in ed || "xaxis.range[0]" in ed || "xaxis.range" in ed || "annotations" in ed || "plot_bgcolor" in ed || Object.keys(ed).length<1) {
                 console.log("Not moved!");
             } else {
                 try {
@@ -443,6 +446,12 @@ $(document).ready(function() {
                         if (key.endsWith(".y1")) {
                             var y1_val = ed[key];
                         }
+                    }
+
+                    if (starting_point < 0) {
+                        starting_point = 0;
+                    } else if (starting_point > kernel_time) {
+                        starting_point = kernel_time - 10;
                     }
 
                     // Not needed for now as we have disabled stretching/squeezing.
@@ -534,7 +543,7 @@ $(document).ready(function() {
     });
 
     $("#kernel-time-btn").click(function () {
-        var kernel_time = $("#kernelTimeInput").val();
+        kernel_time = $("#kernelTimeInput").val();
         $(".dropzone").each(function () {
             var plot = this;
             // Change the range and relayout plot.
@@ -928,7 +937,7 @@ function save_block_modal_values(plot, trace_number) {
     boxObj = trace_to_box_object[plot.id][trace_number-1];
     blockObj = block_number_to_block_object[boxObj.block];
 
-    // TODO: If the start time has been changed in the modal, we move the block.
+    // If the start time has been changed in the modal, we move the block.
     let block_start_time = $('#blockStartTime').val();
     if (blockObj.start_time != block_start_time) {
         let shift_value =  parseInt(block_start_time) - parseInt(blockObj.start_time);
