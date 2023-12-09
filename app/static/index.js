@@ -25,6 +25,15 @@ var block_color_counter = 0;
 
 var kernel_time = 100;
 
+var trace_to_box_object = {
+    'rf_chart': [],
+    'slice_chart': [],
+    'phase_chart': [],
+    'readout_chart': [],
+    'adc_chart': []
+}
+var block_number_to_block_object = {}
+
 // Dummy arrays dictionary for array selection.
 const grad_100_2660_100 = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1, 0.0];
 const grad_220_10_220 = [0.0, 0.0455, 0.0909, 0.1364, 0.1818, 0.2273, 0.2727, 0.3182, 0.3636, 0.4091, 0.4545, 0.5, 0.5455, 0.5909, 0.6364, 0.6818, 0.7273, 0.7727, 0.8182, 0.8636, 0.9091, 0.9545, 1.0, 1.0, 0.9545, 0.9091, 0.8636, 0.8182, 0.7727, 0.7273, 0.6818, 0.6364, 0.5909, 0.5455, 0.5, 0.4545, 0.4091, 0.3636, 0.3182, 0.2727, 0.2273, 0.1818, 0.1364, 0.0909, 0.0455, 0.0];
@@ -307,6 +316,11 @@ Plotly.newPlot('slice_chart', [plot_slice_data], slice_layout, config);
 Plotly.newPlot('phase_chart', [plot_phase_data], phase_layout, config);
 Plotly.newPlot('readout_chart', [plot_readout_data], readout_layout, config);
 Plotly.newPlot('adc_chart', [plot_adc_data], adc_layout, config);
+
+let plots_data = JSON.parse(localStorage.getItem("plots_data"));
+if (plots_data) {
+    reload_plots_data(plots_data);
+}
 
 // If the size of window is changed, we update the layout!
 const rf_chart = document.getElementById('rf_chart');
@@ -992,6 +1006,29 @@ function update_plot_config(shiftIsPressed) {
     });
 }
 
+function save_plots_data() {
+    let plots_data = {};
+    $(".dropzone").each(function () {
+        var plot = this;
+        plots_data[plot.id] = [plot.data, plot.layout];
+    });
+    localStorage.setItem("plots_data", JSON.stringify(plots_data));
+    localStorage.setItem("trace_to_box_object", JSON.stringify(trace_to_box_object));
+    localStorage.setItem("block_number_to_block_object", JSON.stringify(block_number_to_block_object));
+    localStorage.setItem("block_color_counter", JSON.stringify(block_color_counter));
+}
+
+function reload_plots_data (plots_data) {
+    $(".dropzone").each(function () {
+        var plot = this;
+        let plot_data = plots_data[plot.id];
+        Plotly.react(plot, plot_data[0], plot_data[1]);
+    });
+    trace_to_box_object = JSON.parse(localStorage.getItem("trace_to_box_object"));
+    block_number_to_block_object = JSON.parse(localStorage.getItem("block_number_to_block_object"));
+    block_color_counter = JSON.parse(localStorage.getItem("block_color_counter"));
+}
+
 function change_box_start_time(plot, trace_number, starting_point) {
     let x = plot.data[trace_number]["x"];
     let y = plot.data[trace_number]["y"];
@@ -1263,6 +1300,10 @@ function send_data(box_objects, configurations) {
     });
 }
 
+window.onbeforeunload = function (e) {
+    save_plots_data();
+};
+
 class Box {
     type = "";
     axis = "";
@@ -1288,14 +1329,6 @@ class Box {
     }
 }
 
-const trace_to_box_object = {
-    'rf_chart': [],
-    'slice_chart': [],
-    'phase_chart': [],
-    'readout_chart': [],
-    'adc_chart': []
-}
-
 class Block {
     name = "";
     start_time = 0;
@@ -1307,5 +1340,3 @@ class Block {
         this.boxes = box_array;
     }
 }
-
-const block_number_to_block_object = {}
