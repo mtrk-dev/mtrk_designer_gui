@@ -594,6 +594,11 @@ $(document).ready(function() {
 
     $("#reset-btn").click(function(){
         // Reset the plots and plot data to default
+        Plotly.purge(rf_chart);
+        Plotly.purge(slice_chart);
+        Plotly.purge(phase_chart);
+        Plotly.purge(readout_chart);
+        Plotly.purge(adc_chart);
         Plotly.newPlot('rf_chart', [plot_rf_data], rf_layout, config);
         Plotly.newPlot('slice_chart', [plot_slice_data], slice_layout, config);
         Plotly.newPlot('phase_chart', [plot_phase_data], phase_layout, config);
