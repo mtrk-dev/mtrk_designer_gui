@@ -592,6 +592,25 @@ $(document).ready(function() {
         }
     });
 
+    $("#reset-btn").click(function(){
+        // Reset the plots and plot data to default
+        Plotly.newPlot('rf_chart', [plot_rf_data], rf_layout, config);
+        Plotly.newPlot('slice_chart', [plot_slice_data], slice_layout, config);
+        Plotly.newPlot('phase_chart', [plot_phase_data], phase_layout, config);
+        Plotly.newPlot('readout_chart', [plot_readout_data], readout_layout, config);
+        Plotly.newPlot('adc_chart', [plot_adc_data], adc_layout, config);
+        trace_to_box_object = {
+            'rf_chart': [],
+            'slice_chart': [],
+            'phase_chart': [],
+            'readout_chart': [],
+            'adc_chart': []
+        }
+        block_number_to_block_object = {}
+        block_color_counter = 0;
+        location.reload();
+    });
+
     $("#generate-sdl-btn").click(function(){
         const sdl_objects = [];
         for (var key in trace_to_box_object) {

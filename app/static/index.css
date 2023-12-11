@@ -29,6 +29,12 @@
     background: transparent;
 }
 
+#reset-btn {
+    background: transparent;
+    font-size: 12px;
+    margin-top: 8%;
+}
+
 #loopsAccordion, #blocksAccordion {
     margin-top: 5%;
 }
