@@ -317,11 +317,6 @@ Plotly.newPlot('phase_chart', [plot_phase_data], phase_layout, config);
 Plotly.newPlot('readout_chart', [plot_readout_data], readout_layout, config);
 Plotly.newPlot('adc_chart', [plot_adc_data], adc_layout, config);
 
-let plots_data = JSON.parse(localStorage.getItem("plots_data"));
-if (plots_data) {
-    reload_plots_data(plots_data);
-}
-
 // If the size of window is changed, we update the layout!
 const rf_chart = document.getElementById('rf_chart');
 const slice_chart = document.getElementById('slice_chart');
@@ -339,6 +334,11 @@ window.onresize = function() {
     Plotly.relayout(readout_chart, update);
     Plotly.relayout(adc_chart, update);
 };
+
+let plots_data = JSON.parse(localStorage.getItem("plots_data"));
+if (plots_data) {
+    reload_plots_data(plots_data);
+}
 
 load_array_select();
 
@@ -1012,10 +1012,13 @@ function save_plots_data() {
         var plot = this;
         plots_data[plot.id] = [plot.data, plot.layout];
     });
+    let theme = "dark";
+    if (document.documentElement.getAttribute('data-bs-theme') == 'light') theme = "light";
     localStorage.setItem("plots_data", JSON.stringify(plots_data));
     localStorage.setItem("trace_to_box_object", JSON.stringify(trace_to_box_object));
     localStorage.setItem("block_number_to_block_object", JSON.stringify(block_number_to_block_object));
     localStorage.setItem("block_color_counter", JSON.stringify(block_color_counter));
+    localStorage.setItem("theme", theme);
 }
 
 function reload_plots_data (plots_data) {
@@ -1027,6 +1030,16 @@ function reload_plots_data (plots_data) {
     trace_to_box_object = JSON.parse(localStorage.getItem("trace_to_box_object"));
     block_number_to_block_object = JSON.parse(localStorage.getItem("block_number_to_block_object"));
     block_color_counter = JSON.parse(localStorage.getItem("block_color_counter"));
+    theme = localStorage.getItem("theme");
+    if (theme == "light") {
+        $('input[type="checkbox"]').attr("checked", false);
+        document.documentElement.setAttribute('data-bs-theme','light')
+        $(".btn").each(function(){
+            $(this).removeClass("btn-secondary");
+            $(this).addClass("btn-light");
+        });
+        toggle_plot_color(true);
+    }
 }
 
 function change_box_start_time(plot, trace_number, starting_point) {
