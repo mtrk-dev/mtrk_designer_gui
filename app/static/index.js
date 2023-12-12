@@ -438,7 +438,8 @@ $(document).ready(function() {
     $(".dropzone").each(function () {
         var plot = this;
         plot.on("plotly_relayout", function(ed) {
-            if ("shapes" in ed || "xaxis.range[0]" in ed || "xaxis.range" in ed || "annotations" in ed || "plot_bgcolor" in ed || Object.keys(ed).length<1) {
+            if ("shapes" in ed || "xaxis.range[0]" in ed || "xaxis.range" in ed || "annotations" in ed 
+                || "plot_bgcolor" in ed || "height" in ed || "width" in ed || Object.keys(ed).length<1) {
                 console.log("Not moved!");
             } else {
                 try {
@@ -481,7 +482,8 @@ $(document).ready(function() {
                     // If the y0 value is not zero after moving for a shape, we want to move the shape to zero.
                     if (Math.abs(y0_val) != 0) {
                         console.log("Lifted!");
-                        move_shape_to_zero_line(plot, shape_number);
+                        if ("shapes" in plot.layout)
+                            move_shape_to_zero_line(plot, shape_number);
                     }
 
                     // Update the starting point of the box - both UI and object.
