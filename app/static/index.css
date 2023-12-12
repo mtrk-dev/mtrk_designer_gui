@@ -29,9 +29,14 @@
     background: transparent;
 }
 
-#reset-btn {
+#reset-btn, #back-btn, #save-plot-btn {
     background: transparent;
-    font-size: 12px;
+    font-size: 14px;
+    margin-top: 8%;
+}
+
+#saved-msg {
+    padding: 5px;
     margin-top: 8%;
 }
 

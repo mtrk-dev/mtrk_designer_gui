@@ -699,6 +699,22 @@ $(document).ready(function() {
     $('#add-block-btn').click(function(){
         add_block_with_selected_boxes();
     });
+
+    $('#save-plot-btn').click(function(){
+        save_plots_data();
+        $('#saved-msg').removeClass("d-none");
+        $('#saved-msg').show();
+        setTimeout(function(){
+            $('#saved-msg').fadeOut();
+          },1000);
+    });
+
+    $('#back-btn').click(function(){
+        let data = JSON.parse(localStorage.getItem("data"));
+        if (data) {
+            reload_plots_data(data);
+        }
+    });
 });
 
 // Check whether shift button is pressed
