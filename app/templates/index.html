@@ -15,6 +15,14 @@
             <div class="row" style="margin-top: 0%">
               <div id="leftSidebar" class="col-lg-2">
                 <div class="row">
+                  <select id="block-select" class="form-select" aria-label="Block selection">
+                    <option value="Main" selected>Main</option>
+                  </select>
+                  <button type="button" class="btn btn-secondary" id="add-block-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
+                      <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"></path>
+                    </svg>
+                  </button>
                   <div class="input-group mb-3">
                     <span class="input-group-text">TR (ms)</span>
                     <!-- <span class="input-group-text">200</span> -->
@@ -115,7 +123,7 @@
                     </div>
                   </div>
                 </div>
-                <div class="row">
+                <!-- <div class="row">
                   <div class="accordion" id="blocksAccordion">
                     <div class="accordion-item">
                       <h2 class="accordion-header" id="blockHeading">
@@ -155,7 +163,7 @@
                       </div>
                     </div>
                   </div>
-                </div>
+                </div> -->
                 <div class="row">
                   <div class="accordion" id="loopsAccordion">
                     <div class="accordion-item">

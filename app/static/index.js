@@ -34,6 +34,9 @@ var trace_to_box_object = {
 }
 var block_number_to_block_object = {}
 
+// blocks will maintain plot data for all the blocks.
+var blocks = {}
+
 // Dummy arrays dictionary for array selection.
 const grad_100_2660_100 = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1, 0.0];
 const grad_220_10_220 = [0.0, 0.0455, 0.0909, 0.1364, 0.1818, 0.2273, 0.2727, 0.3182, 0.3636, 0.4091, 0.4545, 0.5, 0.5455, 0.5909, 0.6364, 0.6818, 0.7273, 0.7727, 0.8182, 0.8636, 0.9091, 0.9545, 1.0, 1.0, 0.9545, 0.9091, 0.8636, 0.8182, 0.7727, 0.7273, 0.6818, 0.6364, 0.5909, 0.5455, 0.5, 0.4545, 0.4091, 0.3636, 0.3182, 0.2727, 0.2273, 0.1818, 0.1364, 0.0909, 0.0455, 0.0];
@@ -232,7 +235,7 @@ phase_layout["xaxis"]["title"] = "";
 readout_layout["xaxis"]["title"] = "";
 
 rf_layout["title"] = {
-    text:'Block TR',
+    text:'Main',
     font: {
         family: 'Courier New, monospace',
         size: 18,
@@ -337,7 +340,7 @@ window.onresize = function() {
 
 let data = JSON.parse(localStorage.getItem("data"));
 if (data) {
-    reload_plots_data(data);
+    reload_data(data);
 }
 
 load_array_select();
@@ -698,10 +701,14 @@ $(document).ready(function() {
 
     $('#add-block-btn').click(function(){
         add_block_with_selected_boxes();
+        let block_text = "Block_" + block_color_counter;
+        let o = new Option(block_text, block_text);
+        $(o).html(block_text);
+        $("#block-select").append(o);
     });
 
     $('#save-plot-btn').click(function(){
-        save_plots_data();
+        save_data();
         $('#saved-msg').removeClass("d-none");
         $('#saved-msg').show();
         setTimeout(function(){
@@ -712,9 +719,17 @@ $(document).ready(function() {
     $('#back-btn').click(function(){
         let data = JSON.parse(localStorage.getItem("data"));
         if (data) {
-            reload_plots_data(data);
+            reload_data(data);
         }
     });
+
+    $('#block-select').change(function(){
+        // The title of the displayed block will become our previous block.
+        let prev_block = rf_chart.layout["title"]["text"];
+        save_block_data(prev_block);
+        let current_block = $(this).val();
+        load_block_data(current_block);
+    })
 });
 
 // Check whether shift button is pressed
@@ -1048,7 +1063,7 @@ function update_plot_config(shiftIsPressed) {
     });
 }
 
-function save_plots_data() {
+function save_data() {
     let plots_data = {};
     $(".dropzone").each(function () {
         var plot = this;
@@ -1066,7 +1081,7 @@ function save_plots_data() {
     localStorage.setItem("data", JSON.stringify(data));
 }
 
-function reload_plots_data (data) {
+function reload_data(data) {
     let plots_data = data["plots_data"];
     $(".dropzone").each(function () {
         var plot = this;
@@ -1295,6 +1310,18 @@ function update_trace(trace_number, plot) {
 function add_block_with_selected_boxes() {
     let selected_boxes = [];
     let start_time = Number.MAX_VALUE;
+
+    // Storing the base trace in the block by default.
+    let block_data = {}
+    $(".dropzone").each(function () {
+        var plot = this;
+        let layout_copy = JSON.parse(JSON.stringify(plot.layout));
+        layout_copy["shapes"] = [];
+        layout_copy["annotations"] = [];
+        block_data[plot.id] = [[plot.data[0]], layout_copy];
+    });
+
+
     for (var key in trace_to_box_object) {
         trace_to_box_object[key].forEach(function (boxObj, index) {
             if (boxObj.isSelected) {
@@ -1310,6 +1337,16 @@ function add_block_with_selected_boxes() {
                 let plot_id = axis_name_to_axis_id[boxObj.axis];
                 let plot = document.getElementById(plot_id);
                 select_box(trace_number, plot);
+
+                // Adding the data of block to the global blocks object.
+                let trace = JSON.parse(JSON.stringify(plot.data[trace_number]));
+                let shape_number = (trace_number-1)*2;
+                let shape = plot.layout["shapes"][shape_number];
+                let line_shape = plot.layout["shapes"][shape_number+1];
+                block_data[plot.id][0].push(trace);
+                block_data[plot.id][1]["shapes"].push(shape);
+                block_data[plot.id][1]["shapes"].push(line_shape);
+
                 update_block_boxes(true, trace_number, plot);
             }
         });
@@ -1318,6 +1355,7 @@ function add_block_with_selected_boxes() {
         alert("no boxes selected!")
         return;
     }
+    blocks["Block_"+(block_color_counter+1)] = block_data;
     blockObj = new Block("dummy_block_name", start_time, selected_boxes);
     block_number_to_block_object[block_color_counter] = blockObj;
     block_color_counter += 1;
@@ -1341,6 +1379,38 @@ function move_block_boxes(block_number, shift_value) {
     blockObj.start_time = parseInt(blockObj.start_time) + shift_value;
 }
 
+function save_block_data(block_name) {
+    let plot_data = {}
+    $(".dropzone").each(function () {
+        var plot = this;
+        plot_data[plot.id] = [plot.data, plot.layout];
+    });
+    blocks[block_name] = plot_data;
+}
+
+function load_block_data(block_name) {
+    let plots_data = {};
+    if (block_name in blocks) plots_data = blocks[block_name]
+    $(".dropzone").each(function () {
+        var plot = this;
+        let plot_data = plots_data[plot.id];
+        let layout = plot_data[1];
+        if (plot.id == "rf_chart") {
+            layout["title"] = {
+                text: block_name,
+                font: {
+                    family: 'Courier New, monospace',
+                    size: 18,
+                    color: 'rgba(255,255,255,0.9)'
+                },
+                yref: 'paper',
+                y: 1
+            };
+        }
+        Plotly.react(plot, plot_data[0], plot_data[1]);
+    });
+}
+
 function send_data(box_objects, configurations) {
     $.ajax({
         url: '/process',
@@ -1360,7 +1430,7 @@ function send_data(box_objects, configurations) {
 }
 
 window.onbeforeunload = function (e) {
-    save_plots_data();
+    save_data();
 };
 
 class Box {

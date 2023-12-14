@@ -44,7 +44,7 @@
     margin-top: 5%;
 }
 
-#add-loop-btn, #add-block-btn {
+#add-loop-btn {
     margin-top: 5%;
     margin-left: 70%;
 }
@@ -61,6 +61,18 @@
 #leftSidebar {
     height: 100vh;
     overflow-y: auto;
+}
+
+#block-select {
+    width: 90%;
+    margin-left: 5%;
+    margin-bottom: 1%;
+}
+
+#add-block-btn {
+    margin-bottom: 5%;
+    width: 20%;
+    margin-left: 75%;
 }
 
 .blurred {
