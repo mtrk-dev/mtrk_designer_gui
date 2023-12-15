@@ -25,13 +25,14 @@ var block_color_counter = 0;
 
 var kernel_time = 100;
 
-var trace_to_box_object = {
+plot_to_box_objects_template = {
     'rf_chart': [],
     'slice_chart': [],
     'phase_chart': [],
     'readout_chart': [],
     'adc_chart': []
 }
+var plot_to_box_objects = {}
 var block_number_to_block_object = {}
 
 // blocks will maintain plot data for all the blocks.
@@ -422,7 +423,11 @@ $(document).ready(function() {
         // [target.id][trace_number-1] : Box object
         // let trace_number = target.data.length - 1; // Trace number is simply the index of current added trace i.e last index.
         boxObj = new Box(object_to_type[dragged.id], starting_point, axis_id_to_axis_name[target.id], dragged_array);
-        trace_to_box_object[target.id].push(boxObj);
+        let block_name = $('#block-select').val();
+        if (!(block_name in plot_to_box_objects)) {
+            plot_to_box_objects[block_name] = JSON.parse(JSON.stringify(plot_to_box_objects_template));
+        }
+        plot_to_box_objects[block_name][target.id].push(boxObj);
         });
     });
     // sync zoom among all plots.
@@ -490,7 +495,8 @@ $(document).ready(function() {
                     }
 
                     // Update the starting point of the box - both UI and object.
-                    boxObj = trace_to_box_object[plot.id][trace_number-1]
+                    let block_name = $('#block-select').val();
+                    boxObj = plot_to_box_objects[block_name][plot.id][trace_number-1];
                     let shift_value =  parseInt(starting_point) - parseInt(boxObj.start_time);
                     // If the box is part of a block, shift all the boxes in that block.
                     if (boxObj.block != null) {
@@ -522,7 +528,8 @@ $(document).ready(function() {
             selected_plot = plot;
 
             // box is part of a block.
-            boxObj = trace_to_box_object[plot.id][selected_trace_number-1];
+            let block_name = $('#block-select').val();
+            boxObj = plot_to_box_objects[block_name][plot.id][selected_trace_number-1];
             if (boxObj.block != null) {
                 load_block_modal_values(plot, selected_trace_number)
                 $('#blockModal').modal('toggle');
@@ -558,7 +565,8 @@ $(document).ready(function() {
         Plotly.deleteTraces(plot, selected_trace_number);
         delete_shapes(plot, (selected_trace_number-1)*2);
         delete_annotation(plot, selected_trace_number-1);
-        trace_to_box_object[plot.id].splice(selected_trace_number-1, 1);
+        let block_name = $('#block-select').val();
+        plot_to_box_objects[block_name][plot.id].splice(selected_trace_number-1, 1);
     });
 
     $("#kernel-time-btn").click(function () {
@@ -609,13 +617,7 @@ $(document).ready(function() {
         Plotly.newPlot('phase_chart', [plot_phase_data], phase_layout, config);
         Plotly.newPlot('readout_chart', [plot_readout_data], readout_layout, config);
         Plotly.newPlot('adc_chart', [plot_adc_data], adc_layout, config);
-        trace_to_box_object = {
-            'rf_chart': [],
-            'slice_chart': [],
-            'phase_chart': [],
-            'readout_chart': [],
-            'adc_chart': []
-        }
+        plot_to_box_objects = {}
         block_number_to_block_object = {}
         block_color_counter = 0;
         location.reload();
@@ -623,6 +625,7 @@ $(document).ready(function() {
 
     $("#generate-sdl-btn").click(function(){
         const sdl_objects = [];
+        // TODO: update this for the multiple blocks design.
         for (var key in trace_to_box_object) {
             sdl_objects.push(...trace_to_box_object[key]);
         }
@@ -700,7 +703,8 @@ $(document).ready(function() {
     });
 
     $('#add-block-btn').click(function(){
-        add_block_with_selected_boxes();
+        if (!add_block_with_selected_boxes())
+            return;
         let block_text = "Block_" + block_color_counter;
         let o = new Option(block_text, block_text);
         $(o).html(block_text);
@@ -931,7 +935,8 @@ function delete_annotation(plot, annotation_number) {
 }
 
 function load_modal_values(plot, trace_number) {
-    boxObj = trace_to_box_object[plot.id][trace_number-1];
+    let block_name = $('#block-select').val();
+    boxObj = plot_to_box_objects[block_name][plot.id][trace_number-1];
     if (boxObj.type == "rf") {
         $('#rf-parameters-group').show();
     }
@@ -956,14 +961,16 @@ function load_modal_values(plot, trace_number) {
 }
 
 function load_block_modal_values(plot, trace_number) {
-    boxObj = trace_to_box_object[plot.id][trace_number-1];
+    let block_name = $('#block-select').val();
+    boxObj = plot_to_box_objects[block_name][plot.id][trace_number-1];
     blockObj = block_number_to_block_object[boxObj.block];
     $('#inputBlockName').val(blockObj.name);
     $('#blockStartTime').val(blockObj.start_time);
 }
 
 function save_modal_values(plot, trace_number) {
-    boxObj = trace_to_box_object[plot.id][trace_number-1];
+    let block_name = $('#block-select').val();
+    boxObj = plot_to_box_objects[block_name][plot.id][trace_number-1];
     boxObj.name = $('#inputName').val();
 
     // If the selected trace type is different than what it already is we change trace - fixed/variable.
@@ -1005,7 +1012,8 @@ function save_modal_values(plot, trace_number) {
 }
 
 function save_block_modal_values(plot, trace_number) {
-    boxObj = trace_to_box_object[plot.id][trace_number-1];
+    let block_name = $('#block-select').val();
+    boxObj = plot_to_box_objects[block_name][plot.id][trace_number-1];
     blockObj = block_number_to_block_object[boxObj.block];
 
     // If the start time has been changed in the modal, we move the block.
@@ -1073,7 +1081,7 @@ function save_data() {
     if (document.documentElement.getAttribute('data-bs-theme') == 'light') theme = "light";
     let data = {
         "plots_data": plots_data,
-        "trace_to_box_object": trace_to_box_object,
+        "plot_to_box_objects": plot_to_box_objects,
         "block_number_to_block_object": block_number_to_block_object,
         "block_color_counter": block_color_counter,
         "theme": theme
@@ -1088,7 +1096,7 @@ function reload_data(data) {
         let plot_data = plots_data[plot.id];
         Plotly.react(plot, plot_data[0], plot_data[1]);
     });
-    trace_to_box_object = data["trace_to_box_object"];
+    plot_to_box_objects = data["plot_to_box_objects"];
     block_number_to_block_object = data["block_number_to_block_object"];
     block_color_counter = data["block_color_counter"];
     theme = data["theme"];
@@ -1249,7 +1257,8 @@ function toggle_plot_color(isDark) {
 function select_box(trace_number, plot) {
     let shape_number = (trace_number-1)*2;
     let shapes = JSON.parse(JSON.stringify(plot.layout["shapes"]));
-    boxObj = trace_to_box_object[plot.id][trace_number-1];
+    let block_name = $('#block-select').val();
+    boxObj = plot_to_box_objects[block_name][plot.id][trace_number-1];
 
     // If previously not selected, we select it. Otherwise, unselect it.
     if (!boxObj.isSelected) {
@@ -1313,6 +1322,8 @@ function add_block_with_selected_boxes() {
 
     // Storing the base trace in the block by default.
     let block_data = {}
+    let block_name = "Block_"+(block_color_counter+1);
+    plot_to_box_objects[block_name] = JSON.parse(JSON.stringify(plot_to_box_objects_template));
     $(".dropzone").each(function () {
         var plot = this;
         let layout_copy = JSON.parse(JSON.stringify(plot.layout));
@@ -1321,9 +1332,9 @@ function add_block_with_selected_boxes() {
         block_data[plot.id] = [[plot.data[0]], layout_copy];
     });
 
-
-    for (var key in trace_to_box_object) {
-        trace_to_box_object[key].forEach(function (boxObj, index) {
+    let cur_block_name = $('#block-select').val();
+    for (var key in plot_to_box_objects[cur_block_name]) {
+        plot_to_box_objects[cur_block_name][key].forEach(function (boxObj, index) {
             if (boxObj.isSelected) {
                 boxObj.block = block_color_counter;
                 selected_boxes.push(boxObj);
@@ -1337,6 +1348,11 @@ function add_block_with_selected_boxes() {
                 let plot_id = axis_name_to_axis_id[boxObj.axis];
                 let plot = document.getElementById(plot_id);
                 select_box(trace_number, plot);
+
+                // We push the objects to the plot to box objects map
+                objCopy = JSON.parse(JSON.stringify(boxObj));
+                objCopy.isSelected = false;
+                plot_to_box_objects[block_name][plot.id].push(objCopy);
 
                 // Adding the data of block to the global blocks object.
                 let trace = JSON.parse(JSON.stringify(plot.data[trace_number]));
@@ -1353,18 +1369,20 @@ function add_block_with_selected_boxes() {
     }
     if (!selected_boxes.length) {
         alert("no boxes selected!")
-        return;
+        return false;
     }
-    blocks["Block_"+(block_color_counter+1)] = block_data;
-    blockObj = new Block("dummy_block_name", start_time, selected_boxes);
+    blocks[block_name] = block_data;
+    blockObj = new Block(block_name, start_time, selected_boxes);
     block_number_to_block_object[block_color_counter] = blockObj;
     block_color_counter += 1;
     if (block_color_counter >= block_colors.length) block_color_counter = 0;
+    return true;
 }
 
 function move_block_boxes(block_number, shift_value) {
-    for (var key in trace_to_box_object) {
-        trace_to_box_object[key].forEach(function (boxObj, index) {
+    let block_name = $('#block-select').val();
+    for (var key in plot_to_box_objects_template) {
+        plot_to_box_objects[block_name][key].forEach(function (boxObj, index) {
                 if (boxObj.block == block_number) {
                     let trace_number = index + 1
                     let plot_id = axis_name_to_axis_id[boxObj.axis];
