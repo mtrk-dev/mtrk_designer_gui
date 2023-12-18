@@ -1350,8 +1350,9 @@ function add_block_with_selected_boxes() {
                 select_box(trace_number, plot);
 
                 // We push the objects to the plot to box objects map
-                objCopy = JSON.parse(JSON.stringify(boxObj));
+                objCopy = Object.assign(Object.create(Object.getPrototypeOf(boxObj)), boxObj);
                 objCopy.isSelected = false;
+                objCopy.block = null;
                 plot_to_box_objects[block_name][plot.id].push(objCopy);
 
                 // Adding the data of block to the global blocks object.
@@ -1359,9 +1360,11 @@ function add_block_with_selected_boxes() {
                 let shape_number = (trace_number-1)*2;
                 let shape = plot.layout["shapes"][shape_number];
                 let line_shape = plot.layout["shapes"][shape_number+1];
-                block_data[plot.id][0].push(trace);
-                block_data[plot.id][1]["shapes"].push(shape);
-                block_data[plot.id][1]["shapes"].push(line_shape);
+                let annotation = plot.layout["annotations"][trace_number-1];
+                block_data[plot.id][0].push(JSON.parse(JSON.stringify(trace)));
+                block_data[plot.id][1]["shapes"].push(JSON.parse(JSON.stringify(shape)));
+                block_data[plot.id][1]["shapes"].push(JSON.parse(JSON.stringify(line_shape)));
+                block_data[plot.id][1]["annotations"].push(JSON.parse(JSON.stringify(annotation)));
 
                 update_block_boxes(true, trace_number, plot);
             }
