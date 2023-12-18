@@ -1390,7 +1390,7 @@ function move_block_boxes(block_number, shift_value) {
                     let trace_number = index + 1
                     let plot_id = axis_name_to_axis_id[boxObj.axis];
                     let plot = document.getElementById(plot_id);
-                    let starting_point = boxObj.start_time + shift_value;
+                    let starting_point = parseInt(boxObj.start_time) + shift_value;
                     change_box_start_time(plot, trace_number, starting_point);
                     boxObj.start_time = starting_point;
                 }
