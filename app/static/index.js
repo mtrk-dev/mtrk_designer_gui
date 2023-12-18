@@ -619,7 +619,9 @@ $(document).ready(function() {
         Plotly.newPlot('adc_chart', [plot_adc_data], adc_layout, config);
         plot_to_box_objects = {}
         block_number_to_block_object = {}
+        blocks = {}
         block_color_counter = 0;
+        $('#block-select').val('Main');
         location.reload();
     });
 
@@ -1072,30 +1074,31 @@ function update_plot_config(shiftIsPressed) {
 }
 
 function save_data() {
-    let plots_data = {};
-    $(".dropzone").each(function () {
-        var plot = this;
-        plots_data[plot.id] = [plot.data, plot.layout];
-    });
+    // save the current block first in the blocks
+    let block_name = $('#block-select').val();
+    save_block_data(block_name);
     let theme = "dark";
     if (document.documentElement.getAttribute('data-bs-theme') == 'light') theme = "light";
     let data = {
-        "plots_data": plots_data,
+        "plots_data": blocks,
         "plot_to_box_objects": plot_to_box_objects,
         "block_number_to_block_object": block_number_to_block_object,
         "block_color_counter": block_color_counter,
-        "theme": theme
+        "theme": theme,
+        "selected_block": block_name
     }
     localStorage.setItem("data", JSON.stringify(data));
 }
 
 function reload_data(data) {
-    let plots_data = data["plots_data"];
+    let block_name = data["selected_block"];
+    let plots_data = data["plots_data"][block_name];
     $(".dropzone").each(function () {
         var plot = this;
         let plot_data = plots_data[plot.id];
         Plotly.react(plot, plot_data[0], plot_data[1]);
     });
+    blocks = data["plots_data"];
     plot_to_box_objects = data["plot_to_box_objects"];
     block_number_to_block_object = data["block_number_to_block_object"];
     block_color_counter = data["block_color_counter"];
@@ -1109,6 +1112,8 @@ function reload_data(data) {
         });
         toggle_plot_color(true);
     }
+    load_block_select_options();
+    $('#block-select').val(block_name);
 }
 
 function change_box_start_time(plot, trace_number, starting_point) {
@@ -1430,6 +1435,16 @@ function load_block_data(block_name) {
         }
         Plotly.react(plot, plot_data[0], plot_data[1]);
     });
+}
+
+function load_block_select_options() {
+    $("#block-select").empty();
+    // Add the blocks in the block select.
+    for (var block_text in blocks) {
+        let o = new Option(block_text, block_text);
+        $(o).html(block_text);
+        $("#block-select").append(o);
+    }
 }
 
 function send_data(box_objects, configurations) {
