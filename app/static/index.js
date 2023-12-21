@@ -1288,7 +1288,7 @@ function select_box(trace_number, plot) {
     Plotly.relayout(plot, update);
 }
 
-function update_block_boxes(toBlock, trace_number, plot, start_time) {
+function update_block_box(toBlock, trace_number, plot, start_time) {
     let shape_number = (trace_number-1)*2;
     let shapes = JSON.parse(JSON.stringify(plot.layout["shapes"]));
     let annotation_number = trace_number - 1;
@@ -1344,6 +1344,7 @@ function add_block_with_selected_boxes() {
     });
 
     let cur_block_name = $('#block-select').val();
+    const seen_plots = new Set();
     for (var key in plot_to_box_objects[cur_block_name]) {
         plot_to_box_objects[cur_block_name][key].forEach(function (boxObj, index) {
             if (boxObj.isSelected) {
@@ -1377,7 +1378,18 @@ function add_block_with_selected_boxes() {
                 block_data[plot.id][1]["shapes"].push(JSON.parse(JSON.stringify(line_shape)));
                 block_data[plot.id][1]["annotations"].push(JSON.parse(JSON.stringify(annotation)));
 
-                update_block_boxes(true, trace_number, plot, start_time);
+                // If a box is already a block on this axis. We simply delete that box.
+                // Else we update it look like a block.
+                if (seen_plots.has(key)) {
+                    Plotly.deleteTraces(plot, trace_number);
+                    delete_shapes(plot, (trace_number-1)*2);
+                    delete_annotation(plot, trace_number-1);
+                    let block_name = $('#block-select').val();
+                    plot_to_box_objects[block_name][plot.id].splice(trace_number-1, 1);
+                } else {
+                    update_block_box(true, trace_number, plot, start_time);
+                    seen_plots.add(key);
+                }
             }
         });
     }
