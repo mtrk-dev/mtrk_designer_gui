@@ -1321,7 +1321,8 @@ function update_block_boxes(toBlock, trace_number, plot, start_time) {
 
 function update_trace(trace_number, plot) {
     let update = {
-        'line.color': block_colors[block_color_counter]
+        'line.color': block_colors[block_color_counter],
+        'hovertemplate': '<b>Block ' + (block_color_counter + 1) + '</b><extra></extra>'
     };
     Plotly.restyle(plot, update, trace_number);
 }
