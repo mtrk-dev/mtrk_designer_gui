@@ -571,6 +571,38 @@ $(document).ready(function() {
         plot_to_box_objects[block_name][plot.id].splice(selected_trace_number-1, 1);
     });
 
+    $("#block_delete_object_btn").on( "click", function(event) {
+        let plot = selected_plot;
+        let current_block_name = $('#block-select').val();
+        boxObj = plot_to_box_objects[current_block_name][plot.id][selected_trace_number-1];
+        let block_number = boxObj.block;
+
+        // deleting block from memory
+        // TODO: handle the case when block name has been changed by the user.
+        blockObj = block_number_to_block_object[block_number];
+        delete blocks[blockObj.name];
+        delete block_number_to_block_object[block_number];
+        delete blockObj;
+
+        // deleting block UI in current block window.
+        for (var key in plot_to_box_objects[current_block_name]) {
+            plot_to_box_objects[current_block_name][key].forEach(function (boxObj, index) {
+                if (boxObj.block == block_number) {
+                    let trace_number = index + 1;
+                    let plot_id = axis_name_to_axis_id[boxObj.axis];
+                    let plot = document.getElementById(plot_id);
+                    Plotly.deleteTraces(plot, trace_number);
+                    delete_shapes(plot, (trace_number-1)*2);
+                    delete_annotation(plot, trace_number-1);
+                    plot_to_box_objects[current_block_name][plot.id].splice(trace_number-1, 1);
+                }
+            });
+        }
+
+        load_block_select_options();
+        $('#blockModal').modal('toggle');
+    });
+
     $("#kernel-time-btn").click(function () {
         kernel_time = $("#kernelTimeInput").val();
         $(".dropzone").each(function () {
