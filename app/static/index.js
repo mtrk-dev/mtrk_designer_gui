@@ -449,6 +449,9 @@ $(document).ready(function() {
         plot.on("plotly_relayout", function(ed) {
             if ("shapes" in ed || "xaxis.range[0]" in ed || "xaxis.range" in ed || "annotations" in ed 
                 || "plot_bgcolor" in ed || "height" in ed || "width" in ed || Object.keys(ed).length<1) {
+                    if ("height" in ed || "shape" in ed) {
+                        recalculate_mouse_to_plot_conversion_variables();
+                    }
                 console.log("Not moved!");
             } else {
                 try {
