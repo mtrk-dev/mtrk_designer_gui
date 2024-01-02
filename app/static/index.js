@@ -1439,6 +1439,8 @@ function add_block_with_selected_boxes() {
     // For the cases where start_time is not set to the minimum of all the blocks- we move all the boxes
     move_block_boxes(block_color_counter, start_time);
 
+    add_dummy_block_boxes(seen_plots, start_time);
+
     block_color_counter += 1;
     if (block_color_counter >= block_colors.length) block_color_counter = 0;
     return true;
@@ -1460,6 +1462,63 @@ function move_block_boxes(block_number, starting_point) {
     }
     blockObj = block_number_to_block_object[block_number];
     blockObj.start_time = starting_point;
+}
+
+function add_dummy_block_boxes(seen_plots, starting_point) {
+    for (var key in plot_to_box_objects["Main"]) {
+        if(!seen_plots.has(key)) {
+            let target = document.getElementById(key);
+            let x_data = []
+            for (let i=0; i<block_array.length; i+=1) {
+                x_data.push(starting_point + (i/step_size));
+            }
+            let data = {};
+            data["y"] = block_array;
+            data["x"] = x_data;
+            data["line"] = {"color" : block_colors[block_color_counter]};
+            data["hovertemplate"] = '<b>Block ' + (block_color_counter + 1) + '</b><extra></extra>';
+            Plotly.addTraces(target, data);
+
+            var shape = JSON.parse(JSON.stringify(shape_template));
+            let block_color = block_colors[block_color_counter];
+            shape["x0"] = starting_point;
+            shape["x1"] = starting_point + (block_array.length/step_size);
+            shape["line"] =  {
+                color: block_color+"FF",
+                width: 1,
+            };
+            shape["fillcolor"] = block_color + "2F";
+            let added_shapes=[];
+            if ("shapes" in target.layout) { added_shapes = target.layout.shapes;}
+            added_shapes.push(shape);
+
+            var line_shape = JSON.parse(JSON.stringify(line_shape_template));
+            line_shape["x0"] = starting_point+anchor_time;
+            line_shape["x1"] = starting_point+anchor_time;
+            added_shapes.push(line_shape);
+
+            var annotation = JSON.parse(JSON.stringify(annotation_template));
+            annotation["x"] = starting_point+2.5;
+            annotation["text"] = "Block "+(block_color_counter+1);
+            let added_annotations=[];
+            if ("annotations" in target.layout) { added_annotations = target.layout.annotations;}
+            added_annotations.push(annotation);
+
+            var update = {
+                shapes: added_shapes,
+                annotations: added_annotations
+                };
+            Plotly.relayout(target, update);
+
+            boxObj = new Box(object_to_type[target.id], starting_point, axis_id_to_axis_name[target.id], block_array);
+            let block_name = $('#block-select').val();
+            if (!(block_name in plot_to_box_objects)) {
+                plot_to_box_objects[block_name] = JSON.parse(JSON.stringify(plot_to_box_objects_template));
+            }
+            boxObj.block = block_color_counter;
+            plot_to_box_objects[block_name][target.id].push(boxObj);
+        }
+    }
 }
 
 function save_block_data(block_name) {
