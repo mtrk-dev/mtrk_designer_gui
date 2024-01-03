@@ -180,7 +180,7 @@ const layout = {
     showlegend: false,
       margin: {
         t: 20,
-        b: 40
+        b: 20
       },
     title : {
         text: ""
@@ -194,7 +194,8 @@ const layout = {
         },
         tickformat: "digits",
         tickfont : {
-        color : 'rgba(255,255,255,0.9)'
+            family: 'Arial, sans-serif',
+            color : 'rgba(255,255,255,0.9)'
         },
         "gridcolor": "rgba(255,255,255,0.05)",
         "zerolinecolor": "rgba(255,255,255,0.1)",
@@ -209,7 +210,8 @@ const layout = {
             color: 'rgba(255,255,255,0.9)'
         },
         tickfont : {
-        color : 'rgba(255,255,255,0.9)'
+            family: 'Arial, sans-serif',
+            color : 'rgba(255,255,255,0.9)'
         },
         "gridcolor": "rgba(255,255,255,0.05)",
         "zerolinecolor": "rgba(255,255,255,0.1)",
