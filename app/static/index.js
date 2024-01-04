@@ -766,6 +766,7 @@ $(document).ready(function() {
         if (data) {
             reload_data(data);
         }
+        recalculate_mouse_to_plot_conversion_variables();
     });
 
     $('#block-select').change(function(){
