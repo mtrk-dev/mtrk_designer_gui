@@ -1554,6 +1554,14 @@ function load_block_data(block_name) {
         }
         Plotly.react(plot, plot_data[0], plot_data[1]);
     });
+    // For the cases when different theme was selected during block creation.
+    // This ensures the plot color matches the selected theme.
+    if (document.documentElement.getAttribute('data-bs-theme') == 'dark') {
+        toggle_plot_color(false);
+    }
+    else {
+        toggle_plot_color(true);
+    }
 }
 
 function load_block_select_options() {
