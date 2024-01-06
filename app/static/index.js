@@ -1103,6 +1103,22 @@ function save_configurations() {
     return configs
 }
 
+function load_configurations(configs) {
+    // File configs
+    $('#formatConfigInput').val(configs['file']['format']);
+    $('#versionConfigInput').val(configs['file']['version']);
+    $('#measurementConfigInput').val(configs['file']['measurement']);
+    $('#systemConfigInput').val(configs['file']['system']);
+    // Settings
+    $('#readoutSettingInput').val(configs['settings']['readout']);
+    // Info
+    $('#descriptionInfoInput').val(configs['info']['description']);
+    $('#slicesInfoInput').val(configs['info']['slices']);
+    $('#fovInfoInput').val(configs['info']['fov']);
+    $('#seqstringInfoInput').val(configs['info']['seqstring']);
+    $('#reconstructionInfoInput').val(configs['info']['reconstruction']);
+}
+
 function update_plot_config(shiftIsPressed) {
     // If shift is pressed, we restrict shape movement.
     if (config["edits"]["shapePosition"] == shiftIsPressed) return;
@@ -1119,13 +1135,15 @@ function save_data() {
     save_block_data(block_name);
     let theme = "dark";
     if (document.documentElement.getAttribute('data-bs-theme') == 'light') theme = "light";
+    let configurations = save_configurations();
     let data = {
         "plots_data": blocks,
         "plot_to_box_objects": plot_to_box_objects,
         "block_number_to_block_object": block_number_to_block_object,
         "block_color_counter": block_color_counter,
         "theme": theme,
-        "selected_block": block_name
+        "selected_block": block_name,
+        "configurations": configurations
     }
     localStorage.setItem("data", JSON.stringify(data));
 }
@@ -1133,6 +1151,8 @@ function save_data() {
 function reload_data(data) {
     let block_name = data["selected_block"];
     let plots_data = data["plots_data"][block_name];
+    let configurations = data["configurations"];
+    load_configurations(configurations);
     $(".dropzone").each(function () {
         var plot = this;
         let plot_data = plots_data[plot.id];
