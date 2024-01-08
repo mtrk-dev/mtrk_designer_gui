@@ -18,7 +18,7 @@
                   <select id="block-select" class="form-select" aria-label="Block selection">
                     <option value="Main" selected>Main</option>
                   </select>
-                  <button type="button" class="btn btn-secondary" id="add-block-btn">
+                  <button type="button" class="btn btn-secondary" id="add-block-btn" data-bs-toggle="tooltip" data-bs-placement="left" title="Add Block">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
                       <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"></path>
                     </svg>
@@ -212,7 +212,7 @@
                         <ul>
                           <li>Keep shift pressed and move cursor to move boxes and/or blocks.</li>
                           <li>Keep control pressed and click on boxes to select/unselect boxes.</li>
-                          <li>With boxes selected, if add blocks button in the blocks section is pressed, a block will be created.</li>
+                          <li>With boxes selected, if add block button is pressed, a block will be created.</li>
                         </ul>
                       </div>
                     </div>
@@ -380,14 +380,14 @@
                     <i class="fa fa-moon-o theme-icon"></i>
                   </label>
                 </div>
-                <a id="back-btn" class="btn btn-sm btn-secondary" role="button">
+                <a id="back-btn" class="btn btn-sm btn-secondary" role="button" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Back">
                   <i class="fa fa-arrow-left"></i>
                 </a>
-                <a id="reset-btn" class="btn btn-sm btn-secondary" role="button">
+                <a id="reset-btn" class="btn btn-sm btn-secondary" role="button" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Reset">
                   <i class="fa fa-rotate-right"></i>
                 </a>
                 <div>
-                  <a id="save-plot-btn" class="btn btn-sm btn-secondary" role="button">
+                  <a id="save-plot-btn" class="btn btn-sm btn-secondary" role="button" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Save Changes">
                     <i class="fa fa-save"></i>
                   </a>
                   <div id="saved-msg" class="alert alert-success d-none" role="alert">
