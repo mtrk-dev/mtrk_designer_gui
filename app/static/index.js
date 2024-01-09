@@ -665,6 +665,7 @@ $(document).ready(function() {
     });
 
     $("#generate-sdl-btn").click(function(){
+        download_file(file);
         const sdl_objects = [];
         // TODO: update this for the multiple blocks design.
         for (var key in trace_to_box_object) {
@@ -1592,6 +1593,23 @@ function load_block_select_options() {
         $(o).html(block_text);
         $("#block-select").append(o);
     }
+}
+
+const file = new File(['foo'], 'dummy_file.json', {
+    type: 'text/plain',
+});
+function download_file(file) {
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(file);
+    window.open(url, '_blank').focus();
+
+    link.href = url;
+    link.download = file.name;
+    document.body.appendChild(link);
+    link.click();
+
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
 }
 
 function send_data(box_objects, configurations) {
