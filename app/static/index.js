@@ -360,7 +360,7 @@ $(document).ready(function() {
             // show droppable zones.
             $(".nsewdrag").css({
                 "filter": "blur(3px)",
-                "fill": "#1d4455",
+                "fill": "#4c96dd4d",
             });
         });
         source.addEventListener("dragend", (event) => {
@@ -876,6 +876,38 @@ function move_annotation(plot, annotation_number, starting_point) {
     Plotly.relayout(plot, update);
 }
 
+function change_annotation_text(plot, annotation_number, text) {
+    let annotations = JSON.parse(JSON.stringify(plot.layout["annotations"]));
+    annotations[annotation_number]["text"] = text;
+    var update = {
+        annotations: annotations
+        };
+    Plotly.relayout(plot, update);
+}
+
+function update_hover_template(trace_number, plot, hover_text) {
+    let update = {
+        'hovertemplate': hover_text
+    };
+    Plotly.restyle(plot, update, trace_number);
+}
+
+function update_block_boxes_name(block_number, text) {
+    let block_name = $('#block-select').val();
+    for (var key in plot_to_box_objects_template) {
+        plot_to_box_objects[block_name][key].forEach(function (boxObj, index) {
+                if (boxObj.block == block_number) {
+                    let trace_number = index + 1;
+                    let plot_id = axis_name_to_axis_id[boxObj.axis];
+                    let plot = document.getElementById(plot_id);
+                    change_annotation_text(plot, trace_number-1, text);
+                    let hover_text = '<b>' + text + '</b><extra></extra>';
+                    update_hover_template(trace_number, plot, hover_text);
+                }
+        });
+    }
+}
+
 function update_box_shape(plot, box_shape_number, starting_point, ending_point) {
     let shapes = JSON.parse(JSON.stringify(plot.layout["shapes"]));
     shapes[box_shape_number]["x0"] = starting_point;
@@ -1072,14 +1104,31 @@ function save_block_modal_values(plot, trace_number) {
     blockObj = block_number_to_block_object[boxObj.block];
 
     // If the start time has been changed in the modal, we move the block.
-    let block_start_time = $('#blockStartTime').val();
+    let block_start_time = parseInt($('#blockStartTime').val());
     if (blockObj.start_time != block_start_time) {
         // let shift_value =  parseInt(block_start_time) - parseInt(blockObj.start_time);
         move_block_boxes(boxObj.block, parseInt(block_start_time));
     }
 
-    blockObj.name = $('#inputBlockName').val();
-    blockObj.start_time = block_start_time;
+    let input_block_name = $('#inputBlockName').val();
+    let cur_block_name = blockObj.name;
+    // If block name has been changed, we update the block name in our data structures.
+    if (input_block_name != cur_block_name) {
+        let plot_to_box_data = plot_to_box_objects[cur_block_name];
+        delete plot_to_box_objects[cur_block_name];
+        plot_to_box_objects[input_block_name] = plot_to_box_data;
+
+        let block_data = blocks[cur_block_name];
+        delete blocks[cur_block_name];
+        blocks[input_block_name] = block_data;
+
+        load_block_select_options();
+        $('#block-select').val(block_name);
+        update_block_boxes_name(boxObj.block, input_block_name);
+    }
+
+    blockObj.name = input_block_name;
+    blockObj.start_time = parseInt(block_start_time);
 }
 
 function save_configurations() {
