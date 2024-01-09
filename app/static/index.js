@@ -355,8 +355,20 @@ $(document).ready(function() {
     $(".drag").each(function () {
         var source = this;
         source.addEventListener("dragstart", (event) => {
-        // store the element that is being dragged.
-        dragged = event.target;
+            // store the element that is being dragged.
+            dragged = event.target;
+            // show droppable zones.
+            $(".nsewdrag").css({
+                "filter": "blur(3px)",
+                "fill": "#1d4455",
+            });
+        });
+        source.addEventListener("dragend", (event) => {
+            // hide droppable zones.
+            $(".nsewdrag").css({
+                "filter": "blur(0px)",
+                "fill": "transparent",
+            });
         });
     });
 
