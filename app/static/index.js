@@ -344,12 +344,12 @@ window.onresize = function() {
     Plotly.relayout(adc_chart, update);
 };
 
-// Add initial Main block data to blocks storage.
-save_block_data("Main");
-
 let data = JSON.parse(localStorage.getItem("data"));
 if (data) {
     reload_data(data);
+} else {
+    // Add initial Main block data to blocks storage.
+    save_data();
 }
 
 load_array_select();
