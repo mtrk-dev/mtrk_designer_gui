@@ -39,6 +39,8 @@ var block_number_to_block_object = {}
 // blocks will maintain plot data for all the blocks.
 var blocks = {}
 
+var reset_flag = 0;
+
 // Dummy arrays dictionary for array selection.
 const grad_100_2660_100 = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1, 0.0];
 const grad_220_10_220 = [0.0, 0.0455, 0.0909, 0.1364, 0.1818, 0.2273, 0.2727, 0.3182, 0.3636, 0.4091, 0.4545, 0.5, 0.5455, 0.5909, 0.6364, 0.6818, 0.7273, 0.7727, 0.8182, 0.8636, 0.9091, 0.9545, 1.0, 1.0, 0.9545, 0.9091, 0.8636, 0.8182, 0.7727, 0.7273, 0.6818, 0.6364, 0.5909, 0.5455, 0.5, 0.4545, 0.4091, 0.3636, 0.3182, 0.2727, 0.2273, 0.1818, 0.1364, 0.0909, 0.0455, 0.0];
@@ -341,6 +343,9 @@ window.onresize = function() {
     Plotly.relayout(readout_chart, update);
     Plotly.relayout(adc_chart, update);
 };
+
+// Add initial Main block data to blocks storage.
+save_block_data("Main");
 
 let data = JSON.parse(localStorage.getItem("data"));
 if (data) {
@@ -657,22 +662,8 @@ $(document).ready(function() {
     });
 
     $("#reset-btn").click(function(){
-        // Reset the plots and plot data to default
-        Plotly.purge(rf_chart);
-        Plotly.purge(slice_chart);
-        Plotly.purge(phase_chart);
-        Plotly.purge(readout_chart);
-        Plotly.purge(adc_chart);
-        Plotly.newPlot('rf_chart', [plot_rf_data], rf_layout, config);
-        Plotly.newPlot('slice_chart', [plot_slice_data], slice_layout, config);
-        Plotly.newPlot('phase_chart', [plot_phase_data], phase_layout, config);
-        Plotly.newPlot('readout_chart', [plot_readout_data], readout_layout, config);
-        Plotly.newPlot('adc_chart', [plot_adc_data], adc_layout, config);
-        plot_to_box_objects = {}
-        block_number_to_block_object = {}
-        blocks = {}
-        block_color_counter = 0;
-        $('#block-select').val('Main');
+        reset_flag = 1;
+        localStorage.removeItem("data");
         location.reload();
     });
 
@@ -1218,7 +1209,10 @@ function reload_data(data) {
     $(".dropzone").each(function () {
         var plot = this;
         let plot_data = plots_data[plot.id];
-        Plotly.react(plot, plot_data[0], plot_data[1]);
+        let layout = plot_data[1];
+        layout["height"] = window.innerHeight/5;
+        layout["width"] =  rf_chart.offsetWidth;
+        Plotly.react(plot, plot_data[0], layout);
     });
     blocks = data["plots_data"];
     plot_to_box_objects = data["plot_to_box_objects"];
@@ -1636,6 +1630,7 @@ function load_block_data(block_name) {
         }
         // changing the height to handle the case where plot dimension has been changed after block creation.
         layout["height"] = window.innerHeight/5;
+        layout["width"] =  rf_chart.offsetWidth;
         Plotly.react(plot, plot_data[0], plot_data[1]);
     });
     // For the cases when different theme was selected during block creation.
@@ -1694,7 +1689,9 @@ function send_data(box_objects, configurations) {
 }
 
 window.onbeforeunload = function (e) {
-    save_data();
+    if (reset_flag == 0) {
+        save_data();
+    }
 };
 
 class Box {
