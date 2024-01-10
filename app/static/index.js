@@ -1634,6 +1634,8 @@ function load_block_data(block_name) {
                 y: 1
             };
         }
+        // changing the height to handle the case where plot dimension has been changed after block creation.
+        layout["height"] = window.innerHeight/5;
         Plotly.react(plot, plot_data[0], plot_data[1]);
     });
     // For the cases when different theme was selected during block creation.
