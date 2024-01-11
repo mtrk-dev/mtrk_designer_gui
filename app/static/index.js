@@ -1592,7 +1592,7 @@ function add_dummy_block_boxes(seen_plots, starting_point, ending_point) {
                 };
             Plotly.relayout(target, update);
 
-            boxObj = new Box(object_to_type[target.id], starting_point, axis_id_to_axis_name[target.id], block_array);
+            boxObj = new Box(object_to_type[target.id], starting_point, axis_id_to_axis_name[target.id], y_data);
             let block_name = $('#block-select').val();
             if (!(block_name in plot_to_box_objects)) {
                 plot_to_box_objects[block_name] = JSON.parse(JSON.stringify(plot_to_box_objects_template));
