@@ -13,7 +13,7 @@ const dummy_data = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.0, 
 const rf_array = [3.13304e-005,3.14159,0.000275274,3.14159,0.000741752,3.14159,0.00140054,3.14159,0.00221321,3.14159,0.0031333,3.14159,0.00410657,3.14159,0.00507138,3.14159,0.00595912,3.14159,0.00669486,3.14159,0.00719792,3.14159,0.00738272,3.14159,0.00715954,3.14159,0.0064355,3.14159,0.00511552,3.14159,0.00310332,3.14159,0.00030259,3.14159,0.00338198,0,0.00804349,0,0.0137717,0,0.0206519,0,0.0287638,0,0.0381802,0,0.0489663,0,0.0611784,0,0.0748629,0,0.0900558,0,0.106781,0,0.125052,0,0.144867,0,0.166213,0,0.189063,0,0.213376,0,0.239097,0,0.266157,0,0.294475,0,0.323954,0,0.354486,0,0.385951,0,0.418216,0,0.451138,0,0.484565,0,0.518335,0,0.552279,0,0.586221,0,0.619982,0,0.653377,0,0.686221,0,0.718326,0,0.749508,0,0.779582,0,0.80837,0,0.835698,0,0.861398,0,0.885311,0,0.90729,0,0.927195,0,0.9449,0,0.960293,0,0.973275,0,0.983763,0,0.991689,0,0.997001,0,0.999666,0,0.999666,0,0.997001,0,0.991689,0,0.983763,0,0.973275,0,0.960293,0,0.9449,0,0.927195,0,0.90729,0,0.885311,0,0.861398,0,0.835698,0,0.80837,0,0.779582,0,0.749508,0,0.718326,0,0.686221,0,0.653377,0,0.619982,0,0.586221,0,0.552279,0,0.518335,0,0.484565,0,0.451138,0,0.418216,0,0.385951,0,0.354486,0,0.323954,0,0.294475,0,0.266157,0,0.239097,0,0.213376,0,0.189063,0,0.166213,0,0.144867,0,0.125052,0,0.106781,0,0.0900558,0,0.0748629,0,0.0611784,0,0.0489663,0,0.0381802,0,0.0287638,0,0.0206519,0,0.0137717,0,0.00804349,0,0.00338198,0,0.00030259,3.14159,0.00310332,3.14159,0.00511552,3.14159,0.0064355,3.14159,0.00715954,3.14159,0.00738272,3.14159,0.00719792,3.14159,0.00669486,3.14159,0.00595912,3.14159,0.00507138,3.14159,0.00410657,3.14159,0.0031333,3.14159,0.00221321,3.14159,0.00140054,3.14159,0.000741752,3.14159,0.000275274,3.14159,3.13304e-005,3.14159]
 const grad_slice_select_array = [0.0, 0.0455, 0.0909, 0.1364, 0.1818, 0.2273, 0.2727, 0.3182, 0.3636, 0.4091, 0.4545, 0.5, 0.5455, 0.5909, 0.6364, 0.6818, 0.7273, 0.7727, 0.8182, 0.8636, 0.9091, 0.9545, 1.0, 1.0, 0.9545, 0.9091, 0.8636, 0.8182, 0.7727, 0.7273, 0.6818, 0.6364, 0.5909, 0.5455, 0.5, 0.4545, 0.4091, 0.3636, 0.3182, 0.2727, 0.2273, 0.1818, 0.1364, 0.0909, 0.0455, 0.0]
 const adc_readout_array = [0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0]
-const block_array = [0, 0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.75, 0.7, 0.65, 0.6, 0.55, 0.5, 0.45, 0.4, 0.35, 0.3, 0.25, 0.2, 0.15, 0.1, 0.05, 0];
+// const block_array = [0, 0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.75, 0.7, 0.65, 0.6, 0.55, 0.5, 0.45, 0.4, 0.35, 0.3, 0.25, 0.2, 0.15, 0.1, 0.05, 0];
 
 const rf_pulse_array = [];
 for (let i=0; i < 128; i++) {
@@ -1402,6 +1402,7 @@ function select_box(trace_number, plot) {
     Plotly.relayout(plot, update);
 }
 
+// TODO - not being used now. Remove in the future.
 function update_block_box(toBlock, trace_number, plot, start_time) {
     let shape_number = (trace_number-1)*2;
     let shapes = JSON.parse(JSON.stringify(plot.layout["shapes"]));
@@ -1444,6 +1445,7 @@ function update_trace(trace_number, plot) {
 function add_block_with_selected_boxes() {
     let selected_boxes = [];
     let start_time = Number.MAX_VALUE;
+    let end_time = Number.MIN_VALUE;
 
     // Storing the base trace in the block by default.
     let block_data = {}
@@ -1464,9 +1466,6 @@ function add_block_with_selected_boxes() {
             if (boxObj.isSelected) {
                 boxObj.block = block_color_counter;
                 selected_boxes.push(boxObj);
-
-                // Storing the earliest start time- it will be our block start time.
-                start_time = Math.min(start_time, boxObj.start_time);
 
                 // We unselect the box now by calling the function again and update it.
                 // Here, index of the object in the array plus 1 will give us the trace number.
@@ -1492,18 +1491,21 @@ function add_block_with_selected_boxes() {
                 block_data[plot.id][1]["shapes"].push(JSON.parse(JSON.stringify(line_shape)));
                 block_data[plot.id][1]["annotations"].push(JSON.parse(JSON.stringify(annotation)));
 
+                // Calculating the block start time and end time.
+                start_time = Math.min(start_time, boxObj.start_time);
+                end_time = Math.max(end_time, boxObj.start_time + parseInt(trace["y"].length/step_size));
+
                 // If a box is already a block on this axis. We simply delete that box.
                 // Else we update it look like a block.
-                if (seen_plots.has(key)) {
-                    Plotly.deleteTraces(plot, trace_number);
-                    delete_shapes(plot, (trace_number-1)*2);
-                    delete_annotation(plot, trace_number-1);
-                    let block_name = $('#block-select').val();
-                    plot_to_box_objects[block_name][plot.id].splice(trace_number-1, 1);
-                } else {
-                    update_block_box(true, trace_number, plot, start_time);
-                    seen_plots.add(key);
-                }
+                // if (seen_plots.has(key)) {
+                Plotly.deleteTraces(plot, trace_number);
+                delete_shapes(plot, (trace_number-1)*2);
+                delete_annotation(plot, trace_number-1);
+                plot_to_box_objects[cur_block_name][plot.id].splice(trace_number-1, 1);
+                // } else {
+                //     update_block_box(true, trace_number, plot, start_time);
+                //     seen_plots.add(key);
+                // }
             }
         });
     }
@@ -1515,10 +1517,7 @@ function add_block_with_selected_boxes() {
     blockObj = new Block(block_name, start_time, selected_boxes);
     block_number_to_block_object[block_color_counter] = blockObj;
 
-    // For the cases where start_time is not set to the minimum of all the blocks- we move all the boxes
-    move_block_boxes(block_color_counter, start_time);
-
-    add_dummy_block_boxes(seen_plots, start_time);
+    add_dummy_block_boxes(seen_plots, start_time, end_time);
 
     block_color_counter += 1;
     if (block_color_counter >= block_colors.length) block_color_counter = 0;
@@ -1543,16 +1542,20 @@ function move_block_boxes(block_number, starting_point) {
     blockObj.start_time = starting_point;
 }
 
-function add_dummy_block_boxes(seen_plots, starting_point) {
+function add_dummy_block_boxes(seen_plots, starting_point, ending_point) {
     for (var key in plot_to_box_objects["Main"]) {
         if(!seen_plots.has(key)) {
             let target = document.getElementById(key);
-            let x_data = []
-            for (let i=0; i<block_array.length; i+=1) {
-                x_data.push(starting_point + (i/step_size));
+            let x_data = [];
+            let y_data = [];
+            starting_point = parseInt(starting_point);
+            ending_point = parseInt(ending_point);
+            for (let i=starting_point; i<=ending_point; i+=1) {
+                x_data.push(i);
+                y_data.push(0.8);
             }
             let data = {};
-            data["y"] = block_array;
+            data["y"] = y_data;
             data["x"] = x_data;
             data["line"] = {"color" : block_colors[block_color_counter]};
             data["hovertemplate"] = '<b>Block ' + (block_color_counter + 1) + '</b><extra></extra>';
@@ -1561,7 +1564,7 @@ function add_dummy_block_boxes(seen_plots, starting_point) {
             var shape = JSON.parse(JSON.stringify(shape_template));
             let block_color = block_colors[block_color_counter];
             shape["x0"] = starting_point;
-            shape["x1"] = starting_point + (block_array.length/step_size);
+            shape["x1"] = ending_point;
             shape["line"] =  {
                 color: block_color+"FF",
                 width: 1,
