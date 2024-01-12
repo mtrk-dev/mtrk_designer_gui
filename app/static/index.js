@@ -1672,7 +1672,7 @@ function load_loops_configuration() {
         let block = $(this).val();
         let loopInput = `<div class="row">
             <div class="col-8">
-            <a href="#" class="list-group-item list-group-item-action list-group-item-info">`
+            <a class="list-group-item list-group-item-action list-group-item-info block-loop-item">`
             +  block + `</a>
             </div>
             <div class="col-3">
@@ -1684,8 +1684,10 @@ function load_loops_configuration() {
         </div>`;
         $("#loopsInputGroup").append(loopInput);
     });
+    $(".block-loop-item").click(function() {
+        $(this).toggleClass("active");
+    });
 }
-
 
 const file = new File(['foo'], 'dummy_file.json', {
     type: 'text/plain',
