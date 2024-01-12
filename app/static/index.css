@@ -49,6 +49,14 @@
     margin-left: 70%;
 }
 
+#loops-btn {
+    width: 20%;
+    margin-left: 80%;
+    margin-bottom: 5%;
+    display: flex;
+    justify-content: center;
+}
+
 #add-new-array-item {
     text-align: center;
 }
@@ -110,7 +118,3 @@
     background-clip: content-box;
     background-color: #cdd3ddda;
 }
-
-/* rect.nsewdrag:hover {
-    fill: #180a2d !important;
-} */

@@ -34,6 +34,11 @@
                     <input id="" placeholder="200" class="form-control" aria-label="Kernel Time">
                     <button id="" type="button" class="btn btn-secondary">&#10003;</button>
                   </div>
+                  <div>
+                    <a id="loops-btn" class="btn btn-secondary" role="button" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Manage Loops">
+                      <i>&#8734;</i>
+                    </a>
+                  </div>
                 </div>
                 <div class="row objects-group">
                   <div class="btn-group-vertical" role="group" aria-label="Button group with nested dropdown">
@@ -164,7 +169,7 @@
                     </div>
                   </div>
                 </div> -->
-                <div class="row">
+                <!-- <div class="row">
                   <div class="accordion" id="loopsAccordion">
                     <div class="accordion-item">
                       <h2 class="accordion-header" id="headingTwo2">
@@ -204,7 +209,7 @@
                       </div>
                     </div>
                   </div>
-                </div>
+                </div> -->
                 <div class="row">
                   <div class="col">
                     <div hidden >
@@ -368,6 +373,25 @@
                         <button id="block_delete_object_btn" type="button" class="btn btn-danger">Delete Block</button>
                         <button id="block_modal_close_btn" type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                         <button id="block_save_changes_btn" type="button" class="btn btn-primary">Save changes</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="modal fade" id="loopsModal" tabindex="-1" aria-labelledby="loopsModalLabel" aria-hidden="true">
+                  <div class="modal-dialog">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5 class="modal-title" id="loopsModalLabel">Configure Loops</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                      </div>
+                      <div class="modal-body">
+                        <div>
+                          Modal Body
+                        </div>
+                      </div>
+                      <div class="modal-footer">
+                        <button id="loops_modal_close_btn" type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button id="loops_save_changes_btn" type="button" class="btn btn-primary">Save changes</button>
                       </div>
                     </div>
                   </div>

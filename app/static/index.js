@@ -773,6 +773,13 @@ $(document).ready(function() {
         recalculate_mouse_to_plot_conversion_variables();
     });
 
+    $('#loops-btn').click(function(){
+        $('#loopsModal').modal('toggle');
+    });
+    $('#loops_modal_close_btn').click(function(){
+        $('#loopsModal').modal('toggle');
+    });
+
     $('#block-select').change(function(){
         // The title of the displayed block will become our previous block.
         let prev_block = rf_chart.layout["title"]["text"];
