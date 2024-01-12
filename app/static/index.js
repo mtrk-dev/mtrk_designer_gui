@@ -774,6 +774,7 @@ $(document).ready(function() {
     });
 
     $('#loops-btn').click(function(){
+        load_loops_configuration();
         $('#loopsModal').modal('toggle');
     });
     $('#loops_modal_close_btn').click(function(){
@@ -1258,6 +1259,7 @@ function change_box_start_time(plot, trace_number, starting_point) {
     data["x"] = x_data;
     data["line"] = line;
     data["hovertemplate"] = hovertemplate;
+    data["mode"] = "lines";
 
     if (plot.data[trace_number]["mode"]=="markers") {
         data["type"] = "scatter";
@@ -1566,6 +1568,7 @@ function add_dummy_block_boxes(seen_plots, starting_point, ending_point) {
             data["x"] = x_data;
             data["line"] = {"color" : block_colors[block_color_counter]};
             data["hovertemplate"] = '<b>Block ' + (block_color_counter + 1) + '</b><extra></extra>';
+            data["mode"] = "lines";
             Plotly.addTraces(target, data);
 
             var shape = JSON.parse(JSON.stringify(shape_template));
@@ -1662,6 +1665,27 @@ function load_block_select_options() {
         $("#block-select").append(o);
     }
 }
+
+function load_loops_configuration() {
+    $("#loopsInputGroup").empty();
+    $("#block-select option").each(function() {
+        let block = $(this).val();
+        let loopInput = `<div class="row">
+            <div class="col-8">
+            <a href="#" class="list-group-item list-group-item-action list-group-item-info">`
+            +  block + `</a>
+            </div>
+            <div class="col-3">
+            <div class="input-group">
+                <span class="input-group-text">x</span>
+                <input type="number" class="form-control" placeholder=1>
+            </div>
+            </div>
+        </div>`;
+        $("#loopsInputGroup").append(loopInput);
+    });
+}
+
 
 const file = new File(['foo'], 'dummy_file.json', {
     type: 'text/plain',
