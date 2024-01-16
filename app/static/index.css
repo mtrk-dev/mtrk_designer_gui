@@ -16,6 +16,14 @@
     margin-bottom: 5%;
 }
 
+.input-number-blocks {
+    height: 100%;
+}
+
+.loop-config-row {
+    margin-bottom: 2px;
+}
+
 #generate-sdl-btn {
     margin-bottom: 1%;
     position: absolute;

@@ -1670,16 +1670,17 @@ function load_loops_configuration() {
     $("#loopsInputGroup").empty();
     $("#block-select option").each(function() {
         let block = $(this).val();
-        let loopInput = `<div class="row">
+        let loopInput =
+        `<div class="row loop-config-row">
             <div class="col-8">
-            <a class="list-group-item list-group-item-action list-group-item-info block-loop-item">`
-            +  block + `</a>
+                <a class="list-group-item list-group-item-action list-group-item-info block-loop-item">`
+                +  block + `</a>
             </div>
             <div class="col-3">
-            <div class="input-group">
-                <span class="input-group-text">x</span>
-                <input type="number" class="form-control" placeholder=1>
-            </div>
+                <div class="input-group input-number-blocks">
+                    <span class="input-group-text">x</span>
+                    <input type="number" class="form-control" placeholder=1>
+                </div>
             </div>
         </div>`;
         $("#loopsInputGroup").append(loopInput);
