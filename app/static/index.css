@@ -91,6 +91,10 @@
     margin-left: 75%;
 }
 
+#nestingCol {
+    display: block;
+}
+
 .blurred {
     filter: blur(5px);
 }

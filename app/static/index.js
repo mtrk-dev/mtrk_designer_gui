@@ -787,7 +787,19 @@ $(document).ready(function() {
         save_block_data(prev_block);
         let current_block = $(this).val();
         load_block_data(current_block);
-    })
+    });
+
+    $('#group_block_inputs_btn').click(function(){
+        let start = Number.MAX_VALUE;
+        let end = Number.MIN_VALUE;
+        $(".block-loop-item").each(function() {
+            if ($(this).hasClass("active")) {
+                $(this).toggleClass("active");
+                start = Math.min(start, $(this)[0].offsetTop);
+                end = Math.max(end, $(this)[0].offsetTop);
+            }
+        });
+    });
 });
 
 // Check whether shift button is pressed

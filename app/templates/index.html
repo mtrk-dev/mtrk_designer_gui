@@ -385,21 +385,18 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                       </div>
                       <div class="modal-body">
-                        <div id="loopsInputGroup" class="list-group">
-                          <!-- <div class="row">
-                            <div class="col-8">
-                              <a href="#" class="list-group-item list-group-item-action list-group-item-info">Block TR</a>
-                            </div>
-                            <div class="col-4">
-                              <div class="input-group">
-                                <span class="input-group-text">X</span>
-                                <input type="number" class="form-control" placeholder=1>
-                              </div>
-                            </div>
-                          </div> -->
+                        <div class="row">
+                          <div id="nestingCol" class="col-1">
+                            <!-- Space to add group lines -->
+                            <!-- <svg><line x1="10" y1="0" x2="10" y2="128" stroke="gray"/></svg> -->
+                          </div>
+                          <div id="loopsInputGroup" class="col list-group">
+                            <!-- space to add block list groups. -->
+                          </div>
                         </div>
                       </div>
                       <div class="modal-footer">
+                        <button id="group_block_inputs_btn" type="button" class="btn btn-success">Add Group</button>
                         <button id="loops_modal_close_btn" type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                         <button id="loops_save_changes_btn" type="button" class="btn btn-primary">Save changes</button>
                       </div>
