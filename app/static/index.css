@@ -95,6 +95,11 @@
     display: block;
 }
 
+.grouped-loop {
+    margin-left: 10%;
+    width: 90% !important;
+}
+
 .blurred {
     filter: blur(5px);
 }

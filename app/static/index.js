@@ -795,10 +795,14 @@ $(document).ready(function() {
         $(".block-loop-item").each(function() {
             if ($(this).hasClass("active")) {
                 $(this).toggleClass("active");
+                $(this).addClass("grouped-loop");
+                $(this).addClass("disabled");
                 start = Math.min(start, $(this)[0].offsetTop);
                 end = Math.max(end, $(this)[0].offsetTop);
             }
         });
+        let input = '<input type="number" class="form-control" placeholder=1>';
+        $("#nestingCol").append(input);
     });
 });
 
@@ -1684,7 +1688,7 @@ function load_loops_configuration() {
         let block = $(this).val();
         let loopInput =
         `<div class="row loop-config-row">
-            <div class="col-8">
+            <div class="col-7">
                 <a class="list-group-item list-group-item-action list-group-item-info block-loop-item">`
                 +  block + `</a>
             </div>
