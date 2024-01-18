@@ -882,9 +882,9 @@ function move_box_shape(plot, box_shape_number, starting_point) {
     Plotly.relayout(plot, update);
 }
 
-function move_annotation(plot, annotation_number, starting_point) {
+function move_annotation(plot, annotation_number, middle_point) {
     let annotations = JSON.parse(JSON.stringify(plot.layout["annotations"]));
-    annotations[annotation_number]["x"] = starting_point+2.5;
+    annotations[annotation_number]["x"] = middle_point;
     var update = {
         annotations: annotations
         };
@@ -1294,7 +1294,9 @@ function change_box_start_time(plot, trace_number, starting_point) {
     // Here, shape_number + 1, will give the line shape number, as we are always creating line shape after box shape.
     move_box_shape(plot, shape_number, starting_point)
     move_vertical_line_shape(plot, shape_number+1, starting_point);
-    move_annotation(plot, trace_number-1, starting_point);
+    let ending_point = starting_point + x_data.length;
+    let middle_point = (starting_point+ending_point)/2;
+    move_annotation(plot, trace_number-1, middle_point);
 }
 
 function change_box_array(plot, trace_number, starting_point, new_array) {
@@ -1606,8 +1608,9 @@ function add_dummy_block_boxes(seen_plots, starting_point, ending_point) {
             added_shapes.push(line_shape);
 
             var annotation = JSON.parse(JSON.stringify(annotation_template));
-            annotation["x"] = starting_point+2.5;
-            annotation["text"] = "Block "+(block_color_counter+1);
+            let middle_point = (starting_point+ending_point)/2;
+            annotation["x"] = middle_point;
+            annotation["text"] = "Block "+(block_color_counter+1) + " (x1)";
             let added_annotations=[];
             if ("annotations" in target.layout) { added_annotations = target.layout.annotations;}
             added_annotations.push(annotation);
@@ -1684,6 +1687,7 @@ function load_block_select_options() {
 
 function load_loops_configuration() {
     $("#loopsInputGroup").empty();
+    $("#nestingCol").empty();
     $("#block-select option").each(function() {
         let block = $(this).val();
         let loopInput =
