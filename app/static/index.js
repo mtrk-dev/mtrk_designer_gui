@@ -801,7 +801,7 @@ $(document).ready(function() {
                 end = Math.max(end, $(this)[0].offsetTop);
             }
         });
-        let input = '<input type="number" class="form-control" placeholder=1>';
+        let input = `<input type="number" class="group-loop-input" style="top: ${start}px" placeholder=1>`;
         $("#nestingCol").append(input);
     });
 });
@@ -1686,14 +1686,18 @@ function load_block_select_options() {
 }
 
 function load_loops_configuration() {
+    if (Object.keys(plot_to_box_objects).length === 0) return;
+    let nesting = generate_blocks_nesting_structure();
     $("#loopsInputGroup").empty();
     $("#nestingCol").empty();
-    $("#block-select option").each(function() {
-        let block = $(this).val();
+    nesting.forEach(function(val) {
+        let block = val[0];
+        let depth = val[1];
         let loopInput =
         `<div class="row loop-config-row">
             <div class="col-7">
-                <a class="list-group-item list-group-item-action list-group-item-info block-loop-item">`
+                <a class="list-group-item list-group-item-action list-group-item-info block-loop-item"
+                style="margin-left: ${depth*10}%; width: ${100-(depth*10)}%">`
                 +  block + `</a>
             </div>
             <div class="col-3">
@@ -1708,6 +1712,46 @@ function load_loops_configuration() {
     $(".block-loop-item").click(function() {
         $(this).toggleClass("active");
     });
+}
+
+function generate_blocks_nesting_structure() {
+    // Making a graph of block structure.
+    let structure = {};
+    $("#block-select option").each(function() {
+        let parent_block = $(this).val();
+        let seen_blocks = new Set();
+        for (var key in plot_to_box_objects_template) {
+            // Can remove the key loop as if we have dummy boxes on all the axes.
+            plot_to_box_objects[parent_block][key].forEach(function (boxObj, index) {
+                if (boxObj.block !== null) {
+                    if (!seen_blocks.has(boxObj.block)) {
+                        blockObj = block_number_to_block_object[boxObj.block];
+                        let child_block = blockObj.name;
+                        if (parent_block in structure) {
+                            structure[parent_block].push(child_block);
+                        } else {
+                            structure[parent_block] = [child_block];
+                        }
+                        seen_blocks.add(boxObj.block);
+                    }
+                }
+            });
+        }
+    });
+
+    // Doing DFS on the graph to get the nesting.
+    let nesting = [];
+    function dfs(root, level) {
+        nesting.push([root,level]);
+        if (!(root in structure)) {
+            return;
+        }
+        structure[root].forEach(function (child) {
+            dfs(child, level+1);
+        });
+    }
+    dfs("Main", 0);
+    return nesting;
 }
 
 const file = new File(['foo'], 'dummy_file.json', {
