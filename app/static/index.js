@@ -21,7 +21,7 @@ for (let i=0; i < 128; i++) {
 }
 const step_size = 10;
 
-const block_colors = ["#ff0065", "#cf7856", "#978eff", "#5343ff", "#ff7f50", "#77b6df", "#457480", "#ba029c", "#31e658"]
+const block_colors = ["#ff0065", "#cf7856", "#978eff", "#5343ff", "#ff7f50", "#77b6df", "#457480", "#ba029c", "#31e658", "#9be5cc", "#facade", "#fab1ed", "#deface", "#c0ffee", "#beaded", "#a3b899", "#ffaa51", "#216c5c"]
 var block_color_counter = 0;
 
 var kernel_time = 100;
@@ -294,7 +294,7 @@ var annotation_template = {
     showarrow: false,
     font: {
       family: 'Courier New, monospace',
-      size: 12,
+      size: 11,
       color: '#777'
     },
   }
@@ -1695,12 +1695,12 @@ function load_loops_configuration() {
         let depth = val[1];
         let loopInput =
         `<div class="row loop-config-row">
-            <div class="col-7">
+            <div class="col-8">
                 <a class="list-group-item list-group-item-action list-group-item-info block-loop-item"
-                style="margin-left: ${depth*10}%; width: ${100-(depth*10)}%">`
+                style="margin-left: ${depth*15}%; width: ${100-(depth*15)}%">`
                 +  block + `</a>
             </div>
-            <div class="col-3">
+            <div class="col-2">
                 <div class="input-group input-number-blocks">
                     <span class="input-group-text">x</span>
                     <input type="number" class="form-control" placeholder=1>

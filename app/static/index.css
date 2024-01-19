@@ -21,7 +21,7 @@
 }
 
 .loop-config-row {
-    margin-bottom: 2px;
+    margin-bottom: 2%;
 }
 
 #generate-sdl-btn {
@@ -118,6 +118,13 @@
     border-radius: var(--bs-border-radius);
     transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
 }
+
+.block-loop-item::before {
+    content: "-";
+    position: absolute;
+    color: #6b6363;
+    left: -8%;
+  }
 
 .blurred {
     filter: blur(5px);
