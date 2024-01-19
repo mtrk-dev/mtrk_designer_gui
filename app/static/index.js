@@ -795,14 +795,29 @@ $(document).ready(function() {
         $(".block-loop-item").each(function() {
             if ($(this).hasClass("active")) {
                 $(this).toggleClass("active");
-                $(this).addClass("grouped-loop");
-                $(this).addClass("disabled");
+                if ($(this)[0].offsetTop < start) {
+                    $(this).attr('id', 'blockLoopItem'+parseInt($(this)[0].offsetTop));
+                }
                 start = Math.min(start, $(this)[0].offsetTop);
                 end = Math.max(end, $(this)[0].offsetTop);
             }
         });
-        let input = `<input type="number" class="group-loop-input" style="top: ${start}px" placeholder=1>`;
+        // Add input group to take the number of loops for the group.
+        let input = `<div class="input-group" style="top: ${start}px; width: 10%; position: absolute">
+            <span class="input-group-text">x</span>
+            <input type="number" class="form-control" placeholder=1>
+        </div>`;
         $("#nestingCol").append(input);
+
+        // Add a vertical line before the first element.
+        let styleElem = document.head.appendChild(document.createElement("style"));
+        styleElem.innerHTML = `#blockLoopItem${parseInt(start)}:before{
+            content: " ";
+            position: absolute;
+            border-left: solid 1px #4d4545;
+            height: ${end-start+20}px;
+            left: -8%;
+            }`;
     });
 });
 

@@ -95,12 +95,7 @@
     display: block;
 }
 
-.grouped-loop {
-    margin-left: 15%;
-    width: 85% !important;
-}
-
-.group-loop-input {
+/* .group-loop-input {
     position: absolute;
     left: 20px;
     width: 10%;
@@ -117,14 +112,14 @@
     border: var(--bs-border-width) solid var(--bs-border-color);
     border-radius: var(--bs-border-radius);
     transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
-}
+} */
 
-.block-loop-item::before {
+/* .block-loop-item::before {
     content: "-";
     position: absolute;
     color: #6b6363;
     left: -8%;
-  }
+} */
 
 .blurred {
     filter: blur(5px);
