@@ -39,6 +39,9 @@ var block_number_to_block_object = {}
 // blocks will maintain plot data for all the blocks.
 var blocks = {}
 
+// To maintain the number of loops on each block.
+var block_to_loops = {}
+
 var reset_flag = 0;
 
 // Dummy arrays dictionary for array selection.
@@ -600,10 +603,10 @@ $(document).ready(function() {
         let block_number = boxObj.block;
 
         // deleting block from memory
-        // TODO: handle the case when block name has been changed by the user.
         blockObj = block_number_to_block_object[block_number];
         delete blocks[blockObj.name];
         delete block_number_to_block_object[block_number];
+        delete block_to_loops[blockObj.name];
         delete blockObj;
 
         // deleting block UI in current block window.
@@ -837,6 +840,15 @@ $(document).ready(function() {
             }`;
             this.parentNode.remove();
         });
+    });
+
+    $("#loops_save_changes_btn").click(function() {
+        $.each($('.loops-input'), function(index, input) {
+            let block = input.dataset.block;
+            let loops = input.value;
+            block_to_loops[block] = loops;
+        });
+        $('#loopsModal').modal('toggle');
     });
 });
 
@@ -1171,6 +1183,10 @@ function save_block_modal_values(plot, trace_number) {
         delete blocks[cur_block_name];
         blocks[input_block_name] = block_data;
 
+        let block_loops = block_to_loops[cur_block_name];
+        delete block_to_loops[cur_block_name];
+        block_to_loops[input_block_name] = block_loops;
+
         load_block_select_options();
         $('#block-select').val(block_name);
         update_block_boxes_name(boxObj.block, input_block_name);
@@ -1254,7 +1270,8 @@ function save_data() {
         "block_color_counter": block_color_counter,
         "theme": theme,
         "selected_block": block_name,
-        "configurations": configurations
+        "configurations": configurations,
+        "block_to_loops": block_to_loops
     }
     localStorage.setItem("data", JSON.stringify(data));
 }
@@ -1276,6 +1293,7 @@ function reload_data(data) {
     plot_to_box_objects = data["plot_to_box_objects"];
     block_number_to_block_object = data["block_number_to_block_object"];
     block_color_counter = data["block_color_counter"];
+    block_to_loops = data["block_to_loops"];
     theme = data["theme"];
     if (theme == "light") {
         $('input[type="checkbox"]').attr("checked", false);
@@ -1724,6 +1742,7 @@ function load_loops_configuration() {
     let nesting = generate_blocks_nesting_structure();
     $("#loopsInputGroup").empty();
     $("#nestingCol").empty();
+
     nesting.forEach(function(val) {
         let block = val[0];
         let depth = val[1];
@@ -1737,15 +1756,18 @@ function load_loops_configuration() {
             <div class="col-3">
                 <div class="input-group input-number-blocks">
                     <span class="input-group-text">x</span>
-                    <input type="number" class="form-control" placeholder=1>
+                    <input type="number" class="form-control loops-input" data-block=${block} value=1 placeholder=1>
                 </div>
             </div>
         </div>`;
         $("#loopsInputGroup").append(loopInput);
     });
+
     $(".block-loop-item").click(function() {
         $(this).toggleClass("active");
     });
+
+    reload_loops_count();
 }
 
 function generate_blocks_nesting_structure() {
@@ -1786,6 +1808,16 @@ function generate_blocks_nesting_structure() {
     }
     dfs("Main", 0);
     return nesting;
+}
+
+function reload_loops_count() {
+    $.each($('.loops-input'), function(index, input) {
+        let block = input.dataset.block;
+        if (block in block_to_loops) {
+            let loops = block_to_loops[block]
+            input.value = loops;
+        }
+    });
 }
 
 const file = new File(['foo'], 'dummy_file.json', {
