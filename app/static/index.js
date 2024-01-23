@@ -803,21 +803,40 @@ $(document).ready(function() {
             }
         });
         // Add input group to take the number of loops for the group.
-        let input = `<div class="input-group" style="top: ${start}px; width: 10%; position: absolute">
-            <span class="input-group-text">x</span>
-            <input type="number" class="form-control" placeholder=1>
-        </div>`;
+        let input = `
+            <div style="top: ${start}px; width: 12%; position: absolute">
+                <div class="input-group">
+                    <span class="input-group-text">x</span>
+                    <input type="number" class="form-control" placeholder=1>
+                </div>
+                <a class="btn btn-sm delete-group-btn" role="button"
+                    style="background: none; border: none; padding-top: 0px; margin-top: -10%"
+                    data-bs-toggle="tooltip" data-bs-placement="bottom" title="Delete Group">
+                        <i class="fa fa-trash-o"></i>
+                </a>
+            </div>
+        `;
         $("#nestingCol").append(input);
 
         // Add a vertical line before the first element.
         let styleElem = document.head.appendChild(document.createElement("style"));
         styleElem.innerHTML = `#blockLoopItem${parseInt(start)}:before{
             content: " ";
+            display: block;
             position: absolute;
             border-left: solid 1px #4d4545;
             height: ${end-start+20}px;
             left: -8%;
+        }`;
+
+        $(".delete-group-btn").click(function() {
+            let top = parseInt(this.parentNode.style.top);
+            let styleElem = document.head.appendChild(document.createElement("style"));
+            styleElem.innerHTML = `#blockLoopItem${parseInt(top)}:before{
+                display: none;
             }`;
+            this.parentNode.remove();
+        });
     });
 });
 
@@ -1715,7 +1734,7 @@ function load_loops_configuration() {
                 style="margin-left: ${depth*15}%; width: ${100-(depth*15)}%">`
                 +  block + `</a>
             </div>
-            <div class="col-2">
+            <div class="col-3">
                 <div class="input-group input-number-blocks">
                     <span class="input-group-text">x</span>
                     <input type="number" class="form-control" placeholder=1>
