@@ -848,6 +848,7 @@ $(document).ready(function() {
             let loops = input.value;
             block_to_loops[block] = loops;
         });
+        update_annotations_loops_count();
         $('#loopsModal').modal('toggle');
     });
 });
@@ -939,7 +940,7 @@ function move_annotation(plot, annotation_number, middle_point) {
 
 function change_annotation_text(plot, annotation_number, text) {
     let annotations = JSON.parse(JSON.stringify(plot.layout["annotations"]));
-    annotations[annotation_number]["text"] = text;
+    annotations[annotation_number]["text"] = text + " (x1)";
     var update = {
         annotations: annotations
         };
@@ -1662,7 +1663,7 @@ function add_dummy_block_boxes(seen_plots, starting_point, ending_point) {
             var annotation = JSON.parse(JSON.stringify(annotation_template));
             let middle_point = (starting_point+ending_point)/2;
             annotation["x"] = middle_point;
-            annotation["text"] = "Block "+(block_color_counter+1) + " (x1)";
+            annotation["text"] = "Block_"+(block_color_counter+1) + " (x1)";
             let added_annotations=[];
             if ("annotations" in target.layout) { added_annotations = target.layout.annotations;}
             added_annotations.push(annotation);
@@ -1814,10 +1815,28 @@ function reload_loops_count() {
     $.each($('.loops-input'), function(index, input) {
         let block = input.dataset.block;
         if (block in block_to_loops) {
-            let loops = block_to_loops[block]
+            let loops = block_to_loops[block];
             input.value = loops;
         }
     });
+}
+
+function update_annotations_loops_count() {
+    $("#block-select option").each(function() {
+        let parent_block = $(this).val();
+        for (let key in plot_to_box_objects_template) {
+            let layout = blocks[parent_block][key][1];
+            layout.annotations.forEach(function (annotation, index) {
+                let text = annotation.text;
+                let block_name = text.substring(0, text.indexOf("(")-1);
+                if (block_name !== "") {
+                    let loops = block_to_loops[block_name];
+                    annotation.text = block_name + " (x" + loops + ")";
+                }
+            });
+        }
+    });
+    load_block_data($('#block-select').val());
 }
 
 const file = new File(['foo'], 'dummy_file.json', {
