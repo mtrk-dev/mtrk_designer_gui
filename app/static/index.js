@@ -297,7 +297,7 @@ var annotation_template = {
     showarrow: false,
     font: {
       family: 'Courier New, monospace',
-      size: 11,
+      size: 12,
       color: '#777'
     },
   }
@@ -938,9 +938,10 @@ function move_annotation(plot, annotation_number, middle_point) {
     Plotly.relayout(plot, update);
 }
 
-function change_annotation_text(plot, annotation_number, text) {
+function change_annotation_text(plot, annotation_number, block_name) {
     let annotations = JSON.parse(JSON.stringify(plot.layout["annotations"]));
-    annotations[annotation_number]["text"] = text + " (x1)";
+    let loops = block_to_loops[block_name];
+    annotations[annotation_number]["text"] = block_name + " (x" + loops + ")";
     var update = {
         annotations: annotations
         };
