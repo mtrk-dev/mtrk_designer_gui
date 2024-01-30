@@ -1750,12 +1750,12 @@ function load_loops_configuration() {
         let depth = val[1];
         let loopInput =
         `<div class="row loop-config-row">
-            <div class="col-8">
+            <div class="col-9">
                 <a class="list-group-item list-group-item-action list-group-item-info block-loop-item"
                 style="margin-left: ${depth*15}%; width: ${100-(depth*15)}%">`
                 +  block + `</a>
             </div>
-            <div class="col-3">
+            <div class="col-2">
                 <div class="input-group input-number-blocks">
                     <span class="input-group-text">x</span>
                     <input type="number" class="form-control loops-input" data-block=${block} value=1 placeholder=1>
