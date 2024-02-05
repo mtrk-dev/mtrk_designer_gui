@@ -1741,29 +1741,41 @@ function load_block_select_options() {
 
 function load_loops_configuration() {
     if (Object.keys(plot_to_box_objects).length === 0) return;
-    let nesting = generate_blocks_nesting_structure();
+    let structure = generate_blocks_nesting_structure();
     $("#loopsInputGroup").empty();
     $("#nestingCol").empty();
 
-    nesting.forEach(function(val) {
-        let block = val[0];
-        let depth = val[1];
+    // DFS to make the structure in a nested manner.
+    function dfs(root, parentDiv, depth) {
         let loopInput =
-        `<div class="row loop-config-row">
+        `<div style="left: ${depth*12}%; position:absolute; top:0; bottom:0; border-left: 1px solid #4f4848"></div>
+        <div class="row loop-config-row">
             <div class="col-9">
                 <a class="list-group-item list-group-item-action list-group-item-info block-loop-item"
                 style="margin-left: ${depth*15}%; width: ${100-(depth*15)}%">`
-                +  block + `</a>
+                +  root + `</a>
             </div>
             <div class="col-2">
                 <div class="input-group input-number-blocks">
                     <span class="input-group-text">x</span>
-                    <input type="number" class="form-control loops-input" data-block=${block} value=1 placeholder=1>
+                    <input type="number" class="form-control loops-input" data-block=${root} value=1 placeholder=1>
                 </div>
             </div>
         </div>`;
-        $("#loopsInputGroup").append(loopInput);
-    });
+        let curDiv = document.createElement('div');
+        curDiv.classList.add("loops-group");
+        curDiv.innerHTML = loopInput.trim();
+        parentDiv.appendChild(curDiv);
+
+        if (!(root in structure)) {
+            return;
+        }
+        structure[root].forEach(function (child) {
+            dfs(child, curDiv, depth+1);
+        });
+    }
+    let parentDiv = document.getElementById("loopsInputGroup");
+    dfs("Main", parentDiv, 0);
 
     $(".block-loop-item").click(function() {
         $(this).toggleClass("active");
@@ -1796,20 +1808,7 @@ function generate_blocks_nesting_structure() {
             });
         }
     });
-
-    // Doing DFS on the graph to get the nesting.
-    let nesting = [];
-    function dfs(root, level) {
-        nesting.push([root,level]);
-        if (!(root in structure)) {
-            return;
-        }
-        structure[root].forEach(function (child) {
-            dfs(child, level+1);
-        });
-    }
-    dfs("Main", 0);
-    return nesting;
+    return structure;
 }
 
 function reload_loops_count() {

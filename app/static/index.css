@@ -121,6 +121,10 @@
     left: -8%;
 } */
 
+.loops-group {
+    position: relative;
+}
+
 .blurred {
     filter: blur(5px);
 }
