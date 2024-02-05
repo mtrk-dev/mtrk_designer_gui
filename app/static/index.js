@@ -792,55 +792,56 @@ $(document).ready(function() {
         load_block_data(current_block);
     });
 
-    $('#group_block_inputs_btn').click(function(){
-        let start = Number.MAX_VALUE;
-        let end = Number.MIN_VALUE;
-        $(".block-loop-item").each(function() {
-            if ($(this).hasClass("active")) {
-                $(this).toggleClass("active");
-                if ($(this)[0].offsetTop < start) {
-                    $(this).attr('id', 'blockLoopItem'+parseInt($(this)[0].offsetTop));
-                }
-                start = Math.min(start, $(this)[0].offsetTop);
-                end = Math.max(end, $(this)[0].offsetTop);
-            }
-        });
-        // Add input group to take the number of loops for the group.
-        let input = `
-            <div style="top: ${start}px; width: 12%; position: absolute">
-                <div class="input-group">
-                    <span class="input-group-text">x</span>
-                    <input type="number" class="form-control" placeholder=1>
-                </div>
-                <a class="btn btn-sm delete-group-btn" role="button"
-                    style="background: none; border: none; padding-top: 0px; margin-top: -10%"
-                    data-bs-toggle="tooltip" data-bs-placement="bottom" title="Delete Group">
-                        <i class="fa fa-trash-o"></i>
-                </a>
-            </div>
-        `;
-        $("#nestingCol").append(input);
+    // TODO: can be removed in the future.
+    // $('#group_block_inputs_btn').click(function(){
+    //     let start = Number.MAX_VALUE;
+    //     let end = Number.MIN_VALUE;
+    //     $(".block-loop-item").each(function() {
+    //         if ($(this).hasClass("active")) {
+    //             $(this).toggleClass("active");
+    //             if ($(this)[0].offsetTop < start) {
+    //                 $(this).attr('id', 'blockLoopItem'+parseInt($(this)[0].offsetTop));
+    //             }
+    //             start = Math.min(start, $(this)[0].offsetTop);
+    //             end = Math.max(end, $(this)[0].offsetTop);
+    //         }
+    //     });
+    //     // Add input group to take the number of loops for the group.
+    //     let input = `
+    //         <div style="top: ${start}px; width: 12%; position: absolute">
+    //             <div class="input-group">
+    //                 <span class="input-group-text">x</span>
+    //                 <input type="number" class="form-control" placeholder=1>
+    //             </div>
+    //             <a class="btn btn-sm delete-group-btn" role="button"
+    //                 style="background: none; border: none; padding-top: 0px; margin-top: -10%"
+    //                 data-bs-toggle="tooltip" data-bs-placement="bottom" title="Delete Group">
+    //                     <i class="fa fa-trash-o"></i>
+    //             </a>
+    //         </div>
+    //     `;
+    //     $("#nestingCol").append(input);
 
-        // Add a vertical line before the first element.
-        let styleElem = document.head.appendChild(document.createElement("style"));
-        styleElem.innerHTML = `#blockLoopItem${parseInt(start)}:before{
-            content: " ";
-            display: block;
-            position: absolute;
-            border-left: solid 1px #4d4545;
-            height: ${end-start+20}px;
-            left: -8%;
-        }`;
+    //     // Add a vertical line before the first element.
+    //     let styleElem = document.head.appendChild(document.createElement("style"));
+    //     styleElem.innerHTML = `#blockLoopItem${parseInt(start)}:before{
+    //         content: " ";
+    //         display: block;
+    //         position: absolute;
+    //         border-left: solid 1px #4d4545;
+    //         height: ${end-start+20}px;
+    //         left: -8%;
+    //     }`;
 
-        $(".delete-group-btn").click(function() {
-            let top = parseInt(this.parentNode.style.top);
-            let styleElem = document.head.appendChild(document.createElement("style"));
-            styleElem.innerHTML = `#blockLoopItem${parseInt(top)}:before{
-                display: none;
-            }`;
-            this.parentNode.remove();
-        });
-    });
+    //     $(".delete-group-btn").click(function() {
+    //         let top = parseInt(this.parentNode.style.top);
+    //         let styleElem = document.head.appendChild(document.createElement("style"));
+    //         styleElem.innerHTML = `#blockLoopItem${parseInt(top)}:before{
+    //             display: none;
+    //         }`;
+    //         this.parentNode.remove();
+    //     });
+    // });
 
     $("#loops_save_changes_btn").click(function() {
         $.each($('.loops-input'), function(index, input) {
