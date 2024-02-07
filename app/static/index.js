@@ -625,6 +625,7 @@ $(document).ready(function() {
         }
 
         load_block_select_options();
+        $('#block-select').val(current_block_name);
         $('#blockModal').modal('toggle');
     });
 
