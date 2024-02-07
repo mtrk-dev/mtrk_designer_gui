@@ -1186,9 +1186,10 @@ function save_block_modal_values(plot, trace_number) {
         let block_data = blocks[cur_block_name];
         delete blocks[cur_block_name];
         blocks[input_block_name] = block_data;
-
         let block_loops = block_to_loops[cur_block_name];
         delete block_to_loops[cur_block_name];
+
+        if (block_loops === undefined) block_loops = 1;
         block_to_loops[input_block_name] = block_loops;
 
         load_block_select_options();
