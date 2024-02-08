@@ -675,8 +675,8 @@ $(document).ready(function() {
         download_file(file);
         const sdl_objects = [];
         // TODO: update this for the multiple blocks design.
-        for (var key in trace_to_box_object) {
-            sdl_objects.push(...trace_to_box_object[key]);
+        for (var key in plot_to_box_objects["Main"]) {
+            sdl_objects.push(...plot_to_box_objects["Main"][key]);
         }
         let configurations = save_configurations();
         send_data(sdl_objects, configurations);
@@ -1186,6 +1186,7 @@ function save_block_modal_values(plot, trace_number) {
         let block_data = blocks[cur_block_name];
         delete blocks[cur_block_name];
         blocks[input_block_name] = block_data;
+
         let block_loops = block_to_loops[cur_block_name];
         delete block_to_loops[cur_block_name];
 

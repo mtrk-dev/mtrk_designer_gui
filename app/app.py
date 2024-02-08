@@ -1,7 +1,14 @@
 from flask import Flask
 from flask import render_template, request
 import json
-from transform import *
+
+import os
+import sys
+path = os.path.abspath("mtrk_sdl_generator_anais")
+sys.path.append(path)
+
+from backendToUi import *
+# from transform import *
 
 app = Flask(__name__)
 
@@ -16,7 +23,8 @@ def process():
     # Sort the objects according to their start time.
     sorted_boxes = sorted(data['box_objects'], key=lambda x: int(float(x['start_time'])))
     configurations = data['configurations']
-    create_sdl_from_ui_inputs(sorted_boxes, configurations)
+    # create_sdl_from_ui_inputs(sorted_boxes, configurations)
+    create_sdl_from_ui_inputs(sorted_boxes)
     return "Success"
 
 # run the application
