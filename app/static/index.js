@@ -672,7 +672,7 @@ $(document).ready(function() {
     });
 
     $("#generate-sdl-btn").click(function(){
-        download_file(file);
+        // download_file(file);
         const sdl_objects = [];
         // TODO: update this for the multiple blocks design.
         for (var key in plot_to_box_objects["Main"]) {
@@ -1873,6 +1873,7 @@ function send_data(box_objects, configurations) {
             console.log(response);
         },
         error: function(error) {
+            alert("ERROR: could not generate SDL file.")
             console.log(error);
         }
     });

@@ -10,6 +10,9 @@ sys.path.append(path)
 from backendToUi import *
 # from transform import *
 
+import webbrowser
+from threading import Timer
+
 app = Flask(__name__)
 
 @app.route("/")
@@ -25,8 +28,12 @@ def process():
     configurations = data['configurations']
     # create_sdl_from_ui_inputs(sorted_boxes, configurations)
     create_sdl_from_ui_inputs(sorted_boxes)
-    return "Success"
+
+def open_browser():
+    webbrowser.open_new("http://127.0.0.1:5000")
 
 # run the application
 if __name__ == "__main__":
+    # Uncomment this line if you want the webpage to open by default.
+    # Timer(1, open_browser).start()
     app.run(debug=True)
