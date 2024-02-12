@@ -1547,8 +1547,11 @@ function add_block_with_selected_boxes() {
     let cur_block_name = $('#block-select').val();
     const seen_plots = new Set();
     for (var key in plot_to_box_objects[cur_block_name]) {
-        plot_to_box_objects[cur_block_name][key].forEach(function (boxObj, index) {
+        let boxes = JSON.parse(JSON.stringify(plot_to_box_objects[cur_block_name][key]));
+        let deletionOffset = 0;
+        boxes.forEach(function (boxObj, index) {
             if (boxObj.isSelected) {
+                index = index - deletionOffset;
                 boxObj.block = block_color_counter;
                 selected_boxes.push(boxObj);
 
@@ -1580,17 +1583,11 @@ function add_block_with_selected_boxes() {
                 start_time = Math.min(start_time, boxObj.start_time);
                 end_time = Math.max(end_time, boxObj.start_time + parseInt(trace["y"].length/step_size));
 
-                // If a box is already a block on this axis. We simply delete that box.
-                // Else we update it look like a block.
-                // if (seen_plots.has(key)) {
                 Plotly.deleteTraces(plot, trace_number);
                 delete_shapes(plot, (trace_number-1)*2);
                 delete_annotation(plot, trace_number-1);
                 plot_to_box_objects[cur_block_name][plot.id].splice(trace_number-1, 1);
-                // } else {
-                //     update_block_box(true, trace_number, plot, start_time);
-                //     seen_plots.add(key);
-                // }
+                deletionOffset += 1;
             }
         });
     }
@@ -1679,7 +1676,7 @@ function add_dummy_block_boxes(seen_plots, starting_point, ending_point) {
                 };
             Plotly.relayout(target, update);
 
-            boxObj = new Box(object_to_type[target.id], starting_point, axis_id_to_axis_name[target.id], y_data);
+            boxObj = new Box("Block", starting_point, axis_id_to_axis_name[target.id], y_data);
             let block_name = $('#block-select').val();
             if (!(block_name in plot_to_box_objects)) {
                 plot_to_box_objects[block_name] = JSON.parse(JSON.stringify(plot_to_box_objects_template));
