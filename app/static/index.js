@@ -731,7 +731,7 @@ $(document).ready(function() {
         load_array_select();
     });
 
-    $('input[type="checkbox"]').click(function(){
+    $('#flexSwitchCheckChecked').click(function(){
         if (document.documentElement.getAttribute('data-bs-theme') == 'dark') {
             document.documentElement.setAttribute('data-bs-theme','light')
             $(".btn").each(function(){
@@ -1067,6 +1067,42 @@ function change_shapes_variable(plot, shape_number, toVariable) {
     Plotly.relayout(plot, update);
 }
 
+function flip_trace_amplitude(plot, trace_number) {
+    let y = plot.data[trace_number]["y"];
+    let x = plot.data[trace_number]["x"];
+    let line = plot.data[trace_number]["line"];
+    let hovertemplate = plot.data[trace_number]["hovertemplate"];
+
+    // delete the old trace.
+    Plotly.deleteTraces(plot, trace_number);
+
+    // Draw a trace at the new location
+    let y_data = [];
+    let x_data = [];
+    let data = {};
+
+    y = y.map(y => y * -1);
+
+    data["y"] = y;
+    data["x"] = x;
+    data["line"] = line;
+    data["hovertemplate"] = hovertemplate;
+    Plotly.addTraces(plot, data, trace_number);
+    flip_shapes(plot, (trace_number-1)*2);
+}
+
+function flip_shapes(plot, shape_number) {
+    let line_shape_number = shape_number + 1;
+    let box_shape_number = shape_number;
+    let shapes = JSON.parse(JSON.stringify(plot.layout["shapes"]));
+    shapes[line_shape_number]["y1"] = -shape_height;
+    shapes[box_shape_number]["y1"] = -shape_height;
+    var update = {
+        shapes: shapes
+        };
+    Plotly.relayout(plot, update);
+}
+
 function delete_shapes(plot, shape_number) {
     let shapes = JSON.parse(JSON.stringify(plot.layout["shapes"]));
     // This will delete both vertical and box shape.
@@ -1107,6 +1143,12 @@ function load_modal_values(plot, trace_number) {
         $("#constantRadio").prop("checked", true);
         $('#variableAmplitudeGroup').hide();
     }
+    if (boxObj.flip_amplitude) {
+        $("#flipAmplitudeCheck").prop("checked", true);
+    }
+    else {
+        $("#flipAmplitudeCheck").prop("checked", false);
+    }
     $('#inputStepChange').val(boxObj.step_change);
     $('#inputLoopNumber').val(boxObj.loop_number);
     $('#array-selection-btn').text(boxObj.array_info.name);
@@ -1125,6 +1167,20 @@ function save_modal_values(plot, trace_number) {
     boxObj = plot_to_box_objects[block_name][plot.id][trace_number-1];
     boxObj.name = $('#inputName').val();
 
+    // If the start time has been changed in the modal, we move the box.
+    let input_start_time = $('#inputStartTime').val();
+    if (boxObj.start_time != input_start_time)
+        change_box_start_time(plot, trace_number, parseInt(input_start_time));
+
+    // if selected array has been changed, we change the box array.
+    let selected_box_array_name = $('#array-selection-btn').text();
+    if (selected_box_array_name != boxObj.array_info.name) {
+        let new_array = [];
+        if (selected_box_array_name == "Default Array") new_array = axis_id_to_default_array[plot.id]
+        else new_array = array_name_to_array[selected_box_array_name]
+        change_box_array(plot, trace_number, parseInt(input_start_time), new_array);
+    }
+
     // If the selected trace type is different than what it already is we change trace - fixed/variable.
     if ($("#variableRadio").is(':checked')) {
         if (!boxObj.variable_amplitude) {
@@ -1136,23 +1192,24 @@ function save_modal_values(plot, trace_number) {
         }
     }
 
-    // If the start time has been changed in the modal, we move the box.
-    let input_start_time = $('#inputStartTime').val();
-    if (boxObj.start_time != input_start_time)
-        change_box_start_time(plot, trace_number, parseInt(input_start_time));
-
-    let selected_box_array_name = $('#array-selection-btn').text();
-    if (selected_box_array_name != boxObj.array_info.name) {
-        let new_array = [];
-        if (selected_box_array_name == "Default Array") new_array = axis_id_to_default_array[plot.id]
-        else new_array = array_name_to_array[selected_box_array_name]
-        change_box_array(plot, trace_number, parseInt(input_start_time), new_array);
+    // If the flip amplitude check is different than what it already is we toggle it.
+    if ($("#flipAmplitudeCheck").is(':checked')) {
+        if (!boxObj.flip_amplitude) {
+            console.log("earlier not flip now flip.");
+            flip_trace_amplitude(plot, trace_number);
+        }
+    } else {
+        if (boxObj.flip_amplitude) {
+            console.log("earlier flip now not flip.");
+            flip_trace_amplitude(plot, trace_number);
+        }
     }
 
     boxObj.start_time = input_start_time;
     boxObj.anchor_time = $('#inputAnchorTime').val();
     boxObj.amplitude = $('#inputConstantAmplitude').val();
     boxObj.variable_amplitude = $('#variableRadio').is(':checked');
+    boxObj.flip_amplitude = $('#flipAmplitudeCheck').is(':checked');
     boxObj.step_change = $('#inputStepChange').val();
     boxObj.loop_number = $('#inputLoopNumber').val();
     boxObj.array_info.name = selected_box_array_name;
@@ -1890,6 +1947,7 @@ class Box {
     anchor_time = 0;
     amplitude = 0;
     variable_amplitude = false;
+    flip_amplitude = false;
     step_change = 0;
     loop_number = 0;
     isSelected = false;
