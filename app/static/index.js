@@ -221,7 +221,7 @@ const layout = {
         "gridcolor": "rgba(255,255,255,0.05)",
         "zerolinecolor": "rgba(255,255,255,0.1)",
         fixedrange: true,
-        range: [0, 1.75],
+        range: [-1.25, 1.75],
     },
     dragmode: false
 };
@@ -901,7 +901,16 @@ function move_shape_to_zero_line(plot, shape_number) {
     let trace_number = (shape_number/2)+1;
     // if (plot.data[trace_number]["mode"]=="markers") shapes[shape_number]["y0"] = -shape_height;
     shapes[shape_number]["y0"] = 0;
-    shapes[shape_number]["y1"] = shape_height;
+
+    // changing shape if the data is negative.
+    let y = plot.data[trace_number]["y"];
+    let middle_element = y[Math.floor(y.length / 2)];
+    if (middle_element < 0) {
+        shapes[shape_number]["y1"] = -shape_height;
+    } else {
+        shapes[shape_number]["y1"] = shape_height;
+    }
+
     var update = {
         shapes: shapes
         };
@@ -1095,8 +1104,9 @@ function flip_shapes(plot, shape_number) {
     let line_shape_number = shape_number + 1;
     let box_shape_number = shape_number;
     let shapes = JSON.parse(JSON.stringify(plot.layout["shapes"]));
-    shapes[line_shape_number]["y1"] = -shape_height;
-    shapes[box_shape_number]["y1"] = -shape_height;
+    let current_y1 = shapes[box_shape_number]["y1"];
+    shapes[line_shape_number]["y1"] = -current_y1;
+    shapes[box_shape_number]["y1"] = -current_y1;
     var update = {
         shapes: shapes
         };
@@ -1195,12 +1205,10 @@ function save_modal_values(plot, trace_number) {
     // If the flip amplitude check is different than what it already is we toggle it.
     if ($("#flipAmplitudeCheck").is(':checked')) {
         if (!boxObj.flip_amplitude) {
-            console.log("earlier not flip now flip.");
             flip_trace_amplitude(plot, trace_number);
         }
     } else {
         if (boxObj.flip_amplitude) {
-            console.log("earlier flip now not flip.");
             flip_trace_amplitude(plot, trace_number);
         }
     }
