@@ -24,7 +24,7 @@ const step_size = 100;
 const block_colors = ["#ff0065", "#cf7856", "#978eff", "#5343ff", "#ff7f50", "#77b6df", "#457480", "#ba029c", "#31e658", "#9be5cc", "#facade", "#fab1ed", "#deface", "#c0ffee", "#beaded", "#a3b899", "#ffaa51", "#216c5c"]
 var block_color_counter = 0;
 
-var kernel_time = 10;
+var block_duration = 10;
 
 plot_to_box_objects_template = {
     'rf_chart': [],
@@ -204,7 +204,7 @@ const layout = {
         },
         "gridcolor": "rgba(255,255,255,0.05)",
         "zerolinecolor": "rgba(255,255,255,0.1)",
-        range: [0, kernel_time],
+        range: [0, block_duration],
         fixedrange: true,
     },
     yaxis: {
@@ -400,7 +400,7 @@ $(document).ready(function() {
         let dragged_array = object_to_array[dragged.id];
         let starting_point = xInDataCoord;
 
-        if (starting_point < 0 || starting_point > kernel_time) {
+        if (starting_point < 0 || starting_point > block_duration) {
             alert("Invalid drop location");
             return;
         }
@@ -498,8 +498,8 @@ $(document).ready(function() {
                     }
                     if (starting_point < 0) {
                         starting_point = 0;
-                    } else if (starting_point > kernel_time) {
-                        starting_point = kernel_time - 10;
+                    } else if (starting_point > block_duration) {
+                        starting_point = block_duration - 10;
                     }
 
                     // Not needed for now as we have disabled stretching/squeezing.
@@ -628,13 +628,13 @@ $(document).ready(function() {
         $('#blockModal').modal('toggle');
     });
 
-    $("#kernel-time-btn").click(function () {
-        kernel_time = $("#kernelTimeInput").val();
+    $("#block-time-btn").click(function () {
+        block_duration = $("#blockDurationInput").val();
         $(".dropzone").each(function () {
             var plot = this;
             // Change the range and relayout plot.
             let update = {
-                "xaxis.range": [0, kernel_time]
+                "xaxis.range": [0, block_duration]
                 };
             Plotly.relayout(plot, update);
             recalculate_mouse_to_plot_conversion_variables();
