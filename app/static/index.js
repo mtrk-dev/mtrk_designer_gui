@@ -1085,11 +1085,9 @@ function flip_trace_amplitude(plot, trace_number) {
     Plotly.deleteTraces(plot, trace_number);
 
     // Draw a trace at the new location
-    let y_data = [];
-    let x_data = [];
     let data = {};
 
-    y = y.map(y => y * -1);
+    y = y.map(x => x * -1);
 
     data["y"] = y;
     data["x"] = x;
@@ -1181,26 +1179,6 @@ function save_modal_values(plot, trace_number) {
     if (boxObj.start_time != input_start_time)
         change_box_start_time(plot, trace_number, parseFloat(input_start_time));
 
-    // if selected array has been changed, we change the box array.
-    let selected_box_array_name = $('#array-selection-btn').text();
-    if (selected_box_array_name != boxObj.array_info.name) {
-        let new_array = [];
-        if (selected_box_array_name == "Default Array") new_array = axis_id_to_default_array[plot.id]
-        else new_array = array_name_to_array[selected_box_array_name]
-        change_box_array(plot, trace_number, parseFloat(input_start_time), new_array);
-    }
-
-    // If the selected trace type is different than what it already is we change trace - fixed/variable.
-    if ($("#variableRadio").is(':checked')) {
-        if (!boxObj.variable_amplitude) {
-            change_trace_type(plot, trace_number, true);
-        }
-    } else {
-        if (boxObj.variable_amplitude) {
-            change_trace_type(plot, trace_number, false);
-        }
-    }
-
     // If the flip amplitude check is different than what it already is we toggle it.
     if ($("#flipAmplitudeCheck").is(':checked')) {
         if (!boxObj.flip_amplitude) {
@@ -1211,6 +1189,33 @@ function save_modal_values(plot, trace_number) {
             flip_trace_amplitude(plot, trace_number);
         }
     }
+
+    // if selected array has been changed, we change the box array.
+    let selected_box_array_name = $('#array-selection-btn').text();
+    let flip = $('#flipAmplitudeCheck').is(':checked');
+    let array_changed_flag = false;
+    if (selected_box_array_name != boxObj.array_info.name) {
+        let new_array = [];
+        if (selected_box_array_name == "Default Array") new_array = axis_id_to_default_array[plot.id]
+        else new_array = array_name_to_array[selected_box_array_name]
+        if (flip) {
+            new_array = new_array.map(x => x * -1);
+        }
+        change_box_array(plot, trace_number, parseFloat(input_start_time), new_array);
+        array_changed_flag = true;
+    }
+
+    // If the selected trace type is different than what it already is we change trace - fixed/variable.
+    if ($("#variableRadio").is(':checked')) {
+        if (!boxObj.variable_amplitude || array_changed_flag) {
+            change_trace_type(plot, trace_number, true);
+        }
+    } else {
+        if (boxObj.variable_amplitude) {
+            change_trace_type(plot, trace_number, false);
+        }
+    }
+
 
     boxObj.start_time = input_start_time;
     boxObj.anchor_time = $('#inputAnchorTime').val();
