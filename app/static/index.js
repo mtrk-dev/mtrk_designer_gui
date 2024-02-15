@@ -19,12 +19,12 @@ const rf_pulse_array = [];
 for (let i=0; i < 128; i++) {
     rf_pulse_array.push(rf_array[2*i]);
 }
-const step_size = 10;
+const step_size = 100;
 
 const block_colors = ["#ff0065", "#cf7856", "#978eff", "#5343ff", "#ff7f50", "#77b6df", "#457480", "#ba029c", "#31e658", "#9be5cc", "#facade", "#fab1ed", "#deface", "#c0ffee", "#beaded", "#a3b899", "#ffaa51", "#216c5c"]
 var block_color_counter = 0;
 
-var kernel_time = 100;
+var kernel_time = 10;
 
 plot_to_box_objects_template = {
     'rf_chart': [],
@@ -496,7 +496,6 @@ $(document).ready(function() {
                             var y1_val = ed[key];
                         }
                     }
-
                     if (starting_point < 0) {
                         starting_point = 0;
                     } else if (starting_point > kernel_time) {
@@ -527,10 +526,10 @@ $(document).ready(function() {
 
                     // If the box is part of a block, shift all the boxes in that block to the same start point.
                     if (boxObj.block != null) {
-                        move_block_boxes(boxObj.block, parseInt(starting_point));
+                        move_block_boxes(boxObj.block, parseFloat(starting_point));
                     } else {
-                        boxObj.start_time = parseInt(starting_point);
-                        change_box_start_time(plot, trace_number, parseInt(starting_point));
+                        boxObj.start_time = parseFloat(starting_point);
+                        change_box_start_time(plot, trace_number, parseFloat(starting_point));
                     }
                 }
                 catch (err) {
@@ -1180,7 +1179,7 @@ function save_modal_values(plot, trace_number) {
     // If the start time has been changed in the modal, we move the box.
     let input_start_time = $('#inputStartTime').val();
     if (boxObj.start_time != input_start_time)
-        change_box_start_time(plot, trace_number, parseInt(input_start_time));
+        change_box_start_time(plot, trace_number, parseFloat(input_start_time));
 
     // if selected array has been changed, we change the box array.
     let selected_box_array_name = $('#array-selection-btn').text();
@@ -1188,7 +1187,7 @@ function save_modal_values(plot, trace_number) {
         let new_array = [];
         if (selected_box_array_name == "Default Array") new_array = axis_id_to_default_array[plot.id]
         else new_array = array_name_to_array[selected_box_array_name]
-        change_box_array(plot, trace_number, parseInt(input_start_time), new_array);
+        change_box_array(plot, trace_number, parseFloat(input_start_time), new_array);
     }
 
     // If the selected trace type is different than what it already is we change trace - fixed/variable.
@@ -1234,10 +1233,10 @@ function save_block_modal_values(plot, trace_number) {
     blockObj = block_number_to_block_object[boxObj.block];
 
     // If the start time has been changed in the modal, we move the block.
-    let block_start_time = parseInt($('#blockStartTime').val());
+    let block_start_time = parseFloat($('#blockStartTime').val());
     if (blockObj.start_time != block_start_time) {
         // let shift_value =  parseInt(block_start_time) - parseInt(blockObj.start_time);
-        move_block_boxes(boxObj.block, parseInt(block_start_time));
+        move_block_boxes(boxObj.block, parseFloat(block_start_time));
     }
 
     let input_block_name = $('#inputBlockName').val();
@@ -1264,7 +1263,7 @@ function save_block_modal_values(plot, trace_number) {
     }
 
     blockObj.name = input_block_name;
-    blockObj.start_time = parseInt(block_start_time);
+    blockObj.start_time = parseFloat(block_start_time);
 }
 
 function save_configurations() {
@@ -1417,7 +1416,7 @@ function change_box_start_time(plot, trace_number, starting_point) {
     // Here, shape_number + 1, will give the line shape number, as we are always creating line shape after box shape.
     move_box_shape(plot, shape_number, starting_point)
     move_vertical_line_shape(plot, shape_number+1, starting_point);
-    let ending_point = starting_point + x_data.length;
+    let ending_point = starting_point + (x_data.length/step_size);
     let middle_point = (starting_point+ending_point)/2;
     move_annotation(plot, trace_number-1, middle_point);
 }
@@ -1580,7 +1579,7 @@ function update_block_box(toBlock, trace_number, plot, start_time) {
         shapes: shapes,
         };
     Plotly.relayout(plot, update);
-    change_box_array(plot, trace_number, parseInt(start_time), block_array);
+    change_box_array(plot, trace_number, parseFloat(start_time), block_array);
     update_trace(trace_number, plot);
 }
 
@@ -1646,7 +1645,7 @@ function add_block_with_selected_boxes() {
 
                 // Calculating the block start time and end time.
                 start_time = Math.min(start_time, boxObj.start_time);
-                end_time = Math.max(end_time, boxObj.start_time + parseInt(trace["y"].length/step_size));
+                end_time = Math.max(end_time, boxObj.start_time + parseFloat(trace["y"].length/step_size));
 
                 Plotly.deleteTraces(plot, trace_number);
                 delete_shapes(plot, (trace_number-1)*2);
@@ -1695,9 +1694,9 @@ function add_dummy_block_boxes(seen_plots, starting_point, ending_point) {
             let target = document.getElementById(key);
             let x_data = [];
             let y_data = [];
-            starting_point = parseInt(starting_point);
-            ending_point = parseInt(ending_point);
-            for (let i=starting_point; i<=ending_point; i+=1) {
+            starting_point = parseFloat(starting_point);
+            ending_point = parseFloat(ending_point);
+            for (let i=starting_point; i<=ending_point; i+=(1/step_size)) {
                 x_data.push(i);
                 y_data.push(0.8);
             }
@@ -1806,6 +1805,10 @@ function load_block_select_options() {
 }
 
 function load_loops_configuration() {
+    // saving the parent block data from the page before using it
+    // as it might not be up-to-date because of new events.
+    save_block_data($('#block-select').val());
+
     if (Object.keys(plot_to_box_objects).length === 0) return;
     let structure = generate_blocks_nesting_structure();
     $("#loopsInputGroup").empty();
