@@ -95,6 +95,10 @@
     display: block;
 }
 
+#upload-checkpoint-label {
+    margin-bottom: 1%;
+}
+
 /* .group-loop-input {
     position: absolute;
     left: 20px;
@@ -131,6 +135,16 @@
 
 .theme-icon {
     font-size: 13px !important;
+}
+
+.checkpoint-control {
+    margin-top: 16%;
+}
+
+.checkpoint-icon {
+    padding: 2px;
+    border: 1px solid gray;
+    border-radius: 0.2rem;
 }
 
 #flexSwitchCheckChecked {
