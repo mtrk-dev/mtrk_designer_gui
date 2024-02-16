@@ -44,6 +44,10 @@ var block_to_loops = {}
 
 var reset_flag = 0;
 
+var undo_stack = [];
+var redo_stack = [];
+const max_stack_length = 5;
+
 // Dummy arrays dictionary for array selection.
 const grad_100_2660_100 = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1, 0.0];
 const grad_220_10_220 = [0.0, 0.0455, 0.0909, 0.1364, 0.1818, 0.2273, 0.2727, 0.3182, 0.3636, 0.4091, 0.4545, 0.5, 0.5455, 0.5909, 0.6364, 0.6818, 0.7273, 0.7727, 0.8182, 0.8636, 0.9091, 0.9545, 1.0, 1.0, 0.9545, 0.9091, 0.8636, 0.8182, 0.7727, 0.7273, 0.6818, 0.6364, 0.5909, 0.5455, 0.5, 0.4545, 0.4091, 0.3636, 0.3182, 0.2727, 0.2273, 0.1818, 0.1364, 0.0909, 0.0455, 0.0];
@@ -769,10 +773,12 @@ $(document).ready(function() {
     });
 
     $('#undo-btn').click(function(){
-        let data = JSON.parse(localStorage.getItem("data"));
-        if (data) {
-            reload_data(data);
-        }
+        undo_data();
+        recalculate_mouse_to_plot_conversion_variables();
+    });
+
+    $('#redo-btn').click(function(){
+        redo_data();
         recalculate_mouse_to_plot_conversion_variables();
     });
 
@@ -1349,6 +1355,14 @@ function save_data() {
         "block_to_loops": block_to_loops
     }
     localStorage.setItem("data", JSON.stringify(data));
+
+    // Limit the length of undo stack
+    undo_stack.push(JSON.parse(JSON.stringify(data)));
+    if (undo_stack.length > max_stack_length) {
+        undo_stack.shift(); // Remove the oldest item
+    }
+    // Clear redo stack whenever a new state is saved
+    redo_stack = [];
 }
 
 function reload_data(data) {
@@ -1381,6 +1395,55 @@ function reload_data(data) {
     }
     load_block_select_options();
     $('#block-select').val(block_name);
+}
+
+function generate_current_data_state() {
+    let block_name = $('#block-select').val();
+    save_block_data(block_name);
+    let theme = "dark";
+    if (document.documentElement.getAttribute('data-bs-theme') == 'light') theme = "light";
+    let configurations = save_configurations();
+    let current_state_data = {
+        "plots_data": blocks,
+        "plot_to_box_objects": plot_to_box_objects,
+        "block_number_to_block_object": block_number_to_block_object,
+        "block_color_counter": block_color_counter,
+        "theme": theme,
+        "selected_block": block_name,
+        "configurations": configurations,
+        "block_to_loops": block_to_loops
+    }
+    return current_state_data;
+}
+
+function undo_data() {
+    if (undo_stack.length > 0) {
+        // Generating the current state of data:
+        // As current data might not be the same as last saved.
+        let current_state_data = generate_current_data_state();
+
+        redo_stack.push(current_state_data);
+        let prev_state_data = undo_stack.pop();
+        localStorage.setItem('data', JSON.stringify(prev_state_data));
+        reload_data(prev_state_data);
+    } else {
+        alert("Cannot undo further!");
+    }
+}
+
+function redo_data() {
+    if (redo_stack.length > 0) {
+        // Generating the current state of data:
+        // As current data might not be the same as last saved.
+        let current_state_data = generate_current_data_state();
+
+        undo_stack.push(current_state_data);
+        let next_state_data = redo_stack.pop();
+        localStorage.setItem('data', JSON.stringify(next_state_data));
+        reload_data(next_state_data);
+    } else {
+        alert("cannot redo further!");
+    }
 }
 
 function change_box_start_time(plot, trace_number, starting_point) {
