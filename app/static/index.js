@@ -768,7 +768,7 @@ $(document).ready(function() {
           },1000);
     });
 
-    $('#back-btn').click(function(){
+    $('#undo-btn').click(function(){
         let data = JSON.parse(localStorage.getItem("data"));
         if (data) {
             reload_data(data);

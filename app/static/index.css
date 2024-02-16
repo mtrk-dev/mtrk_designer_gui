@@ -37,7 +37,7 @@
     background: transparent;
 }
 
-#reset-btn, #back-btn, #save-plot-btn {
+#reset-btn, #undo-btn, #redo-btn, #save-plot-btn {
     background: transparent;
     font-size: 14px;
     margin-top: 8%;
