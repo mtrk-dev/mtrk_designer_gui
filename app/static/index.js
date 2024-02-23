@@ -1188,11 +1188,15 @@ function delete_annotation(plot, annotation_number) {
 function load_modal_values(plot, trace_number) {
     let block_name = $('#block-select').val();
     boxObj = plot_to_box_objects[block_name][plot.id][trace_number-1];
+    $('.rf-param').hide();
+    $('.grad-param').hide();
+    $('.adc-param').hide();
     if (boxObj.type == "rf") {
-        $('#rf-parameters-group').show();
-    }
-    else {
-        $('#rf-parameters-group').hide();
+        $('.rf-param').show();
+    } else if (boxObj.type == "grad") {
+        $('.grad-param').show();
+    } else {
+        $('.adc-param').show();
     }
     $('#inputName').val(boxObj.name);
     $('#inputStartTime').val(boxObj.start_time);

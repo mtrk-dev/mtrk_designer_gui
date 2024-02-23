@@ -249,7 +249,19 @@
                       </div>
                       <div class="modal-body">
                         <form id="parametersForm" action="">
-                          <div id="rf-parameters-group" class="form-group">
+                          <div class="form-group">
+                            <label for="inputName">Name</label>
+                            <input type="text" class="form-control" id="inputName" placeholder="Ex: Grad Slice Refocus">
+                          </div>
+                          <div class="form-group">
+                            <label for="inputStartTime">Start Time (ms)</label>
+                            <input type="number" class="form-control" id="inputStartTime" placeholder=0>
+                          </div>
+                          <div class="form-group rf-param grad-param">
+                            <label for="inputAnchorTime">Anchor Time (ms)</label>
+                            <input type="number" class="form-control" id="inputAnchorTime" placeholder=0>
+                          </div>
+                          <div class="form-group rf-param">
                             <label for="inputRFType">RF Type</label>
                             <div class="form-check">
                               <input class="form-check-input" type="radio" name="exampleRadios" id="rfExcitationRadio" value="excitation" checked>
@@ -263,20 +275,18 @@
                                 Refocus
                               </label>
                             </div>
+                            <label for="inputRfAddedPhaseType">Added Phase Type</label>
+                            <input type="text" class="form-control" id="inputRfAddedPhaseType" placeholder="Ex: ">
+                            <label for="inputRfAddedPhase">Added Phase</label>
+                            <input type="number" class="form-control" id="inputRfAddedPhase" placeholder=1.0>
+                            <label for="inputRfInitialPhase">Initial Phase</label>
+                            <input type="number" class="form-control" id="inputRfInitialPhase" placeholder=1>
+                            <label for="inputRfThickness">Thickness</label>
+                            <input type="number" class="form-control" id="inputRfThickness" placeholder=1>
+                            <label for="inputRfFlipAngle">Flip Angle</label>
+                            <input type="number" class="form-control" id="inputRfFlipAngle" placeholder=1>
                           </div>
-                          <div class="form-group">
-                            <label for="inputName">Name</label>
-                            <input type="text" class="form-control" id="inputName" placeholder="Ex: Grad Slice Refocus">
-                          </div>
-                          <div class="form-group">
-                            <label for="inputStartTime">Start Time (ms)</label>
-                            <input type="number" class="form-control" id="inputStartTime" placeholder=0>
-                          </div>
-                          <div class="form-group">
-                            <label for="inputAnchorTime">Anchor Time (ms)</label>
-                            <input type="number" class="form-control" id="inputAnchorTime" placeholder=0>
-                          </div>
-                          <div class="form-group">
+                          <div class="form-group grad-param">
                             <label for="inputAmplitude">Amplitude</label>
                             <div class="form-check">
                               <input class="form-check-input" type="radio" name="exampleRadios" id="constantRadio" value="constant" checked>
@@ -307,8 +317,26 @@
                                 Flip Amplitude
                               </label>
                             </div>
+                            <label for="inputGradEquationName">Equation Name</label>
+                            <input type="text" class="form-control" id="inputGradEquationName" placeholder="Ex: phaseencoding">
+                            <label for="inputGradEquationExpression">Equation Expression</label>
+                            <input type="text" class="form-control" id="inputGradEquationExpression" placeholder="Ex: 0.3378125*(ctr(1)-64.5)">
                           </div>
-                          <div class="form-group">
+                          <div class="form-group adc-param">
+                            <label for="inputAdcFrequency">Frequency</label>
+                            <input type="number" class="form-control" id="inputAdcFrequency" placeholder=1>
+                            <label for="inputAdcPhase">Phase</label>
+                            <input type="number" class="form-control" id="inputAdcPhase" placeholder=1>
+                            <label for="inputAdcAddedPhaseType">Added Phase Type</label>
+                            <input type="text" class="form-control" id="inputAdcAddedPhaseType" placeholder="Ex: ">
+                            <label for="inputAdcAddedPhase">Added Phase</label>
+                            <input type="number" class="form-control" id="inputAdcAddedPhase" placeholder=1.0>
+                            <label for="inputAdcSamples">Samples</label>
+                            <input type="number" class="form-control" id="inputAdcSamples" placeholder=36>
+                            <label for="inputAdcDwellTime">Dwell Time</label>
+                            <input type="number" class="form-control" id="inputAdcDwellTime" placeholder=1>
+                          </div>
+                          <div class="form-group grad-param">
                             <div class="btn-group">
                               <button type="button" id="array-selection-btn" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">Default Array</button>
                               <ul id="array-dropdown-menu" class="dropdown-menu">
