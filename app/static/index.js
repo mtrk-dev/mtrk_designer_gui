@@ -410,9 +410,14 @@ $(document).ready(function() {
             alert("Invalid drop location");
             return;
         }
+
+        let multiplier = 1;
+        if (object_to_type[dragged.id] == "rf") {
+            multiplier = 2;
+        }
         let x_data = []
         for (let i=0; i<dragged_array.length; i+=1) {
-            x_data.push(starting_point + (i/step_size));
+            x_data.push(starting_point + multiplier*(i/step_size));
         }
         let data = {};
         data["y"] = dragged_array;
@@ -424,7 +429,7 @@ $(document).ready(function() {
         // Update the trace by adding a box around it.
         var shape = JSON.parse(JSON.stringify(shape_template));
         shape["x0"] = starting_point;
-        shape["x1"] = starting_point + (dragged_array.length/step_size);
+        shape["x1"] = starting_point + multiplier*(dragged_array.length/step_size);
         let added_shapes=[];
         if ("shapes" in target.layout) { added_shapes = target.layout.shapes;}
         added_shapes.push(shape);
