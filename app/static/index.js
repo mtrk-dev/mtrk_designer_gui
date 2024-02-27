@@ -1260,14 +1260,16 @@ function save_modal_values(plot, trace_number) {
     if (boxObj.start_time != input_start_time)
         change_box_start_time(plot, trace_number, parseFloat(input_start_time));
 
-    // If the flip amplitude check is different than what it already is we toggle it.
-    if ($("#flipAmplitudeCheck").is(':checked')) {
-        if (!boxObj.flip_amplitude) {
-            flip_trace_amplitude(plot, trace_number);
-        }
-    } else {
-        if (boxObj.flip_amplitude) {
-            flip_trace_amplitude(plot, trace_number);
+    // If the flip amplitude check for a grad box is different than what it already is we toggle it.
+    if (boxObj.type == "grad") {
+        if ($("#flipAmplitudeCheck").is(':checked')) {
+            if (!boxObj.flip_amplitude) {
+                flip_trace_amplitude(plot, trace_number);
+            }
+        } else {
+            if (boxObj.flip_amplitude) {
+                flip_trace_amplitude(plot, trace_number);
+            }
         }
     }
 
