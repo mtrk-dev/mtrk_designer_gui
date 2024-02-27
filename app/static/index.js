@@ -697,9 +697,9 @@ $(document).ready(function() {
     });
     $(document).on('click', '#add-new-array-item', function () {
         $('#parametersModal').addClass('blurred');
-        $('#addArrayModal').modal('toggle');
+        $('#arrayConfigModal').modal('toggle');
     })
-    $('#addArrayModal').on('hidden.bs.modal', function () {
+    $('#arrayConfigModal').on('hidden.bs.modal', function () {
         $('#parametersModal').removeClass('blurred');
         $('#inputArrayName').val("");
         $('#inputArrayValues').val("");
@@ -795,6 +795,11 @@ $(document).ready(function() {
     });
     $('#loops_modal_close_btn').click(function(){
         $('#loopsModal').modal('toggle');
+    });
+
+    $('#arrays-config-btn').click(function(){
+        load_array_select_options();
+        $('#arrayConfigModal').modal('toggle');
     });
 
     $('#block-select').change(function(){
@@ -1968,6 +1973,16 @@ function load_block_select_options() {
         let o = new Option(block_text, block_text);
         $(o).html(block_text);
         $("#block-select").append(o);
+    }
+}
+
+function load_array_select_options() {
+    $("#array-select").empty();
+    // Add the arrays in the array select.
+    for (var array_text in array_name_to_array) {
+        let o = new Option(array_text, array_text);
+        $(o).html(array_text);
+        $("#array-select").append(o);
     }
 }
 

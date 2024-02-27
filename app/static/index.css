@@ -57,12 +57,12 @@
     margin-left: 70%;
 }
 
-#loops-btn {
-    width: 20%;
-    margin-left: 80%;
+#loops-btn, #arrays-config-btn {
     margin-bottom: 5%;
-    display: flex;
-    justify-content: center;
+}
+
+#arrays-config-icon {
+    font-size: 12px;
 }
 
 #add-new-array-item {
@@ -83,6 +83,10 @@
     width: 90%;
     margin-left: 5%;
     margin-bottom: 1%;
+}
+
+#array-select {
+    width: 30%;
 }
 
 #add-block-btn {

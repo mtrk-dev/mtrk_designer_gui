@@ -39,6 +39,9 @@
                     <button id="" type="button" class="btn btn-secondary">&#10003;</button>
                   </div> -->
                   <div>
+                    <a id="arrays-config-btn" class="btn btn-secondary" role="button" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Configure Arrays">
+                      <i id="arrays-config-icon" class="fa fa-cube"></i>
+                    </a>
                     <a id="loops-btn" class="btn btn-secondary" role="button" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Configure Loops">
                       <i>&#8734;</i>
                     </a>
@@ -353,11 +356,11 @@
                     </div>
                   </div>
                 </div>
-                <div class="modal fade" id="addArrayModal" tabindex="-1" aria-labelledby="addArrayModalLabel" aria-hidden="true">
-                  <div class="modal-dialog">
+                <div class="modal fade" id="arrayConfigModal" tabindex="-1" aria-labelledby="arrayConfigModalLabel" aria-hidden="true">
+                  <div class="modal-dialog modal-lg">
                     <div class="modal-content">
                       <div class="modal-header">
-                        <h5 class="modal-title" id="addArrayModalLabel">Array Details</h5>
+                        <h5 class="modal-title" id="arrayConfigModalLabel">Array Details</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                       </div>
                       <div class="modal-body">
@@ -378,6 +381,11 @@
                           </div>
                           <div id="addArrayValidFeedback" class="valid-feedback">
                             New array added!
+                          </div>
+                          <div class="form-group">
+                            <select id="array-select" class="form-select" aria-label="Array select">
+                              <option selected>Select Array</option>
+                            </select>
                           </div>
                         </form>
                       </div>
