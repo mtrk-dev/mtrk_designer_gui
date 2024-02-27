@@ -1201,24 +1201,45 @@ function load_modal_values(plot, trace_number) {
     $('#inputName').val(boxObj.name);
     $('#inputStartTime').val(boxObj.start_time);
     $('#inputAnchorTime').val(boxObj.anchor_time);
-    $('#inputConstantAmplitude').val(boxObj.amplitude);
-    if (boxObj.variable_amplitude) {
-        $("#variableRadio").prop("checked", true);
-        $('#variableAmplitudeGroup').show();
-    }
-    else {
-        $("#constantRadio").prop("checked", true);
-        $('#variableAmplitudeGroup').hide();
-    }
-    if (boxObj.flip_amplitude) {
-        $("#flipAmplitudeCheck").prop("checked", true);
-    }
-    else {
-        $("#flipAmplitudeCheck").prop("checked", false);
-    }
-    $('#inputStepChange').val(boxObj.step_change);
-    $('#inputLoopNumber').val(boxObj.loop_number);
     $('#array-selection-btn').text(boxObj.array_info.name);
+
+    if (boxObj.type == "rf") {
+        $('#inputRfAddedPhaseType').val(boxObj.rf_added_phase_type);
+        $('#inputRfAddedPhase').val(boxObj.rf_added_phase_float);
+        $('#inputRfInitialPhase').val(boxObj.init_phase);
+        $('#inputRfThickness').val(boxObj.thickness);
+        $('#inputRfFlipAngle').val(boxObj.flip_angle);
+        if (!boxObj.purpose || boxObj.purpose == "excitation") {
+            $("#rfExcitationRadio").prop("checked", true);
+        } else {
+            $("#rfRefocusRadio").prop("checked", true);
+        }
+    } else if (boxObj.type == "grad") {
+        $('#inputConstantAmplitude').val(boxObj.amplitude);
+        $('#inputStepChange').val(boxObj.step_change);
+        $('#inputLoopNumber').val(boxObj.loop_number);
+        $('#inputGradEquationName').val(boxObj.equation_info.name);
+        $('#inputGradEquationExpression').val(boxObj.equation_info.expression);
+        if (boxObj.variable_amplitude) {
+            $("#variableRadio").prop("checked", true);
+            $('#variableAmplitudeGroup').show();
+        } else {
+            $("#constantRadio").prop("checked", true);
+            $('#variableAmplitudeGroup').hide();
+        }
+        if (boxObj.flip_amplitude) {
+            $("#flipAmplitudeCheck").prop("checked", true);
+        } else {
+            $("#flipAmplitudeCheck").prop("checked", false);
+        }
+    } else {
+        $('#inputAdcFrequency').val(boxObj.frequency);
+        $('#inputAdcPhase').val(boxObj.phase);
+        $('#inputAdcAddedPhaseType').val(boxObj.adc_added_phase_type);
+        $('#inputAdcAddedPhase').val(boxObj.adc_added_phase_float);
+        $('#inputAdcSamples').val(boxObj.samples);
+        $('#inputAdcDwellTime').val(boxObj.dwell_time);
+    }
 }
 
 function load_block_modal_values(plot, trace_number) {
@@ -1276,19 +1297,41 @@ function save_modal_values(plot, trace_number) {
         }
     }
 
-
     boxObj.start_time = input_start_time;
     boxObj.anchor_time = $('#inputAnchorTime').val();
-    boxObj.amplitude = $('#inputConstantAmplitude').val();
-    boxObj.variable_amplitude = $('#variableRadio').is(':checked');
-    boxObj.flip_amplitude = $('#flipAmplitudeCheck').is(':checked');
-    boxObj.step_change = $('#inputStepChange').val();
-    boxObj.loop_number = $('#inputLoopNumber').val();
     boxObj.array_info.name = selected_box_array_name;
     if (selected_box_array_name == "Default Array") {
         boxObj.array_info.array = axis_id_to_default_array[plot.id];
     } else {
         boxObj.array_info.array = array_name_to_array[selected_box_array_name];
+    }
+
+    if (boxObj.type == "rf") {
+        boxObj.rf_added_phase_type = $('#inputRfAddedPhaseType').val();
+        boxObj.rf_added_phase_float = $('#inputRfAddedPhase').val();
+        boxObj.init_phase = $('#inputRfInitialPhase').val();
+        boxObj.thickness = $('#inputRfThickness').val();
+        boxObj.flip_angle = $('#inputRfFlipAngle').val();
+        if ($('#rfExcitationRadio').is(':checked')) {
+            boxObj.purpose = "excitation";
+        } else {
+            boxObj.purpose = "refocusing";
+        }
+    } else if (boxObj.type == "grad") {
+        boxObj.amplitude = $('#inputConstantAmplitude').val();
+        boxObj.variable_amplitude = $('#variableRadio').is(':checked');
+        boxObj.flip_amplitude = $('#flipAmplitudeCheck').is(':checked');
+        boxObj.step_change = $('#inputStepChange').val();
+        boxObj.loop_number = $('#inputLoopNumber').val();
+        boxObj.equation_info.name = $('#inputGradEquationName').val();
+        boxObj.equation_info.expression = $('#inputGradEquationExpression').val();
+    } else {
+        boxObj.frequency = $('#inputAdcFrequency').val();
+        boxObj.phase = $('#inputAdcPhase').val();
+        boxObj.adc_added_phase_type = $('#inputAdcAddedPhaseType').val();
+        boxObj.adc_added_phase_float = $('#inputAdcAddedPhase').val();
+        boxObj.samples = $('#inputAdcSamples').val();
+        boxObj.dwell_time = $('#inputAdcDwellTime').val();
     }
 }
 
@@ -2081,13 +2124,29 @@ class Box {
     amplitude = 0;
     variable_amplitude = false;
     flip_amplitude = false;
-    step_change = 0;
-    loop_number = 0;
+    step_change = null;
+    loop_number = null;
     isSelected = false;
     block = null;
+    purpose = "";
+    rf_added_phase_type = "";
+    rf_added_phase_float = null;
+    init_phase = null;
+    thickness = null;
+    flip_angle = null;
+    frequency = null;
+    adc_added_phase_type = "";
+    adc_added_phase_float = null;
+    phase = null;
+    samples = null;
+    dwell_time = null;
     array_info = {
         name: "Default Array",
         array: []
+    };
+    equation_info = {
+        name: "",
+        expression: ""
     }
 
     constructor(type, start_time, axis, array) {
