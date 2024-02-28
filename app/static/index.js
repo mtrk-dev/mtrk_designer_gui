@@ -361,7 +361,7 @@ if (data) {
     save_data();
 }
 
-load_array_select();
+load_parameters_array_dropdown();
 
 $(document).ready(function() {
     let dragged = null;
@@ -693,12 +693,12 @@ $(document).ready(function() {
     });
 
     $(document).on('click', '.array-dropdown', function () {
-        $('#array-selection-btn').text($(this).text());
+        $('#array-dropdown-btn').text($(this).text());
     });
-    $(document).on('click', '#add-new-array-item', function () {
-        $('#parametersModal').addClass('blurred');
-        $('#arrayConfigModal').modal('toggle');
-    })
+    // $(document).on('click', '#add-new-array-item', function () {
+    //     $('#parametersModal').addClass('blurred');
+    //     $('#arrayConfigModal').modal('toggle');
+    // })
     $('#arrayConfigModal').on('hidden.bs.modal', function () {
         $('#parametersModal').removeClass('blurred');
         $('#inputArrayName').val("");
@@ -749,8 +749,8 @@ $(document).ready(function() {
             }
 
             // populate the array selection again with the addition of new array.
-            load_array_select();
-            load_array_select_options();
+            load_parameters_array_dropdown();
+            load_array_manager_select_options();
             $("#array-select").val(arrayName);
         }
     });
@@ -812,7 +812,7 @@ $(document).ready(function() {
     });
 
     $('#arrays-config-btn').click(function(){
-        load_array_select_options();
+        load_array_manager_select_options();
         $('#arrayConfigModal').modal('toggle');
     });
 
@@ -1239,7 +1239,7 @@ function load_modal_values(plot, trace_number) {
     $('#inputName').val(boxObj.name);
     $('#inputStartTime').val(boxObj.start_time);
     $('#inputAnchorTime').val(boxObj.anchor_time);
-    $('#array-selection-btn').text(boxObj.array_info.name);
+    $('#array-dropdown-btn').text(boxObj.array_info.name);
 
     if (boxObj.type == "rf") {
         $('#inputRfAddedPhaseType').val(boxObj.rf_added_phase_type);
@@ -1312,7 +1312,7 @@ function save_modal_values(plot, trace_number) {
     }
 
     // if selected array has been changed, we change the box array.
-    let selected_box_array_name = $('#array-selection-btn').text();
+    let selected_box_array_name = $('#array-dropdown-btn').text();
     let flip = $('#flipAmplitudeCheck').is(':checked');
     let array_changed_flag = false;
     if (selected_box_array_name != boxObj.array_info.name) {
@@ -1652,7 +1652,7 @@ function change_box_array(plot, trace_number, starting_point, new_array) {
     move_vertical_line_shape(plot, shape_number+1, starting_point);
 }
 
-function load_array_select() {
+function load_parameters_array_dropdown() {
     let ul = document.getElementById("array-dropdown-menu");
     ul.innerHTML = '';
     ul.innerHTML += '<li><a class="dropdown-item array-dropdown">Default Array</a></li>';
@@ -1663,8 +1663,8 @@ function load_array_select() {
         li.setAttribute("class", "dropdown-item array-dropdown")
         ul.appendChild(li);
     }
-    ul.innerHTML += '<li><hr class="dropdown-divider"></li> \
-    <li id="add-new-array-item"><a class="dropdown-item">&#43;</a></li>';
+    // ul.innerHTML += '<li><hr class="dropdown-divider"></li> \
+    // <li id="add-new-array-item"><a class="dropdown-item">&#43;</a></li>';
 }
 
 function validateArrayName(arrayName) {
@@ -2009,7 +2009,7 @@ function load_block_select_options() {
     }
 }
 
-function load_array_select_options() {
+function load_array_manager_select_options() {
     $("#array-select").empty();
     // Add a default new array option.
     let o = new Option("New Array", "New Array");
