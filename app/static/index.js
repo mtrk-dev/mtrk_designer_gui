@@ -716,7 +716,7 @@ $(document).ready(function() {
         let arrayName = $('#inputArrayName').val();
         let arrayValues = $('#inputArrayValues').val();
         isNameValid = validateArrayName(arrayName);
-        const [areValuesValid, array] = validateArrayValues(arrayValues);
+        const [areValuesValid, validated_array] = validateArrayValues(arrayValues);
         if (!isNameValid) {
             $('#inputArrayNameInvalidFeedback').show();
             $('#inputArrayName').removeClass('is-valid').addClass('is-invalid');
@@ -735,10 +735,24 @@ $(document).ready(function() {
         }
         if (isNameValid && areValuesValid) {
             $('#addArrayValidFeedback').show();
+
+            // If new array is selected, we simply add the array. We update it otherwise.
+            let selected_array_name = $("#array-select").val();
+            if (selected_array_name == "New Array") {
+                array_name_to_array[arrayName] = validated_array;
+            } else {
+                // Handling name changed case.
+                if (selected_array_name !== arrayName) {
+                    delete array_name_to_array[selected_array_name];
+                }
+                array_name_to_array[arrayName] = validated_array;
+            }
+
+            // populate the array selection again with the addition of new array.
+            load_array_select();
+            load_array_select_options();
+            $("#array-select").val(arrayName);
         }
-        array_name_to_array[arrayName] = array;
-        // populate the array selection again with the addition of new array.
-        load_array_select();
     });
 
     $('#flexSwitchCheckChecked').click(function(){
@@ -808,6 +822,25 @@ $(document).ready(function() {
         save_block_data(prev_block);
         let current_block = $(this).val();
         load_block_data(current_block);
+    });
+
+    $('#array-select').change(function(){
+        let selected_array_name = $(this).val();
+        if (selected_array_name == "New Array") {
+            $("#inputArrayName").val("");
+            $('#inputArrayValues').val("");
+        } else {
+            let selected_array_values = array_name_to_array[selected_array_name];
+            $("#inputArrayName").val(selected_array_name);
+            $('#inputArrayValues').val(selected_array_values);
+        }
+        $('#inputArrayName').removeClass('is-valid');
+        $('#inputArrayName').removeClass('is-invalid');
+        $('#inputArrayValues').removeClass('is-valid');
+        $('#inputArrayValues').removeClass('is-invalid');
+        $('#inputArrayNameInvalidFeedback').hide();
+        $('#inputArrayValuesInvalidFeedback').hide();
+        $('#addArrayValidFeedback').hide();
     });
 
     // TODO: can be removed in the future.
@@ -1978,7 +2011,11 @@ function load_block_select_options() {
 
 function load_array_select_options() {
     $("#array-select").empty();
-    // Add the arrays in the array select.
+    // Add a default new array option.
+    let o = new Option("New Array", "New Array");
+    $(o).html("New Array");
+    $("#array-select").append(o);
+    // Add all the available arrays.
     for (var array_text in array_name_to_array) {
         let o = new Option(array_text, array_text);
         $(o).html(array_text);
