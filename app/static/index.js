@@ -1316,6 +1316,7 @@ function load_modal_values(plot, trace_number) {
             $("#flipAmplitudeCheck").prop("checked", false);
         }
     } else {
+        $('#inputAdcDuration').val(boxObj.duration);
         $('#inputAdcFrequency').val(boxObj.frequency);
         $('#inputAdcPhase').val(boxObj.phase);
         $('#inputAdcAddedPhaseType').val(boxObj.adc_added_phase_type);
@@ -1411,6 +1412,12 @@ function save_modal_values(plot, trace_number) {
         boxObj.equation_info.name = $('#inputGradEquationName').val();
         boxObj.equation_info.expression = $('#inputGradEquationExpression').val();
     } else {
+        // Update the adc trace if duration is changed.
+        let new_duration = $('#inputAdcDuration').val();
+        if (new_duration && new_duration !== boxObj.duration) {
+            update_adc_trace_duration(plot, trace_number, parseFloat(input_start_time), new_duration);
+        }
+        boxObj.duration = new_duration;
         boxObj.frequency = $('#inputAdcFrequency').val();
         boxObj.phase = $('#inputAdcPhase').val();
         boxObj.adc_added_phase_type = $('#inputAdcAddedPhaseType').val();
@@ -1693,6 +1700,35 @@ function change_box_array(plot, trace_number, starting_point, new_array) {
 
     // Update the box shape according to the new trace array
     let ending_point = starting_point + (y.length/step_size)
+    update_box_shape(plot, shape_number, starting_point, ending_point);
+    move_vertical_line_shape(plot, shape_number+1, starting_point);
+}
+
+function update_adc_trace_duration(plot, trace_number, starting_point, new_duration) {
+    let line = plot.data[trace_number]["line"];
+    let hovertemplate = plot.data[trace_number]["hovertemplate"];
+    let shape_number = (trace_number-1)*2;
+
+    let x_data = [];
+    let y_data = [];
+    for (let i=0; i<=new_duration*step_size; i+=1) {
+        x_data.push(starting_point+(i/step_size));
+        if (i==0 || i==(new_duration*step_size)) y_data.push(0);
+        else y_data.push(0.8);
+    }
+
+    let data = {};
+    data["y"] = y_data;
+    data["x"] = x_data;
+    data["line"] = line;
+    data["hovertemplate"] = hovertemplate;
+
+    // delete the trace from the old location and add at new location.
+    Plotly.deleteTraces(plot, trace_number);
+    Plotly.addTraces(plot, data, trace_number);
+
+    // Update the box shape according to the new trace array
+    let ending_point = starting_point + (y_data.length/step_size)
     update_box_shape(plot, shape_number, starting_point, ending_point);
     move_vertical_line_shape(plot, shape_number+1, starting_point);
 }
@@ -2251,6 +2287,7 @@ class Box {
     init_phase = null;
     thickness = null;
     flip_angle = null;
+    duration = null;
     frequency = null;
     adc_added_phase_type = "";
     adc_added_phase_float = null;
