@@ -1383,7 +1383,7 @@ function save_modal_values(plot, trace_number) {
         }
     }
 
-    boxObj.start_time = input_start_time;
+    boxObj.start_time = parseFloat(input_start_time);
     boxObj.anchor_time = $('#inputAnchorTime').val();
     boxObj.array_info.name = selected_box_array_name;
     if (selected_box_array_name == "Default Array") {
@@ -1415,9 +1415,9 @@ function save_modal_values(plot, trace_number) {
         // Update the adc trace if duration is changed.
         let new_duration = $('#inputAdcDuration').val();
         if (new_duration && new_duration !== boxObj.duration) {
-            update_adc_trace_duration(plot, trace_number, parseFloat(input_start_time), new_duration);
+            update_adc_trace_duration(plot, trace_number, parseFloat(input_start_time), parseFloat(new_duration));
         }
-        boxObj.duration = new_duration;
+        boxObj.duration = parseFloat(new_duration);
         boxObj.frequency = $('#inputAdcFrequency').val();
         boxObj.phase = $('#inputAdcPhase').val();
         boxObj.adc_added_phase_type = $('#inputAdcAddedPhaseType').val();
