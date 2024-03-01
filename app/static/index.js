@@ -177,6 +177,13 @@ line: {
 // hovertemplate: '<b> %{text}</b><br> %{y:.2f}<extra></extra>'
 };
 
+const plot_array_data = {
+    name: 'Array',
+    line: {
+        color: 'pink',
+      }
+};
+
 const layout = {
     plot_bgcolor:"rgba(0,0,0,0.1)",
     paper_bgcolor:"rgba(0,0,0,0.6)",
@@ -334,6 +341,37 @@ Plotly.newPlot('slice_chart', [plot_slice_data], slice_layout, config);
 Plotly.newPlot('phase_chart', [plot_phase_data], phase_layout, config);
 Plotly.newPlot('readout_chart', [plot_readout_data], readout_layout, config);
 Plotly.newPlot('adc_chart', [plot_adc_data], adc_layout, config);
+
+// Array manager chart
+array_chart_layout = {
+    plot_bgcolor:"rgba(0,0,0,0.1)",
+    paper_bgcolor:"rgba(0,0,0,0.6)",
+    showlegend: false,
+    // width: 0.2*window.innerWidth,
+    height: 0.15*window.innerHeight,
+    margin: {
+        t: 25,
+        b: 25,
+        l: 25,
+        r: 25
+    },
+    xaxis: {
+        "gridcolor": "rgba(255,255,255,0.05)",
+        "zerolinecolor": "rgba(255,255,255,0.05)",
+        showticklabels: false,
+        fixedrange: true,
+        range: [0, block_duration],
+    },
+    yaxis: {
+        "gridcolor": "rgba(255,255,255,0.05)",
+        "zerolinecolor": "rgba(255,255,255,0.05)",
+        showticklabels: false,
+        range: [0, 1.25],
+        fixedrange: true,
+    },
+    dragmode: false
+}
+Plotly.newPlot('array_manager_chart', [plot_array_data], array_chart_layout, config);
 
 // If the size of window is changed, we update the layout!
 const rf_chart = document.getElementById('rf_chart');
@@ -752,6 +790,7 @@ $(document).ready(function() {
             load_parameters_array_dropdown();
             load_array_manager_select_options();
             $("#array-select").val(arrayName);
+            update_array_manager_chart(validated_array);
         }
     });
 
@@ -813,6 +852,10 @@ $(document).ready(function() {
 
     $('#arrays-config-btn').click(function(){
         load_array_manager_select_options();
+        let plot = document.getElementById("array_manager_chart");
+        if (plot.data.length > 0) {
+            Plotly.deleteTraces(plot, -1);
+        }
         $('#arrayConfigModal').modal('toggle');
     });
 
@@ -829,10 +872,12 @@ $(document).ready(function() {
         if (selected_array_name == "New Array") {
             $("#inputArrayName").val("");
             $('#inputArrayValues').val("");
+            Plotly.deleteTraces("array_manager_chart", -1);
         } else {
             let selected_array_values = array_name_to_array[selected_array_name];
             $("#inputArrayName").val(selected_array_name);
             $('#inputArrayValues').val(selected_array_values);
+            update_array_manager_chart(selected_array_values);
         }
         $('#inputArrayName').removeClass('is-valid');
         $('#inputArrayName').removeClass('is-invalid');
@@ -1954,6 +1999,24 @@ function add_dummy_block_boxes(seen_plots, starting_point, ending_point) {
             plot_to_box_objects[block_name][target.id].push(boxObj);
         }
     }
+}
+
+function update_array_manager_chart(y_data) {
+    let plot = document.getElementById("array_manager_chart");
+    let x_data = []
+    let starting_point = 1;
+    for (let i=0; i<y_data.length; i+=1) {
+        x_data.push(starting_point + (i/step_size));
+    }
+    let data = {};
+    data["y"] = y_data;
+    data["x"] = x_data;
+
+    // Delete the last trace, and add the new trace.
+    if (plot.data.length > 0) {
+        Plotly.deleteTraces(plot, -1);
+    }
+    Plotly.addTraces(plot, data, -1);
 }
 
 function save_block_data(block_name) {

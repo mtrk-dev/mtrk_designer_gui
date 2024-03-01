@@ -103,6 +103,11 @@
     margin-bottom: 1%;
 }
 
+#array_manager_chart {
+    margin-bottom: 2%;
+    margin-left: 4%;
+}
+
 /* .group-loop-input {
     position: absolute;
     left: 20px;
