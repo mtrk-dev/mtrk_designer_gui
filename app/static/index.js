@@ -548,7 +548,7 @@ $(document).ready(function() {
                     if (starting_point < 0) {
                         starting_point = 0;
                     } else if (starting_point > block_duration) {
-                        starting_point = block_duration - 10;
+                        starting_point = block_duration - 1;
                     }
 
                     // Not needed for now as we have disabled stretching/squeezing.
@@ -678,7 +678,7 @@ $(document).ready(function() {
     });
 
     $("#block-time-btn").click(function () {
-        block_duration = $("#blockDurationInput").val();
+        block_duration = parseInt($("#blockDurationInput").val());
         $(".dropzone").each(function () {
             var plot = this;
             // Change the range and relayout plot.
@@ -2086,7 +2086,8 @@ function load_block_data(block_name) {
         // changing the height to handle the case where plot dimension has been changed after block creation.
         layout["height"] = window.innerHeight/5;
         layout["width"] =  rf_chart.offsetWidth;
-        Plotly.react(plot, plot_data[0], plot_data[1]);
+        layout["xaxis"]["range"] = [0, block_duration];
+        Plotly.react(plot, plot_data[0], layout);
     });
     // For the cases when different theme was selected during block creation.
     // This ensures the plot color matches the selected theme.
