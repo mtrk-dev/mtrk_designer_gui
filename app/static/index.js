@@ -315,8 +315,8 @@ var annotation_template = {
     },
   }
 
-// keeping default 10 for now, later to be set by user.
-const anchor_time = 0;
+// keeping default 0.1 for now, later to be set by user.
+const anchor_time = 0.1;
 
 const config = {
     // scrollZoom: true,
@@ -626,6 +626,8 @@ $(document).ready(function() {
         elements = Array.from(elements);
         save_modal_values(plot, selected_trace_number);
         $('#parametersModal').modal('toggle');
+        // auto-save data.
+        $( "#save-plot-btn" ).trigger( "click" );
     });
 
     $("#block_save_changes_btn").on( "click", function(event) {
