@@ -46,7 +46,7 @@ var reset_flag = 0;
 
 var undo_stack = [];
 var redo_stack = [];
-const max_stack_length = 5;
+const max_stack_length = 8;
 
 const current_version = "1.1";
 
@@ -500,6 +500,9 @@ $(document).ready(function() {
             plot_to_box_objects[block_name] = JSON.parse(JSON.stringify(plot_to_box_objects_template));
         }
         plot_to_box_objects[block_name][target.id].push(boxObj);
+
+        // auto-save data.
+        $( "#save-plot-btn" ).trigger( "click" );
         });
     });
     // sync zoom among all plots.
