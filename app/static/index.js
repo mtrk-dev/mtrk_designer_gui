@@ -711,9 +711,11 @@ $(document).ready(function() {
         if ($(this).is(':checked')) {
           if ($(this).val() == "constant") {
             $('#variableAmplitudeGroup').hide();
+            $('#inputConstantAmplitude').show();
           }
           else if ($(this).val() == "variable") {
             $('#variableAmplitudeGroup').show();
+            $('#inputConstantAmplitude').hide();
           }
         }
     });
@@ -1297,6 +1299,7 @@ function load_modal_values(plot, trace_number) {
         $('#inputRfInitialPhase').val(boxObj.init_phase);
         $('#inputRfThickness').val(boxObj.thickness);
         $('#inputRfFlipAngle').val(boxObj.flip_angle);
+        $('#inputRfDuration').val(boxObj.rf_duration);
         if (!boxObj.purpose || boxObj.purpose == "excitation") {
             $("#rfExcitationRadio").prop("checked", true);
         } else {
@@ -1311,9 +1314,11 @@ function load_modal_values(plot, trace_number) {
         if (boxObj.variable_amplitude) {
             $("#variableRadio").prop("checked", true);
             $('#variableAmplitudeGroup').show();
+            $('#inputConstantAmplitude').hide();
         } else {
             $("#constantRadio").prop("checked", true);
             $('#variableAmplitudeGroup').hide();
+            $('#inputConstantAmplitude').show();
         }
         if (boxObj.flip_amplitude) {
             $("#flipAmplitudeCheck").prop("checked", true);
@@ -1321,7 +1326,7 @@ function load_modal_values(plot, trace_number) {
             $("#flipAmplitudeCheck").prop("checked", false);
         }
     } else {
-        $('#inputAdcDuration').val(boxObj.duration);
+        $('#inputAdcDuration').val(boxObj.adc_duration);
         $('#inputAdcFrequency').val(boxObj.frequency);
         $('#inputAdcPhase').val(boxObj.phase);
         $('#inputAdcAddedPhaseType').val(boxObj.adc_added_phase_type);
@@ -1403,6 +1408,7 @@ function save_modal_values(plot, trace_number) {
         boxObj.init_phase = $('#inputRfInitialPhase').val();
         boxObj.thickness = $('#inputRfThickness').val();
         boxObj.flip_angle = $('#inputRfFlipAngle').val();
+        boxObj.rf_duration = parseFloat($('#inputRfDuration').val());
         if ($('#rfExcitationRadio').is(':checked')) {
             boxObj.purpose = "excitation";
         } else {
@@ -1417,12 +1423,12 @@ function save_modal_values(plot, trace_number) {
         boxObj.equation_info.name = $('#inputGradEquationName').val();
         boxObj.equation_info.expression = $('#inputGradEquationExpression').val();
     } else {
-        // Update the adc trace if duration is changed.
+        // Update the adc trace if adc_duration is changed.
         let new_duration = $('#inputAdcDuration').val();
-        if (new_duration && new_duration !== boxObj.duration) {
+        if (new_duration && new_duration !== boxObj.adc_duration) {
             update_adc_trace_duration(plot, trace_number, parseFloat(input_start_time), parseFloat(new_duration));
         }
-        boxObj.duration = parseFloat(new_duration);
+        boxObj.adc_duration = parseFloat(new_duration);
         boxObj.frequency = $('#inputAdcFrequency').val();
         boxObj.phase = $('#inputAdcPhase').val();
         boxObj.adc_added_phase_type = $('#inputAdcAddedPhaseType').val();
@@ -2280,7 +2286,8 @@ class Box {
     init_phase = null;
     thickness = null;
     flip_angle = null;
-    duration = null;
+    adc_duration = null;
+    rf_duration = null;
     frequency = null;
     adc_added_phase_type = "";
     adc_added_phase_float = null;
