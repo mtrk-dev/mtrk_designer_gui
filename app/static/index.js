@@ -266,6 +266,10 @@ rf_layout["title"] = {
     yref: 'paper',
     y: 1
 }
+
+// Some extra space for x-axis label.
+adc_layout["margin"]["b"] = 30;
+
 // We will use the shape template and keep adding to the total shapes in one axis.
 var shapes_array = [];
 const shape_height = 1.1;
