@@ -319,8 +319,8 @@ var annotation_template = {
     },
   }
 
-// keeping default 0.1 for now, later to be set by user.
-const anchor_time = 0.1;
+// keeping default 0 for now, later to be set by user.
+const anchor_time = 0;
 
 const config = {
     // scrollZoom: true,
@@ -897,6 +897,16 @@ $(document).ready(function() {
         $('#inputArrayNameInvalidFeedback').hide();
         $('#inputArrayValuesInvalidFeedback').hide();
         $('#addArrayValidFeedback').hide();
+    });
+
+    $("#inputAnchorTime").hide();
+    $('#anchor-time-mode-select').change(function(){
+        let selected_mode = $(this).val();
+        if (selected_mode == "custom") {
+            $("#inputAnchorTime").show();
+        } else {
+            $("#inputAnchorTime").hide();
+        }
     });
 
     // TODO: can be removed in the future.

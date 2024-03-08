@@ -254,15 +254,27 @@
                         <form id="parametersForm" action="">
                           <div class="form-group">
                             <label for="inputName">Name</label>
-                            <input type="text" class="form-control" id="inputName" placeholder="Ex: Grad Slice Refocus">
+                            <input type="text" class="form-control form-control-sm" id="inputName" placeholder="Ex: Grad Slice Refocus">
                           </div>
                           <div class="form-group">
                             <label for="inputStartTime">Start Time (ms)</label>
-                            <input type="number" class="form-control" id="inputStartTime" placeholder=0>
+                            <input type="number" class="form-control form-control-sm" id="inputStartTime" placeholder=0>
                           </div>
                           <div class="form-group rf-param grad-param">
                             <label for="inputAnchorTime">Anchor Time (ms)</label>
-                            <input type="number" class="form-control" id="inputAnchorTime" placeholder=0>
+                            <div class="row">
+                              <div class="col-8">
+                                <select id="anchor-time-mode-select" class="form-select form-select-sm" aria-label=".form-select-sm example">
+                                  <option selected value="start">Start</option>
+                                  <option value="mid">Mid</option>
+                                  <option value="end">End</option>
+                                  <option value="custom">Custom</option>
+                                </select>
+                              </div>
+                              <div class="col-4">
+                                <input type="number" class="form-control form-control-sm" id="inputAnchorTime" placeholder=0>
+                              </div>
+                            </div>
                           </div>
                           <div class="form-group rf-param">
                             <label for="inputRFType">RF Type</label>
@@ -279,17 +291,17 @@
                               </label>
                             </div>
                             <label for="inputRfDuration">Duration (ms)</label>
-                            <input type="number" class="form-control" id="inputRfDuration" value="1" placeholder=1>
+                            <input type="number" class="form-control form-control-sm" id="inputRfDuration" value="1" placeholder=1>
                             <label for="inputRfAddedPhaseType">Added Phase Type</label>
-                            <input type="text" class="form-control" id="inputRfAddedPhaseType" placeholder="Ex: ">
+                            <input type="text" class="form-control form-control-sm" id="inputRfAddedPhaseType" placeholder="Ex: ">
                             <label for="inputRfAddedPhase">Added Phase</label>
-                            <input type="number" class="form-control" id="inputRfAddedPhase" placeholder=0>
+                            <input type="number" class="form-control form-control-sm" id="inputRfAddedPhase" placeholder=0>
                             <label for="inputRfInitialPhase">Initial Phase</label>
-                            <input type="number" class="form-control" id="inputRfInitialPhase" placeholder=0>
+                            <input type="number" class="form-control form-control-sm" id="inputRfInitialPhase" placeholder=0>
                             <label for="inputRfThickness">Thickness</label>
-                            <input type="number" class="form-control" id="inputRfThickness" placeholder=1>
+                            <input type="number" class="form-control form-control-sm" id="inputRfThickness" placeholder=1>
                             <label for="inputRfFlipAngle">Flip Angle</label>
-                            <input type="number" class="form-control" id="inputRfFlipAngle" placeholder=1>
+                            <input type="number" class="form-control form-control-sm" id="inputRfFlipAngle" placeholder=1>
                           </div>
                           <div class="form-group grad-param">
                             <label for="inputAmplitude">Amplitude</label>
@@ -305,15 +317,15 @@
                                 Variable
                               </label>
                             </div>
-                            <input type="number" class="form-control" id="inputConstantAmplitude" placeholder=0>
+                            <input type="number" class="form-control form-control-sm" id="inputConstantAmplitude" placeholder=0>
                             <div id="variableAmplitudeGroup" class="form-row">
                               <div class="form-group col">
                                 <label for="inputStepChange">Step Change</label>
-                                <input type="number" class="form-control" id="inputStepChange" placeholder=0>
+                                <input type="number" class="form-control form-control-sm" id="inputStepChange" placeholder=0>
                               </div>
                               <div class="form-group col">
                                 <label for="inputLoopNumber">Loop Number</label>
-                                <input type="number" class="form-control" id="inputLoopNumber" placeholder=0>
+                                <input type="number" class="form-control form-control-sm" id="inputLoopNumber" placeholder=0>
                               </div>
                             </div>
                             <div class="form-check">
@@ -323,25 +335,25 @@
                               </label>
                             </div>
                             <label for="inputGradEquationName">Equation Name</label>
-                            <input type="text" class="form-control" id="inputGradEquationName" placeholder="Ex: phaseencoding">
+                            <input type="text" class="form-control form-control-sm" id="inputGradEquationName" placeholder="Ex: phaseencoding">
                             <label for="inputGradEquationExpression">Equation Expression</label>
-                            <input type="text" class="form-control" id="inputGradEquationExpression" placeholder="Ex: 0.3378125*(ctr(1)-64.5)">
+                            <input type="text" class="form-control form-control-sm" id="inputGradEquationExpression" placeholder="Ex: 0.3378125*(ctr(1)-64.5)">
                           </div>
                           <div class="form-group adc-param">
                             <label for="inputAdcDuration">Duration (ms)</label>
-                            <input type="number" class="form-control" id="inputAdcDuration" value="1" placeholder=1>
+                            <input type="number" class="form-control form-control-sm" id="inputAdcDuration" value="1" placeholder=1>
                             <label for="inputAdcFrequency">Frequency</label>
-                            <input type="number" class="form-control" id="inputAdcFrequency" placeholder=0>
+                            <input type="number" class="form-control form-control-sm" id="inputAdcFrequency" placeholder=0>
                             <label for="inputAdcPhase">Phase</label>
-                            <input type="number" class="form-control" id="inputAdcPhase" placeholder=0>
+                            <input type="number" class="form-control form-control-sm" id="inputAdcPhase" placeholder=0>
                             <label for="inputAdcAddedPhaseType">Added Phase Type</label>
-                            <input type="text" class="form-control" id="inputAdcAddedPhaseType" placeholder="Ex: ">
+                            <input type="text" class="form-control form-control-sm" id="inputAdcAddedPhaseType" placeholder="Ex: ">
                             <label for="inputAdcAddedPhase">Added Phase</label>
-                            <input type="number" class="form-control" id="inputAdcAddedPhase" placeholder=0>
+                            <input type="number" class="form-control form-control-sm" id="inputAdcAddedPhase" placeholder=0>
                             <label for="inputAdcSamples">Samples</label>
-                            <input type="number" class="form-control" id="inputAdcSamples" placeholder=36>
+                            <input type="number" class="form-control form-control-sm" id="inputAdcSamples" placeholder=36>
                             <label for="inputAdcDwellTime">Dwell Time</label>
-                            <input type="number" class="form-control" id="inputAdcDwellTime" placeholder=1>
+                            <input type="number" class="form-control form-control-sm" id="inputAdcDwellTime" placeholder=1>
                           </div>
                           <div class="form-group grad-param rf-param">
                             <div class="btn-group">
