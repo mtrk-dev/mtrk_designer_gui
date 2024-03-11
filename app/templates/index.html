@@ -465,6 +465,54 @@
                     </div>
                   </div>
                 </div>
+                <div class="modal fade" id="eventsModal" tabindex="-1" aria-labelledby="eventsModalLabel" aria-hidden="true">
+                  <div class="modal-dialog">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5 class="modal-title" id="eventsModalLabel">Configure Events</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                      </div>
+                      <div class="modal-body">
+                        <div class="row">
+                          <div class="form-group">
+                            <label for="event-action-select">Event</label>
+                            <select id="event-action-select" class="form-select" aria-label=".form-select-sm example">
+                              <option selected value="calc">Calculation</option>
+                              <option value="init">Initialization</option>
+                              <option value="sync">Sync</option>
+                            </select>
+                          </div>
+                          <div class="calc-params">
+                            <div class="form-group">
+                              <label for="inputCalcActionType">Type</label>
+                              <input type="text" class="form-control" id="inputCalcActionType" placeholder="Ex: float_rfspoil">
+                              <label for="inputCalcFloat">Float (ms)</label>
+                              <input type="number" class="form-control" id="inputCalcFloat" placeholder=0>
+                              <label for="inputCalcIncrement">Increment (ms)</label>
+                              <input type="number" class="form-control" id="inputCalcIncrement" placeholder=0>
+                            </div>
+                          </div>
+                          <div class="init-params">
+                            <div class="form-group">
+                              <label for="inputInitActionGradients">Gradients</label>
+                              <input type="text" class="form-control" id="inputInitActionGradients" placeholder="Ex: logical">
+                            </div>
+                          </div>
+                          <div class="sync-params">
+                            <div class="form-group">
+                              <label for="inputSyncTime">Time (ms)</label>
+                              <input type="number" class="form-control" id="inputSyncTime" placeholder=0>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="modal-footer">
+                        <button id="events_modal_close_btn" type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button id="events_save_changes_btn" type="button" class="btn btn-primary">Save changes</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
               <div id="events-col" class="col-auto">
                 <a id="event-manager-btn" class="btn btn-sm btn-secondary role="button" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Manage Events">

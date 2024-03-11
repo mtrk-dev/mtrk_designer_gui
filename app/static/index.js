@@ -864,6 +864,13 @@ $(document).ready(function() {
         $('#loopsModal').modal('toggle');
     });
 
+    $('#event-manager-btn').click(function(){
+        $('#eventsModal').modal('toggle');
+    });
+    $('#events_modal_close_btn').click(function(){
+        $('#eventsModal').modal('toggle');
+    });
+
     $('#arrays-config-btn').click(function(){
         load_array_manager_select_options();
         let plot = document.getElementById("array_manager_chart");
@@ -909,6 +916,22 @@ $(document).ready(function() {
             $("#inputAnchorTime").show();
         } else {
             $("#inputAnchorTime").hide();
+        }
+    });
+
+    $(".init-params").hide();
+    $(".sync-params").hide();
+    $('#event-action-select').change(function(){
+        $(".calc-params").hide();
+        $(".init-params").hide();
+        $(".sync-params").hide();
+        let selected_action = $(this).val();
+        if (selected_action == "calc") {
+            $(".calc-params").show();
+        } else if (selected_action == "init") {
+            $(".init-params").show();
+        } else if (selected_action == "sync") {
+            $(".sync-params").show();
         }
     });
 

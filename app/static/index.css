@@ -94,7 +94,7 @@
     margin-bottom: 1%;
 }
 
-#array-select {
+#array-select, #event-action-select {
     width: 30%;
 }
 
