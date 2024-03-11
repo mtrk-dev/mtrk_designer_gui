@@ -43,6 +43,14 @@
     margin-top: 8%;
 }
 
+#event-manager-btn {
+    /* font-size: 14px; */
+    background: transparent;
+    color: #49b149;
+    border: 1px solid #49b149;
+    margin-top: 15%;
+}
+
 #saved-msg {
     padding: 5px;
     margin-top: 8%;
@@ -81,6 +89,7 @@
 
 #block-select {
     width: 90%;
+    margin-top: 5%;
     margin-left: 5%;
     margin-bottom: 1%;
 }
@@ -106,6 +115,14 @@
 #array_manager_chart {
     margin-bottom: 2%;
     margin-left: 4%;
+}
+
+#events-col {
+    background: #0e0f10;
+}
+
+#plot-col {
+    padding-right: 0px;
 }
 
 /* .group-loop-input {

@@ -198,7 +198,9 @@ const layout = {
     showlegend: false,
       margin: {
         t: 20,
-        b: 20
+        b: 20,
+        r: 15,
+        // l: 60
       },
     title : {
         text: ""
@@ -813,7 +815,7 @@ $(document).ready(function() {
                 $(this).addClass("btn-light");
             });
             toggle_plot_color(true);
-
+            $("#events-col").css('background', "#fbfbfb");
         }
         else {
             document.documentElement.setAttribute('data-bs-theme','dark')
@@ -822,6 +824,7 @@ $(document).ready(function() {
                 $(this).addClass("btn-secondary");
             });
             toggle_plot_color(false);
+            $("#events-col").css('background', "#0e0f10");
         }
     });
 
