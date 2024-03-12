@@ -44,10 +44,10 @@
 }
 
 #event-manager-btn {
-    /* font-size: 14px; */
+    font-size: 14px;
     background: transparent;
-    color: #49b149;
-    border: 1px solid #49b149;
+    /* color: #49b149; */
+    /* border: 1px solid #49b149; */
     margin-top: 15%;
 }
 

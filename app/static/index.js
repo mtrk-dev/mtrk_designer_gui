@@ -1038,6 +1038,31 @@ $(document).ready(function() {
         document.body.removeChild(link);
         window.URL.revokeObjectURL(url);
     });
+
+    $("#events_save_changes_btn").click(function() {
+        let event_data = {};
+        let selected_action = $("#event-action-select").val();
+        event_data["eventType"] = selected_action;
+
+        // Save and then reset values.
+        if (selected_action == "calc") {
+            event_data["inputCalcActionType"] = $("#inputCalcActionType").val();
+            event_data["inputCalcFloat"] = $("#inputCalcFloat").val();
+            event_data["inputCalcIncrement"] = $("#inputCalcIncrement").val();
+            $("#inputCalcActionType").val('');
+            $("#inputCalcFloat").val('');
+            $("#inputCalcIncrement").val('');
+        } else if (selected_action == "init") {
+            event_data["inputInitActionGradients"] = $("#inputInitActionGradients").val();
+            $("#inputInitActionGradients").val('');
+        } else if (selected_action == "sync") {
+            event_data["inputSyncTime"] = $("#inputSyncTime").val();
+            $("#inputSyncTime").val('');
+        }
+
+        add_new_event(event_data);
+        $('#eventsModal').modal('toggle');
+    });
 });
 
 // Check whether shift button is pressed
@@ -2263,6 +2288,24 @@ function update_annotations_loops_count() {
         }
     });
     load_block_data($('#block-select').val());
+}
+
+function add_new_event(event_data) {
+    let event_btn_str = `<a class="btn btn-sm btn-secondary"
+    role="button" data-bs-toggle="tooltip" data-bs-placement="bottom"
+    title="${event_data["eventType"]} event">
+        <i class="fa fa-calculator"></i>
+    </a>`;
+    let el = document.createElement('div');
+    el.innerHTML = event_btn_str;
+
+    if (event_data["eventType"] == "calc") {
+        $("#calc-events").append(el);
+    } else if (event_data["eventType"] == "init") {
+        $("#init-events").append("<div>Init event!</div>");
+    } else if (event_data["eventType"] == "sync") {
+        $("#sync-events").append("<div>Sync event!</div>");
+    }
 }
 
 const file = new File(['foo'], 'dummy_file.json', {
