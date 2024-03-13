@@ -42,6 +42,12 @@ var blocks = {}
 // To maintain the number of loops on each block.
 var block_to_loops = {}
 
+const event_type_to_icon_str = {
+    "calc": "fa fa-calculator",
+    "init": "fa fa-play",
+    "sync": "fa fa-refresh"
+}
+
 var reset_flag = 0;
 
 var undo_stack = [];
@@ -865,6 +871,15 @@ $(document).ready(function() {
     });
 
     $('#event-manager-btn').click(function(){
+        // update/clear the modal to default
+        $("#eventsModalLabel").text("Add Event");
+        $("#event-action-select").val("calc");
+        $('#event-action-select').change();
+        $("#inputCalcActionType").val('');
+        $("#inputCalcFloat").val('');
+        $("#inputCalcIncrement").val('');
+        $("#inputInitActionGradients").val('');
+        $("#inputSyncTime").val('');
         $('#eventsModal').modal('toggle');
     });
     $('#events_modal_close_btn').click(function(){
@@ -1042,22 +1057,18 @@ $(document).ready(function() {
     $("#events_save_changes_btn").click(function() {
         let event_data = {};
         let selected_action = $("#event-action-select").val();
-        event_data["eventType"] = selected_action;
+        event_data["event-type"] = selected_action;
 
         // Save and then reset values.
+        // Saving data with hyphens (-) as it gets converted to camel case when data attributes are used.
         if (selected_action == "calc") {
-            event_data["inputCalcActionType"] = $("#inputCalcActionType").val();
-            event_data["inputCalcFloat"] = $("#inputCalcFloat").val();
-            event_data["inputCalcIncrement"] = $("#inputCalcIncrement").val();
-            $("#inputCalcActionType").val('');
-            $("#inputCalcFloat").val('');
-            $("#inputCalcIncrement").val('');
+            event_data["input-calc-action-type"] = $("#inputCalcActionType").val();
+            event_data["input-calc-float"] = $("#inputCalcFloat").val();
+            event_data["input-calc-increment"] = $("#inputCalcIncrement").val();
         } else if (selected_action == "init") {
-            event_data["inputInitActionGradients"] = $("#inputInitActionGradients").val();
-            $("#inputInitActionGradients").val('');
+            event_data["input-init-action-gradients"] = $("#inputInitActionGradients").val();
         } else if (selected_action == "sync") {
-            event_data["inputSyncTime"] = $("#inputSyncTime").val();
-            $("#inputSyncTime").val('');
+            event_data["input-sync-time"] = $("#inputSyncTime").val();
         }
 
         add_new_event(event_data);
@@ -1082,6 +1093,27 @@ $(document).keyup(function() {
 });
 var shiftIsPressed = false;
 var controlIsPressed = false;
+
+// Add click handler to the event buttons.
+$(document).on("click", ".event-btn", function () {
+    let clicked_event_data = $(this).data();
+    let event_type = clicked_event_data["eventType"];
+    $("#event-action-select").val(event_type);
+    $('#event-action-select').change();
+    $("#eventsModalLabel").text("Configure Event");
+
+    if (event_type == "calc") {
+        $("#inputCalcActionType").val(clicked_event_data["inputCalcActionType"]);
+        $("#inputCalcFloat").val(clicked_event_data["inputCalcFloat"]);
+        $("#inputCalcIncrement").val(clicked_event_data["inputCalcIncrement"]);
+    } else if (event_type == "init") {
+        $("#inputInitActionGradients").val(clicked_event_data["inputInitActionGradients"]);
+    } else if (event_type == "sync") {
+        $("#inputSyncTime").val(clicked_event_data["inputSyncTime"]);
+    }
+
+    $('#eventsModal').modal('toggle');
+})
 
 // Pre processing code to convert the mouse point x-value to plot's xaxis value.
 var xaxis = rf_chart._fullLayout.xaxis;
@@ -2291,21 +2323,36 @@ function update_annotations_loops_count() {
 }
 
 function add_new_event(event_data) {
-    let event_btn_str = `<a class="btn btn-sm btn-secondary"
-    role="button" data-bs-toggle="tooltip" data-bs-placement="bottom"
-    title="${event_data["eventType"]} event">
-        <i class="fa fa-calculator"></i>
-    </a>`;
+    let event_type = event_data["event-type"];
+    let event_icon_str = event_type_to_icon_str[event_type];
+
+    let data_attributes_str = create_data_attributes_string(event_data);
+
+    let event_btn_str = `<a
+        class="btn btn-sm btn-secondary event-btn"
+        role="button" data-bs-toggle="tooltip" data-bs-placement="bottom"
+        title="${event_type} event" ${data_attributes_str}>
+            <i class="${event_icon_str}"></i>
+        </a>`;
     let el = document.createElement('div');
     el.innerHTML = event_btn_str;
 
-    if (event_data["eventType"] == "calc") {
+    if (event_type == "calc") {
         $("#calc-events").append(el);
-    } else if (event_data["eventType"] == "init") {
-        $("#init-events").append("<div>Init event!</div>");
-    } else if (event_data["eventType"] == "sync") {
-        $("#sync-events").append("<div>Sync event!</div>");
+    } else if (event_type == "init") {
+        $("#init-events").append(el);
+    } else if (event_type == "sync") {
+        $("#sync-events").append(el);
     }
+}
+
+function create_data_attributes_string(event_data) {
+    let data_attributes_str = ``;
+    for (let key in event_data) {
+        if (event_data[key] == "") continue;
+        data_attributes_str += "data-" + key + "=" + event_data[key] + " ";
+    }
+    return data_attributes_str;
 }
 
 const file = new File(['foo'], 'dummy_file.json', {

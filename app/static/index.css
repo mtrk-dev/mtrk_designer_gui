@@ -24,6 +24,16 @@
     margin-bottom: 2%;
 }
 
+.event-section {
+    margin-bottom: 30%;
+    margin-top: 10%;
+}
+
+.event-btn {
+    margin-bottom: 8%;
+    width: 100%;
+}
+
 #generate-sdl-btn {
     margin-bottom: 1%;
     position: absolute;
