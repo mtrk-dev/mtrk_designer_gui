@@ -4,7 +4,8 @@ import json
 
 import os
 import sys
-path = os.path.abspath("mtrk_sdl_generator_anais")
+path = os.path.abspath("C:/Users/artiga02/mtrk_sdl_generator")
+# path = os.path.abspath("mtrk_sdl_generator_anais")
 sys.path.append(path)
 
 from backendToUi import *
