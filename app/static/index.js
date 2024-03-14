@@ -54,7 +54,7 @@ var undo_stack = [];
 var redo_stack = [];
 const max_stack_length = 8;
 
-const current_version = "1.1";
+const current_version = "1.2";
 
 // Dummy arrays dictionary for array selection.
 const grad_100_2660_100 = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1, 0.0];
@@ -870,20 +870,6 @@ $(document).ready(function() {
         $('#loopsModal').modal('toggle');
     });
 
-    $('#event-manager-btn').click(function(){
-        // update/clear the modal to default
-        $("#eventsModalLabel").text("Add Event");
-        $("#event-action-select").val("calc");
-        $('#event-action-select').change();
-        $("#inputCalcActionType").val('');
-        $("#inputCalcFloat").val('');
-        $("#inputCalcIncrement").val('');
-        $("#inputInitActionGradients").val('');
-        $("#inputSyncTime").val('');
-        $("#delete_event_btn").hide();
-        $('#eventsModal').modal('toggle');
-        selected_event_btn = null;
-    });
     $('#events_modal_close_btn').click(function(){
         $('#eventsModal').modal('toggle');
     });
@@ -1024,7 +1010,7 @@ $(document).ready(function() {
                 let content = JSON.parse(reader.result);
                 let version = content["version"];
                 let data = content["data"];
-                if (version === "1.1") {
+                if (version === current_version) {
                     reload_data(data);
                     save_data();
                 } else {
@@ -1104,7 +1090,23 @@ $(document).keyup(function() {
 var shiftIsPressed = false;
 var controlIsPressed = false;
 
-// Add click handler to the event buttons.
+// Add click handler to add event button.
+$(document).on("click", "#add-event-btn", function(){
+    // update/clear the modal to default
+    $("#eventsModalLabel").text("Add Event");
+    $("#event-action-select").val("calc");
+    $('#event-action-select').change();
+    $("#inputCalcActionType").val('');
+    $("#inputCalcFloat").val('');
+    $("#inputCalcIncrement").val('');
+    $("#inputInitActionGradients").val('');
+    $("#inputSyncTime").val('');
+    $("#delete_event_btn").hide();
+    $('#eventsModal').modal('toggle');
+    selected_event_btn = null;
+});
+
+// Add click handler to each event button.
 var selected_event_btn = null;
 $(document).on("click", ".event-btn", function () {
     selected_event_btn = $(this);
@@ -1679,6 +1681,7 @@ function reload_data(data) {
     block_color_counter = data["block_color_counter"];
     block_to_loops = data["block_to_loops"];
     array_name_to_array = data["array_name_to_array"];
+    $("#events-col")[0].innerHTML = data["events_col_inner_html"];
     theme = data["theme"];
     if (theme == "light") {
         $('input[type="checkbox"]').attr("checked", false);
@@ -1699,6 +1702,7 @@ function generate_current_data_state() {
     let theme = "dark";
     if (document.documentElement.getAttribute('data-bs-theme') == 'light') theme = "light";
     let configurations = save_configurations();
+    let events_col_inner_html = $("#events-col")[0].innerHTML;
     let current_state_data = {
         "plots_data": blocks,
         "plot_to_box_objects": plot_to_box_objects,
@@ -1708,7 +1712,8 @@ function generate_current_data_state() {
         "selected_block": block_name,
         "configurations": configurations,
         "block_to_loops": block_to_loops,
-        "array_name_to_array": array_name_to_array
+        "array_name_to_array": array_name_to_array,
+        "events_col_inner_html": events_col_inner_html
     }
     return current_state_data;
 }
@@ -2362,7 +2367,9 @@ function add_new_event(event_data) {
 function update_event(event_data) {
     for (let key in event_data) {
         if (event_data[key] == "") continue;
+        // adding it in the both dataset and string attributes for utility.
         selected_event_btn.data(key, event_data[key]);
+        selected_event_btn.attr("data-"+key, event_data[key]);
     }
 }
 
