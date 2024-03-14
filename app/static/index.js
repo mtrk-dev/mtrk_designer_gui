@@ -816,7 +816,7 @@ $(document).ready(function() {
     $('#flexSwitchCheckChecked').click(function(){
         if (document.documentElement.getAttribute('data-bs-theme') == 'dark') {
             document.documentElement.setAttribute('data-bs-theme','light')
-            $(".btn").each(function(){
+            $(".btn-secondary").each(function(){
                 $(this).removeClass("btn-secondary");
                 $(this).addClass("btn-light");
             });
@@ -825,7 +825,7 @@ $(document).ready(function() {
         }
         else {
             document.documentElement.setAttribute('data-bs-theme','dark')
-            $(".btn").each(function(){
+            $(".btn-light").each(function(){
                 $(this).removeClass("btn-light");
                 $(this).addClass("btn-secondary");
             });
@@ -880,7 +880,9 @@ $(document).ready(function() {
         $("#inputCalcIncrement").val('');
         $("#inputInitActionGradients").val('');
         $("#inputSyncTime").val('');
+        $("#delete_event_btn").hide();
         $('#eventsModal').modal('toggle');
+        selected_event_btn = null;
     });
     $('#events_modal_close_btn').click(function(){
         $('#eventsModal').modal('toggle');
@@ -1070,8 +1072,16 @@ $(document).ready(function() {
         } else if (selected_action == "sync") {
             event_data["input-sync-time"] = $("#inputSyncTime").val();
         }
+        if (selected_event_btn == null) {
+            add_new_event(event_data);
+        } else {
+            update_event(event_data);
+        }
+        $('#eventsModal').modal('toggle');
+    });
 
-        add_new_event(event_data);
+    $("#delete_event_btn").click(function () {
+        selected_event_btn.remove();
         $('#eventsModal').modal('toggle');
     });
 });
@@ -1095,12 +1105,15 @@ var shiftIsPressed = false;
 var controlIsPressed = false;
 
 // Add click handler to the event buttons.
+var selected_event_btn = null;
 $(document).on("click", ".event-btn", function () {
+    selected_event_btn = $(this);
     let clicked_event_data = $(this).data();
     let event_type = clicked_event_data["eventType"];
     $("#event-action-select").val(event_type);
     $('#event-action-select').change();
     $("#eventsModalLabel").text("Configure Event");
+    $("#delete_event_btn").show();
 
     if (event_type == "calc") {
         $("#inputCalcActionType").val(clicked_event_data["inputCalcActionType"]);
@@ -2343,6 +2356,13 @@ function add_new_event(event_data) {
         $("#init-events").append(el);
     } else if (event_type == "sync") {
         $("#sync-events").append(el);
+    }
+}
+
+function update_event(event_data) {
+    for (let key in event_data) {
+        if (event_data[key] == "") continue;
+        selected_event_btn.data(key, event_data[key]);
     }
 }
 
