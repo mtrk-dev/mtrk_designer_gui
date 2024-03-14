@@ -4,7 +4,8 @@ import json
 
 import os
 import sys
-path = os.path.abspath("mtrk_sdl_generator_anais")
+path = os.path.abspath("C:/Users/artiga02/mtrk_sdl_generator")
+# path = os.path.abspath("mtrk_sdl_generator_anais")
 sys.path.append(path)
 
 from backendToUi import *
@@ -27,7 +28,7 @@ def process():
     sorted_boxes = sorted(data['box_objects'], key=lambda x: int(float(x['start_time'])))
     configurations = data['configurations']
     # create_sdl_from_ui_inputs(sorted_boxes, configurations)
-    create_sdl_from_ui_inputs(sorted_boxes)
+    create_sdl_from_ui_inputs(sorted_boxes, configurations)
 
 def open_browser():
     webbrowser.open_new("http://127.0.0.1:5000")
