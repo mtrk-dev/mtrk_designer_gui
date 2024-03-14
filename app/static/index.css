@@ -24,6 +24,16 @@
     margin-bottom: 2%;
 }
 
+.event-section {
+    margin-bottom: 30%;
+    margin-top: 10%;
+}
+
+.event-btn {
+    margin-bottom: 8%;
+    width: 100%;
+}
+
 #generate-sdl-btn {
     margin-bottom: 1%;
     position: absolute;
@@ -41,6 +51,14 @@
     background: transparent;
     font-size: 14px;
     margin-top: 8%;
+}
+
+#event-manager-btn {
+    font-size: 14px;
+    background: transparent;
+    /* color: #49b149; */
+    /* border: 1px solid #49b149; */
+    margin-top: 15%;
 }
 
 #saved-msg {
@@ -81,11 +99,12 @@
 
 #block-select {
     width: 90%;
+    margin-top: 5%;
     margin-left: 5%;
     margin-bottom: 1%;
 }
 
-#array-select {
+#array-select, #event-action-select {
     width: 30%;
 }
 
@@ -106,6 +125,14 @@
 #array_manager_chart {
     margin-bottom: 2%;
     margin-left: 4%;
+}
+
+#events-col {
+    background: #0e0f10;
+}
+
+#plot-col {
+    padding-right: 0px;
 }
 
 /* .group-loop-input {

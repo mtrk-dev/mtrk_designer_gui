@@ -24,10 +24,12 @@ def index():
 @app.route('/process', methods=['POST'])
 def process():
     data = json.loads(request.data, strict=False)
+    # Convert the start time from ms to us.
+    for box_object in data["box_objects"]:
+        box_object["start_time"] = float(box_object['start_time'])*1000
     # Sort the objects according to their start time.
     sorted_boxes = sorted(data['box_objects'], key=lambda x: int(float(x['start_time'])))
     configurations = data['configurations']
-    # create_sdl_from_ui_inputs(sorted_boxes, configurations)
     create_sdl_from_ui_inputs(sorted_boxes, configurations)
 
 def open_browser():

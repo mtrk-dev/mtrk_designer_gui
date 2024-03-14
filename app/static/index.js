@@ -42,11 +42,17 @@ var blocks = {}
 // To maintain the number of loops on each block.
 var block_to_loops = {}
 
+const event_type_to_icon_str = {
+    "calc": "fa fa-calculator",
+    "init": "fa fa-play",
+    "sync": "fa fa-refresh"
+}
+
 var reset_flag = 0;
 
 var undo_stack = [];
 var redo_stack = [];
-const max_stack_length = 5;
+const max_stack_length = 8;
 
 const current_version = "1.1";
 
@@ -198,7 +204,9 @@ const layout = {
     showlegend: false,
       margin: {
         t: 20,
-        b: 20
+        b: 20,
+        r: 15,
+        // l: 60
       },
     title : {
         text: ""
@@ -266,6 +274,10 @@ rf_layout["title"] = {
     yref: 'paper',
     y: 1
 }
+
+// Some extra space for x-axis label.
+adc_layout["margin"]["b"] = 30;
+
 // We will use the shape template and keep adding to the total shapes in one axis.
 var shapes_array = [];
 const shape_height = 1.1;
@@ -315,8 +327,8 @@ var annotation_template = {
     },
   }
 
-// keeping default 0.1 for now, later to be set by user.
-const anchor_time = 0.1;
+// keeping default 0 for now, later to be set by user.
+const anchor_time = 0;
 
 const config = {
     // scrollZoom: true,
@@ -500,6 +512,9 @@ $(document).ready(function() {
             plot_to_box_objects[block_name] = JSON.parse(JSON.stringify(plot_to_box_objects_template));
         }
         plot_to_box_objects[block_name][target.id].push(boxObj);
+
+        // auto-save data.
+        $( "#save-plot-btn" ).trigger( "click" );
         });
     });
     // sync zoom among all plots.
@@ -708,9 +723,11 @@ $(document).ready(function() {
         if ($(this).is(':checked')) {
           if ($(this).val() == "constant") {
             $('#variableAmplitudeGroup').hide();
+            $('#inputConstantAmplitude').show();
           }
           else if ($(this).val() == "variable") {
             $('#variableAmplitudeGroup').show();
+            $('#inputConstantAmplitude').hide();
           }
         }
     });
@@ -799,20 +816,21 @@ $(document).ready(function() {
     $('#flexSwitchCheckChecked').click(function(){
         if (document.documentElement.getAttribute('data-bs-theme') == 'dark') {
             document.documentElement.setAttribute('data-bs-theme','light')
-            $(".btn").each(function(){
+            $(".btn-secondary").each(function(){
                 $(this).removeClass("btn-secondary");
                 $(this).addClass("btn-light");
             });
             toggle_plot_color(true);
-
+            $("#events-col").css('background', "#fbfbfb");
         }
         else {
             document.documentElement.setAttribute('data-bs-theme','dark')
-            $(".btn").each(function(){
+            $(".btn-light").each(function(){
                 $(this).removeClass("btn-light");
                 $(this).addClass("btn-secondary");
             });
             toggle_plot_color(false);
+            $("#events-col").css('background', "#0e0f10");
         }
     });
 
@@ -852,6 +870,24 @@ $(document).ready(function() {
         $('#loopsModal').modal('toggle');
     });
 
+    $('#event-manager-btn').click(function(){
+        // update/clear the modal to default
+        $("#eventsModalLabel").text("Add Event");
+        $("#event-action-select").val("calc");
+        $('#event-action-select').change();
+        $("#inputCalcActionType").val('');
+        $("#inputCalcFloat").val('');
+        $("#inputCalcIncrement").val('');
+        $("#inputInitActionGradients").val('');
+        $("#inputSyncTime").val('');
+        $("#delete_event_btn").hide();
+        $('#eventsModal').modal('toggle');
+        selected_event_btn = null;
+    });
+    $('#events_modal_close_btn').click(function(){
+        $('#eventsModal').modal('toggle');
+    });
+
     $('#arrays-config-btn').click(function(){
         load_array_manager_select_options();
         let plot = document.getElementById("array_manager_chart");
@@ -888,6 +924,32 @@ $(document).ready(function() {
         $('#inputArrayNameInvalidFeedback').hide();
         $('#inputArrayValuesInvalidFeedback').hide();
         $('#addArrayValidFeedback').hide();
+    });
+
+    $("#inputAnchorTime").hide();
+    $('#anchor-time-mode-select').change(function(){
+        let selected_mode = $(this).val();
+        if (selected_mode == "custom") {
+            $("#inputAnchorTime").show();
+        } else {
+            $("#inputAnchorTime").hide();
+        }
+    });
+
+    $(".init-params").hide();
+    $(".sync-params").hide();
+    $('#event-action-select').change(function(){
+        $(".calc-params").hide();
+        $(".init-params").hide();
+        $(".sync-params").hide();
+        let selected_action = $(this).val();
+        if (selected_action == "calc") {
+            $(".calc-params").show();
+        } else if (selected_action == "init") {
+            $(".init-params").show();
+        } else if (selected_action == "sync") {
+            $(".sync-params").show();
+        }
     });
 
     // TODO: can be removed in the future.
@@ -993,6 +1055,35 @@ $(document).ready(function() {
         document.body.removeChild(link);
         window.URL.revokeObjectURL(url);
     });
+
+    $("#events_save_changes_btn").click(function() {
+        let event_data = {};
+        let selected_action = $("#event-action-select").val();
+        event_data["event-type"] = selected_action;
+
+        // Save and then reset values.
+        // Saving data with hyphens (-) as it gets converted to camel case when data attributes are used.
+        if (selected_action == "calc") {
+            event_data["input-calc-action-type"] = $("#inputCalcActionType").val();
+            event_data["input-calc-float"] = $("#inputCalcFloat").val();
+            event_data["input-calc-increment"] = $("#inputCalcIncrement").val();
+        } else if (selected_action == "init") {
+            event_data["input-init-action-gradients"] = $("#inputInitActionGradients").val();
+        } else if (selected_action == "sync") {
+            event_data["input-sync-time"] = $("#inputSyncTime").val();
+        }
+        if (selected_event_btn == null) {
+            add_new_event(event_data);
+        } else {
+            update_event(event_data);
+        }
+        $('#eventsModal').modal('toggle');
+    });
+
+    $("#delete_event_btn").click(function () {
+        selected_event_btn.remove();
+        $('#eventsModal').modal('toggle');
+    });
 });
 
 // Check whether shift button is pressed
@@ -1012,6 +1103,30 @@ $(document).keyup(function() {
 });
 var shiftIsPressed = false;
 var controlIsPressed = false;
+
+// Add click handler to the event buttons.
+var selected_event_btn = null;
+$(document).on("click", ".event-btn", function () {
+    selected_event_btn = $(this);
+    let clicked_event_data = $(this).data();
+    let event_type = clicked_event_data["eventType"];
+    $("#event-action-select").val(event_type);
+    $('#event-action-select').change();
+    $("#eventsModalLabel").text("Configure Event");
+    $("#delete_event_btn").show();
+
+    if (event_type == "calc") {
+        $("#inputCalcActionType").val(clicked_event_data["inputCalcActionType"]);
+        $("#inputCalcFloat").val(clicked_event_data["inputCalcFloat"]);
+        $("#inputCalcIncrement").val(clicked_event_data["inputCalcIncrement"]);
+    } else if (event_type == "init") {
+        $("#inputInitActionGradients").val(clicked_event_data["inputInitActionGradients"]);
+    } else if (event_type == "sync") {
+        $("#inputSyncTime").val(clicked_event_data["inputSyncTime"]);
+    }
+
+    $('#eventsModal').modal('toggle');
+})
 
 // Pre processing code to convert the mouse point x-value to plot's xaxis value.
 var xaxis = rf_chart._fullLayout.xaxis;
@@ -1294,6 +1409,7 @@ function load_modal_values(plot, trace_number) {
         $('#inputRfInitialPhase').val(boxObj.init_phase);
         $('#inputRfThickness').val(boxObj.thickness);
         $('#inputRfFlipAngle').val(boxObj.flip_angle);
+        $('#inputRfDuration').val(boxObj.rf_duration);
         if (!boxObj.purpose || boxObj.purpose == "excitation") {
             $("#rfExcitationRadio").prop("checked", true);
         } else {
@@ -1308,9 +1424,11 @@ function load_modal_values(plot, trace_number) {
         if (boxObj.variable_amplitude) {
             $("#variableRadio").prop("checked", true);
             $('#variableAmplitudeGroup').show();
+            $('#inputConstantAmplitude').hide();
         } else {
             $("#constantRadio").prop("checked", true);
             $('#variableAmplitudeGroup').hide();
+            $('#inputConstantAmplitude').show();
         }
         if (boxObj.flip_amplitude) {
             $("#flipAmplitudeCheck").prop("checked", true);
@@ -1318,7 +1436,7 @@ function load_modal_values(plot, trace_number) {
             $("#flipAmplitudeCheck").prop("checked", false);
         }
     } else {
-        $('#inputAdcDuration').val(boxObj.duration);
+        $('#inputAdcDuration').val(boxObj.adc_duration);
         $('#inputAdcFrequency').val(boxObj.frequency);
         $('#inputAdcPhase').val(boxObj.phase);
         $('#inputAdcAddedPhaseType').val(boxObj.adc_added_phase_type);
@@ -1400,6 +1518,7 @@ function save_modal_values(plot, trace_number) {
         boxObj.init_phase = $('#inputRfInitialPhase').val();
         boxObj.thickness = $('#inputRfThickness').val();
         boxObj.flip_angle = $('#inputRfFlipAngle').val();
+        boxObj.rf_duration = parseFloat($('#inputRfDuration').val());
         if ($('#rfExcitationRadio').is(':checked')) {
             boxObj.purpose = "excitation";
         } else {
@@ -1414,12 +1533,12 @@ function save_modal_values(plot, trace_number) {
         boxObj.equation_info.name = $('#inputGradEquationName').val();
         boxObj.equation_info.expression = $('#inputGradEquationExpression').val();
     } else {
-        // Update the adc trace if duration is changed.
+        // Update the adc trace if adc_duration is changed.
         let new_duration = $('#inputAdcDuration').val();
-        if (new_duration && new_duration !== boxObj.duration) {
+        if (new_duration && new_duration !== boxObj.adc_duration) {
             update_adc_trace_duration(plot, trace_number, parseFloat(input_start_time), parseFloat(new_duration));
         }
-        boxObj.duration = parseFloat(new_duration);
+        boxObj.adc_duration = parseFloat(new_duration);
         boxObj.frequency = $('#inputAdcFrequency').val();
         boxObj.phase = $('#inputAdcPhase').val();
         boxObj.adc_added_phase_type = $('#inputAdcAddedPhaseType').val();
@@ -2216,6 +2335,46 @@ function update_annotations_loops_count() {
     load_block_data($('#block-select').val());
 }
 
+function add_new_event(event_data) {
+    let event_type = event_data["event-type"];
+    let event_icon_str = event_type_to_icon_str[event_type];
+
+    let data_attributes_str = create_data_attributes_string(event_data);
+
+    let event_btn_str = `<a
+        class="btn btn-sm btn-secondary event-btn"
+        role="button" data-bs-toggle="tooltip" data-bs-placement="bottom"
+        title="${event_type} event" ${data_attributes_str}>
+            <i class="${event_icon_str}"></i>
+        </a>`;
+    let el = document.createElement('div');
+    el.innerHTML = event_btn_str;
+
+    if (event_type == "calc") {
+        $("#calc-events").append(el);
+    } else if (event_type == "init") {
+        $("#init-events").append(el);
+    } else if (event_type == "sync") {
+        $("#sync-events").append(el);
+    }
+}
+
+function update_event(event_data) {
+    for (let key in event_data) {
+        if (event_data[key] == "") continue;
+        selected_event_btn.data(key, event_data[key]);
+    }
+}
+
+function create_data_attributes_string(event_data) {
+    let data_attributes_str = ``;
+    for (let key in event_data) {
+        if (event_data[key] == "") continue;
+        data_attributes_str += "data-" + key + "=" + event_data[key] + " ";
+    }
+    return data_attributes_str;
+}
+
 const file = new File(['foo'], 'dummy_file.json', {
     type: 'text/plain',
 });
@@ -2277,7 +2436,8 @@ class Box {
     init_phase = null;
     thickness = null;
     flip_angle = null;
-    duration = null;
+    adc_duration = null;
+    rf_duration = null;
     frequency = null;
     adc_added_phase_type = "";
     adc_added_phase_float = null;
