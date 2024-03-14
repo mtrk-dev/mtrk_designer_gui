@@ -451,7 +451,7 @@ $(document).ready(function() {
         event.preventDefault();
 
         let xInDataCoord = mx*event.x + cx;
-        console.log(dragged.id +" dropped at " + target.id + " | Location: " + Math.round(xInDataCoord));
+        xInDataCoord = parseFloat(xInDataCoord.toFixed(4));
         
         let dragged_array = object_to_array[dragged.id];
         let starting_point = xInDataCoord;
@@ -548,7 +548,7 @@ $(document).ready(function() {
                     let trace_number = (shape_number/2)+1;
                     for (var key in ed) {
                         if (key.endsWith(".x0")) {
-                            var starting_point = ed[key];
+                            var starting_point = parseFloat(ed[key].toFixed(4));
                         }
                         if (key.endsWith(".y0")) {
                             var y0_val = ed[key];
