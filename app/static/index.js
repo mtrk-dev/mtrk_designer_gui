@@ -748,9 +748,11 @@ $(document).ready(function() {
             }
             block_to_sdl_objects[block] = sdl_objects;
         }
+        if (Object.keys(block_to_sdl_objects).length === 0) return;
         let configurations = save_configurations();
         let structure = generate_blocks_nesting_structure();
-        send_data(block_to_sdl_objects, configurations, structure);
+        let events = generate_events_data();
+        send_data(block_to_sdl_objects, configurations, structure, events);
     });
 
     $(document).on('click', '.array-dropdown', function () {
@@ -2390,6 +2392,14 @@ function create_data_attributes_string(event_data) {
     return data_attributes_str;
 }
 
+function generate_events_data() {
+    let events = [];
+    $(".event-btn").each(function(){
+        events.push($(this).data());
+    });
+    return events;
+}
+
 const file = new File(['foo'], 'dummy_file.json', {
     type: 'text/plain',
 });
@@ -2407,7 +2417,7 @@ function download_file(file) {
     window.URL.revokeObjectURL(url);
 }
 
-function send_data(block_to_box_objects, configurations, block_structure) {
+function send_data(block_to_box_objects, configurations, block_structure, events) {
     $.ajax({
         url: '/process',
         type: 'POST',
@@ -2415,7 +2425,8 @@ function send_data(block_to_box_objects, configurations, block_structure) {
         data: JSON.stringify({ 
             'block_to_box_objects': block_to_box_objects,
             'configurations': configurations,
-            'block_structure': block_structure
+            'block_structure': block_structure,
+            'events': events
         }),
         success: function(response) {
             console.log(response);
