@@ -740,13 +740,17 @@ $(document).ready(function() {
 
     $("#generate-sdl-btn").click(function(){
         // download_file(file);
-        const sdl_objects = [];
-        // TODO: update this for the multiple blocks design.
-        for (var key in plot_to_box_objects["Main"]) {
-            sdl_objects.push(...plot_to_box_objects["Main"][key]);
+        let block_to_sdl_objects = {};
+        for (let block in plot_to_box_objects) {
+            let sdl_objects = [];
+            for (var key in plot_to_box_objects[block]) {
+                sdl_objects.push(...plot_to_box_objects[block][key]);
+            }
+            block_to_sdl_objects[block] = sdl_objects;
         }
         let configurations = save_configurations();
-        send_data(sdl_objects, configurations);
+        let structure = generate_blocks_nesting_structure();
+        send_data(block_to_sdl_objects, configurations, structure);
     });
 
     $(document).on('click', '.array-dropdown', function () {
@@ -2403,14 +2407,15 @@ function download_file(file) {
     window.URL.revokeObjectURL(url);
 }
 
-function send_data(box_objects, configurations) {
+function send_data(block_to_box_objects, configurations, block_structure) {
     $.ajax({
         url: '/process',
         type: 'POST',
         contentType: 'application/json',
         data: JSON.stringify({ 
-            'box_objects': box_objects,
-            'configurations': configurations
+            'block_to_box_objects': block_to_box_objects,
+            'configurations': configurations,
+            'block_structure': block_structure
         }),
         success: function(response) {
             console.log(response);
