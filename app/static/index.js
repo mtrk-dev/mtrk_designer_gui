@@ -880,6 +880,13 @@ $(document).ready(function() {
         $('#eventsModal').modal('toggle');
     });
 
+    $("#settings_modal_close_btn").click(function(){
+        $('#settingsModal').modal('toggle');
+    })
+    $("#settings_save_changes_btn").click(function(){
+        $('#settingsModal').modal('toggle');
+    })
+
     $('#arrays-config-btn').click(function(){
         load_array_manager_select_options();
         let plot = document.getElementById("array_manager_chart");
