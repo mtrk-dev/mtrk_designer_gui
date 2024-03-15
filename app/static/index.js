@@ -883,6 +883,10 @@ $(document).ready(function() {
         $('#arrayConfigModal').modal('toggle');
     });
 
+    $("#settings-btn").click(function(){
+        $("#settingsModal").modal('toggle');
+    })
+
     $('#block-select').change(function(){
         // The title of the displayed block will become our previous block.
         let prev_block = rf_chart.layout["title"]["text"];

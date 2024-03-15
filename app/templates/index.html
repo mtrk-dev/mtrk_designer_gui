@@ -19,12 +19,10 @@
                     <option value="Main" selected>Main</option>
                   </select>
                   <button type="button" class="btn btn-secondary" id="add-block-btn" data-bs-toggle="tooltip" data-bs-placement="left" title="Add Block">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
-                      <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"></path>
-                    </svg>
+                    <i>&#43;</i>
                   </button>
                   <div class="input-group mb-3">
-                    <span class="input-group-text" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Block Duration">BD (ms)</span>
+                    <span class="input-group-text" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Block Duration (ms)">BD</span>
                     <input id="blockDurationInput" placeholder="10" class="form-control" aria-label="Block Duration">
                     <button id="block-time-btn" type="button" class="btn btn-secondary">&#10003;</button>
                   </div>
@@ -39,6 +37,9 @@
                     <button id="" type="button" class="btn btn-secondary">&#10003;</button>
                   </div> -->
                   <div>
+                    <a id="settings-btn" class="btn btn-secondary" role="button" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Settings">
+                      <i class="fa fa-wrench"></i>
+                    </a>
                     <a id="arrays-config-btn" class="btn btn-secondary" role="button" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Configure Arrays">
                       <i id="arrays-config-icon" class="fa fa-cube"></i>
                     </a>
@@ -510,6 +511,22 @@
                         <button id="delete_event_btn" type="button" class="btn btn-danger">Delete Event</button>
                         <button id="events_modal_close_btn" type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                         <button id="events_save_changes_btn" type="button" class="btn btn-primary">Save changes</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="modal fade" id="settingsModal" tabindex="-1" aria-labelledby="settingsModalLabel" aria-hidden="true">
+                  <div class="modal-dialog">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5 class="modal-title" id="settingsModalLabel">Settings</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                      </div>
+                      <div class="modal-body">
+                      </div>
+                      <div class="modal-footer">
+                        <button id="settings_modal_close_btn" type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button id="settings_save_changes_btn" type="button" class="btn btn-primary">Save changes</button>
                       </div>
                     </div>
                   </div>
