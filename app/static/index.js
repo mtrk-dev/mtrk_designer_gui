@@ -1621,6 +1621,7 @@ function save_configurations() {
     let fov = $('#fovInfoInput').val();
     let seqstring = $('#seqstringInfoInput').val();
     let reconstruction = $('#reconstructionInfoInput').val();
+    let pe_lines = $('#peLinesInfoInput').val();
     configs['file'] = {
         'format': format,
         'version': version,
@@ -1635,7 +1636,8 @@ function save_configurations() {
         'slices': slices,
         'fov': fov,
         'seqstring': seqstring,
-        'reconstruction': reconstruction
+        'reconstruction': reconstruction,
+        'pe_lines': pe_lines
     }
     return configs
 }
@@ -1654,6 +1656,7 @@ function load_configurations(configs) {
     $('#fovInfoInput').val(configs['info']['fov']);
     $('#seqstringInfoInput').val(configs['info']['seqstring']);
     $('#reconstructionInfoInput').val(configs['info']['reconstruction']);
+    $('#peLinesInfoInput').val(configs['info']['pe_lines']);
 }
 
 function update_plot_config(shiftIsPressed) {
