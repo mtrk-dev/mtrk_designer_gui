@@ -83,11 +83,11 @@ const object_to_type = {
 }
 
 const axis_id_to_color = {
-    "rf_chart" : "blue",
-    "slice_chart" : "blue",
-    "phase_chart" : "blue",
-    "readout_chart": "blue",
-    "adc_chart": "blue"
+    "rf_chart" : "magenta",
+    "slice_chart" : "magenta",
+    "phase_chart" : "magenta",
+    "readout_chart": "magenta",
+    "adc_chart": "magenta"
 }
 
 const axis_id_to_axis_name = {
@@ -1511,6 +1511,17 @@ function save_modal_values(plot, trace_number) {
         array_changed_flag = true;
     }
 
+    // If the amplitude for a grad box has been changed we update and adjust the scale.
+    if (boxObj.type == "grad") {
+        let input_constant_amplitude = $('#inputConstantAmplitude').val();
+        let base_array = [];
+        if (selected_box_array_name == "Default Array") base_array = axis_id_to_default_array[plot.id]
+        else base_array = array_name_to_array[selected_box_array_name]
+        if (input_constant_amplitude != boxObj.amplitude) {
+            update_trace_amplitude(plot, trace_number, base_array, input_constant_amplitude);
+        }
+    }
+
     // If the selected trace type is different than what it already is we change trace - fixed/variable.
     if ($("#variableRadio").is(':checked')) {
         if (!boxObj.variable_amplitude || array_changed_flag) {
@@ -1866,6 +1877,28 @@ function update_adc_trace_duration(plot, trace_number, starting_point, new_durat
     move_vertical_line_shape(plot, shape_number+1, starting_point);
 }
 
+function update_trace_amplitude(plot, trace_number, base_array, amplitude) {
+    let y = base_array;
+    let x = plot.data[trace_number]["x"];
+    let line = plot.data[trace_number]["line"];
+    let hovertemplate = plot.data[trace_number]["hovertemplate"];
+
+    // delete the old trace.
+    Plotly.deleteTraces(plot, trace_number);
+
+    // Draw a trace at the new location
+    let data = {};
+
+    y = y.map(x => x * amplitude);
+
+    data["y"] = y;
+    data["x"] = x;
+    data["line"] = line;
+    data["hovertemplate"] = hovertemplate;
+    Plotly.addTraces(plot, data, trace_number);
+    // flip_shapes(plot, (trace_number-1)*2);
+}
+
 function load_parameters_array_dropdown() {
     let ul = document.getElementById("array-dropdown-menu");
     ul.innerHTML = '';
@@ -1913,11 +1946,11 @@ function toggle_plot_color(isDark) {
             "xaxis.titlefont.color": "rgba(0,0,0,0.9)",
             "xaxis.tickfont.color": "rgba(0,0,0,0.9)",
             "xaxis.gridcolor": "rgba(0,0,0,0.05)",
-            "xaxis.zerolinecolor": "rgba(0,0,0,0.1)",
+            "xaxis.zerolinecolor": "rgba(0,0,0,0.2)",
             "yaxis.titlefont.color": "rgba(0,0,0,0.9)",
             "yaxis.tickfont.color": "rgba(0,0,0,0.9)",
             "yaxis.gridcolor": "rgba(0,0,0,0.05)",
-            "yaxis.zerolinecolor": "rgba(0,0,0,0.1)",
+            "yaxis.zerolinecolor": "rgba(0,0,0,0.2)",
             "title.font.color": 'rgba(0,0,0,0.9)'
         }
     } else {
@@ -2079,7 +2112,7 @@ function add_block_with_selected_boxes() {
         return false;
     }
     blocks[block_name] = block_data;
-    blockObj = new Block(block_name, start_time, selected_boxes);
+    blockObj = new Block(block_name, start_time);
     block_number_to_block_object[block_color_counter] = blockObj;
 
     add_dummy_block_boxes(seen_plots, start_time, end_time);
@@ -2436,6 +2469,8 @@ function send_data(block_to_box_objects, configurations, block_structure, events
             'block_to_box_objects': block_to_box_objects,
             'configurations': configurations,
             'block_structure': block_structure,
+            'block_to_loops': block_to_loops,
+            'block_number_to_block_object': block_number_to_block_object,
             'events': events
         }),
         success: function(response) {
@@ -2501,11 +2536,9 @@ class Box {
 class Block {
     name = "";
     start_time = 0;
-    boxes = [];
 
-    constructor(name, start_time, box_array) {
+    constructor(name, start_time) {
         this.name = name;
         this.start_time = start_time;
-        this.boxes = box_array;
     }
 }
