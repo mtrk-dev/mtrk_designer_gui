@@ -826,6 +826,10 @@ $(document).ready(function() {
                 $(this).removeClass("btn-secondary");
                 $(this).addClass("btn-light");
             });
+            $(".event-btn").each(function(){
+                $(this).removeClass("btn-light");
+                $(this).addClass("btn-secondary");
+            });
             $("body").css('background', "#b2beb56b");
             toggle_plot_color(true);
             $("#events-col").css('background', "#ffffff");
@@ -834,6 +838,10 @@ $(document).ready(function() {
         else {
             document.documentElement.setAttribute('data-bs-theme','dark')
             $(".btn-light").each(function(){
+                $(this).removeClass("btn-light");
+                $(this).addClass("btn-secondary");
+            });
+            $(".event-btn").each(function(){
                 $(this).removeClass("btn-light");
                 $(this).addClass("btn-secondary");
             });
