@@ -21,7 +21,7 @@ for (let i=0; i < 128; i++) {
 }
 const step_size = 100;
 
-const block_colors = ["#ff0065", "#cf7856", "#978eff", "#5343ff", "#ff7f50", "#77b6df", "#457480", "#ba029c", "#31e658", "#9be5cc", "#facade", "#fab1ed", "#deface", "#c0ffee", "#beaded", "#a3b899", "#ffaa51", "#216c5c"]
+const block_colors = ["#cf7856", "#978eff", "#5343ff", "#ff7f50", "#ff0065", "#77b6df", "#457480", "#ba029c", "#31e658", "#9be5cc", "#facade", "#fab1ed", "#deface", "#c0ffee", "#beaded", "#a3b899", "#ffaa51", "#216c5c"]
 var block_color_counter = 0;
 
 var block_duration = 10;
@@ -826,8 +826,10 @@ $(document).ready(function() {
                 $(this).removeClass("btn-secondary");
                 $(this).addClass("btn-light");
             });
+            $("body").css('background', "#b2beb56b");
             toggle_plot_color(true);
-            $("#events-col").css('background', "#fbfbfb");
+            $("#events-col").css('background', "#ffffff");
+            $("#plot-col").css('background', "#ffffff");
         }
         else {
             document.documentElement.setAttribute('data-bs-theme','dark')
@@ -835,8 +837,10 @@ $(document).ready(function() {
                 $(this).removeClass("btn-light");
                 $(this).addClass("btn-secondary");
             });
+            $("body").css('background', "var(--bs-body-bg)");
             toggle_plot_color(false);
             $("#events-col").css('background', "#0e0f10");
+            $("#plot-col").css('background', "var(--bs-body-bg)");
         }
     });
 
@@ -1942,7 +1946,7 @@ function toggle_plot_color(isDark) {
     if (isDark) {
         var update = {
             "plot_bgcolor":"rgba(255,255,255,0.1)",
-            "paper_bgcolor":"rgba(215,215,215,0.1)",
+            "paper_bgcolor":"rgba(255,255,255,0.1)",
             "xaxis.titlefont.color": "rgba(0,0,0,0.9)",
             "xaxis.tickfont.color": "rgba(0,0,0,0.9)",
             "xaxis.gridcolor": "rgba(0,0,0,0.05)",
