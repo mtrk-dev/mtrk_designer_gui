@@ -1338,35 +1338,13 @@ function change_shapes_variable(plot, shape_number, toVariable) {
     Plotly.relayout(plot, update);
 }
 
-function flip_trace_amplitude(plot, trace_number) {
-    let y = plot.data[trace_number]["y"];
-    let x = plot.data[trace_number]["x"];
-    let line = plot.data[trace_number]["line"];
-    let hovertemplate = plot.data[trace_number]["hovertemplate"];
-
-    // delete the old trace.
-    Plotly.deleteTraces(plot, trace_number);
-
-    // Draw a trace at the new location
-    let data = {};
-
-    y = y.map(x => x * -1);
-
-    data["y"] = y;
-    data["x"] = x;
-    data["line"] = line;
-    data["hovertemplate"] = hovertemplate;
-    Plotly.addTraces(plot, data, trace_number);
-    flip_shapes(plot, (trace_number-1)*2);
-}
-
-function flip_shapes(plot, shape_number) {
+function flip_shapes(plot, shape_number, multiplier) {
     let line_shape_number = shape_number + 1;
     let box_shape_number = shape_number;
     let shapes = JSON.parse(JSON.stringify(plot.layout["shapes"]));
     let current_y1 = shapes[box_shape_number]["y1"];
-    shapes[line_shape_number]["y1"] = -current_y1;
-    shapes[box_shape_number]["y1"] = -current_y1;
+    shapes[line_shape_number]["y1"] = Math.abs(current_y1) * multiplier;
+    shapes[box_shape_number]["y1"] = Math.abs(current_y1) * multiplier;
     var update = {
         shapes: shapes
         };
@@ -1487,27 +1465,17 @@ function save_modal_values(plot, trace_number) {
         array_changed_flag = true;
     }
 
-    // If the amplitude for a grad box has been changed we update and adjust the scale.
+    // If the amplitude for a grad box has been changed/flipped we update and adjust the scale.
     if (boxObj.type == "grad") {
         let input_constant_amplitude = $('#inputConstantAmplitude').val();
         let base_array = [];
         if (selected_box_array_name == "Default Array") base_array = axis_id_to_default_array[plot.id]
         else base_array = array_name_to_array[selected_box_array_name]
-        if (input_constant_amplitude != boxObj.amplitude) {
+        if (!(input_constant_amplitude == boxObj.amplitude && flip == boxObj.flip_amplitude)) {
+            if (flip) {
+                input_constant_amplitude *= -1;
+            }
             update_trace_amplitude(plot, trace_number, base_array, input_constant_amplitude);
-        }
-    }
-
-    // If the flip amplitude check for a grad box is different than what it already is we toggle it.
-    if (boxObj.type == "grad") {
-        if ($("#flipAmplitudeCheck").is(':checked')) {
-            if (!boxObj.flip_amplitude) {
-                flip_trace_amplitude(plot, trace_number);
-            }
-        } else {
-            if (boxObj.flip_amplitude) {
-                flip_trace_amplitude(plot, trace_number);
-            }
         }
     }
 
@@ -1878,7 +1846,12 @@ function update_trace_amplitude(plot, trace_number, base_array, amplitude) {
     data["line"] = line;
     data["hovertemplate"] = hovertemplate;
     Plotly.addTraces(plot, data, trace_number);
-    // flip_shapes(plot, (trace_number-1)*2);
+
+    if (amplitude < 0) {
+        flip_shapes(plot, (trace_number-1)*2, -1);
+    } else {
+        flip_shapes(plot, (trace_number-1)*2, 1);
+    }
 }
 
 function load_parameters_array_dropdown() {
@@ -2512,7 +2485,7 @@ class Box {
     name = "";
     start_time = 0;
     anchor_time = 0;
-    amplitude = 0;
+    amplitude = 1;
     variable_amplitude = false;
     flip_amplitude = false;
     step_change = null;
