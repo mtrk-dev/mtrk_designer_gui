@@ -456,6 +456,17 @@ $(document).ready(function() {
         let dragged_array = object_to_array[dragged.id];
         let starting_point = xInDataCoord;
 
+        if (dragged.id == "rf_excitation_btn" && target.id != "rf_chart") {
+            alert("Object type not suitable for this axis.");
+            return;
+        } else if (dragged.id == "gradient_btn" && (target.id == "rf_chart" || target.id == "adc_chart")) {
+            alert("Object type not suitable for this axis.");
+            return;
+        } else if (dragged.id == "adc_readout_btn" && target.id != "adc_chart") {
+            alert("Object type not suitable for this axis.");
+            return;
+        }
+
         if (starting_point < 0 || starting_point > block_duration) {
             alert("Invalid drop location");
             return;
