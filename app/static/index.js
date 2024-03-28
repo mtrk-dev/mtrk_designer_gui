@@ -820,35 +820,11 @@ $(document).ready(function() {
     });
 
     $('#flexSwitchCheckChecked').click(function(){
-        if (document.documentElement.getAttribute('data-bs-theme') == 'dark') {
-            document.documentElement.setAttribute('data-bs-theme','light')
-            $(".btn-secondary").each(function(){
-                $(this).removeClass("btn-secondary");
-                $(this).addClass("btn-light");
-            });
-            $(".event-btn").each(function(){
-                $(this).removeClass("btn-light");
-                $(this).addClass("btn-secondary");
-            });
-            $("body").css('background', "#b2beb56b");
-            toggle_plot_color(true);
-            $("#events-col").css('background', "#ffffff");
-            $("#plot-col").css('background', "#ffffff");
-        }
-        else {
-            document.documentElement.setAttribute('data-bs-theme','dark')
-            $(".btn-light").each(function(){
-                $(this).removeClass("btn-light");
-                $(this).addClass("btn-secondary");
-            });
-            $(".event-btn").each(function(){
-                $(this).removeClass("btn-light");
-                $(this).addClass("btn-secondary");
-            });
-            $("body").css('background', "var(--bs-body-bg)");
-            toggle_plot_color(false);
-            $("#events-col").css('background', "#0e0f10");
-            $("#plot-col").css('background', "var(--bs-body-bg)");
+        let current_theme = document.documentElement.getAttribute('data-bs-theme');
+        if (current_theme == "light") {
+            update_theme("dark");
+        } else {
+            update_theme("light");
         }
     });
 
@@ -1495,18 +1471,6 @@ function save_modal_values(plot, trace_number) {
     if (boxObj.start_time != input_start_time)
         change_box_start_time(plot, trace_number, parseFloat(input_start_time));
 
-    // If the flip amplitude check for a grad box is different than what it already is we toggle it.
-    if (boxObj.type == "grad") {
-        if ($("#flipAmplitudeCheck").is(':checked')) {
-            if (!boxObj.flip_amplitude) {
-                flip_trace_amplitude(plot, trace_number);
-            }
-        } else {
-            if (boxObj.flip_amplitude) {
-                flip_trace_amplitude(plot, trace_number);
-            }
-        }
-    }
 
     // if selected array has been changed, we change the box array.
     let selected_box_array_name = $('#array-dropdown-btn').text();
@@ -1516,9 +1480,9 @@ function save_modal_values(plot, trace_number) {
         let new_array = [];
         if (selected_box_array_name == "Default Array") new_array = axis_id_to_default_array[plot.id]
         else new_array = array_name_to_array[selected_box_array_name]
-        if (flip) {
-            new_array = new_array.map(x => x * -1);
-        }
+        // if (flip) {
+        //     new_array = new_array.map(x => x * -1);
+        // }
         change_box_array(plot, trace_number, parseFloat(input_start_time), new_array);
         array_changed_flag = true;
     }
@@ -1531,6 +1495,19 @@ function save_modal_values(plot, trace_number) {
         else base_array = array_name_to_array[selected_box_array_name]
         if (input_constant_amplitude != boxObj.amplitude) {
             update_trace_amplitude(plot, trace_number, base_array, input_constant_amplitude);
+        }
+    }
+
+    // If the flip amplitude check for a grad box is different than what it already is we toggle it.
+    if (boxObj.type == "grad") {
+        if ($("#flipAmplitudeCheck").is(':checked')) {
+            if (!boxObj.flip_amplitude) {
+                flip_trace_amplitude(plot, trace_number);
+            }
+        } else {
+            if (boxObj.flip_amplitude) {
+                flip_trace_amplitude(plot, trace_number);
+            }
         }
     }
 
@@ -1726,15 +1703,8 @@ function reload_data(data) {
     array_name_to_array = data["array_name_to_array"];
     $("#events-col")[0].innerHTML = data["events_col_inner_html"];
     theme = data["theme"];
-    if (theme == "light") {
-        $('input[type="checkbox"]').attr("checked", false);
-        document.documentElement.setAttribute('data-bs-theme','light')
-        $(".btn").each(function(){
-            $(this).removeClass("btn-secondary");
-            $(this).addClass("btn-light");
-        });
-        toggle_plot_color(true);
-    }
+    let current_theme = document.documentElement.getAttribute('data-bs-theme');
+    update_theme(current_theme);
     load_block_select_options();
     $('#block-select').val(block_name);
 }
@@ -1948,6 +1918,41 @@ function validateArrayValues(arrayValues) {
         }
     }
     return [true, floatVals]
+}
+
+function update_theme(toTheme) {
+    if (toTheme == "light") {
+        document.documentElement.setAttribute('data-bs-theme','light');
+        $('input[type="checkbox"]').attr("checked", false);
+        $(".btn-secondary").each(function(){
+            $(this).removeClass("btn-secondary");
+            $(this).addClass("btn-light");
+        });
+        $(".event-btn").each(function(){
+            $(this).removeClass("btn-light");
+            $(this).addClass("btn-secondary");
+        });
+        $("body").css('background', "#b2beb56b");
+        toggle_plot_color(true);
+        $("#events-col").css('background', "#ffffff");
+        $("#plot-col").css('background', "#ffffff");
+    }
+    else {
+        document.documentElement.setAttribute('data-bs-theme','dark');
+        $('input[type="checkbox"]').attr("checked", true);
+        $(".btn-light").each(function(){
+            $(this).removeClass("btn-light");
+            $(this).addClass("btn-secondary");
+        });
+        $(".event-btn").each(function(){
+            $(this).removeClass("btn-light");
+            $(this).addClass("btn-secondary");
+        });
+        $("body").css('background', "var(--bs-body-bg)");
+        toggle_plot_color(false);
+        $("#events-col").css('background', "#0e0f10");
+        $("#plot-col").css('background', "var(--bs-body-bg)");
+    }
 }
 
 function toggle_plot_color(isDark) {
