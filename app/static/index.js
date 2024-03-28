@@ -2406,6 +2406,7 @@ function generate_blocks_nesting_structure() {
 function reload_loops_count() {
     $.each($('.loops-input'), function(index, input) {
         let block = input.dataset.block;
+        if (block == "Main") input.disabled = true;
         if (block in block_to_loops) {
             let loops = block_to_loops[block];
             input.value = loops;
