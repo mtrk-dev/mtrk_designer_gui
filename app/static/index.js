@@ -280,7 +280,7 @@ adc_layout["margin"]["b"] = 30;
 
 // We will use the shape template and keep adding to the total shapes in one axis.
 var shapes_array = [];
-const shape_height = 1.1;
+var shape_height = 1.1;
 var shape_template = 
     {
       type: 'rect',
@@ -491,6 +491,7 @@ $(document).ready(function() {
         var shape = JSON.parse(JSON.stringify(shape_template));
         shape["x0"] = starting_point;
         shape["x1"] = starting_point + multiplier*(dragged_array.length/step_size);
+        shape["y1"] = shape_height;
         let added_shapes=[];
         if ("shapes" in target.layout) { added_shapes = target.layout.shapes;}
         added_shapes.push(shape);
@@ -544,7 +545,7 @@ $(document).ready(function() {
     $(".dropzone").each(function () {
         var plot = this;
         plot.on("plotly_relayout", function(ed) {
-            if ("shapes" in ed || "xaxis.range[0]" in ed || "xaxis.range" in ed || "annotations" in ed 
+            if ("shapes" in ed || "xaxis.range[0]" in ed || "xaxis.range" in ed || "yaxis" in ed || "annotations" in ed
                 || "plot_bgcolor" in ed || "height" in ed || "width" in ed || Object.keys(ed).length<1) {
                     if ("height" in ed || "shape" in ed) {
                         recalculate_mouse_to_plot_conversion_variables();
@@ -670,6 +671,7 @@ $(document).ready(function() {
         delete_annotation(plot, selected_trace_number-1);
         let block_name = $('#block-select').val();
         plot_to_box_objects[block_name][plot.id].splice(selected_trace_number-1, 1);
+        scale_boxes_amplitude();
     });
 
     $("#block_delete_object_btn").on( "click", function(event) {
@@ -1469,9 +1471,6 @@ function save_modal_values(plot, trace_number) {
         let new_array = [];
         if (selected_box_array_name == "Default Array") new_array = axis_id_to_default_array[plot.id]
         else new_array = array_name_to_array[selected_box_array_name]
-        // if (flip) {
-        //     new_array = new_array.map(x => x * -1);
-        // }
         change_box_array(plot, trace_number, parseFloat(input_start_time), new_array);
         array_changed_flag = true;
     }
@@ -1482,11 +1481,12 @@ function save_modal_values(plot, trace_number) {
         let base_array = [];
         if (selected_box_array_name == "Default Array") base_array = axis_id_to_default_array[plot.id]
         else base_array = array_name_to_array[selected_box_array_name]
-        if (!(input_constant_amplitude == boxObj.amplitude && flip == boxObj.flip_amplitude)) {
+        if (!(input_constant_amplitude == boxObj.amplitude && flip == boxObj.flip_amplitude) || array_changed_flag) {
             if (flip) {
                 input_constant_amplitude *= -1;
             }
             update_trace_amplitude(plot, trace_number, base_array, input_constant_amplitude);
+            scale_boxes_amplitude();
         }
     }
 
@@ -1686,6 +1686,7 @@ function reload_data(data) {
     update_theme(current_theme);
     load_block_select_options();
     $('#block-select').val(block_name);
+    scale_boxes_amplitude();
 }
 
 function generate_current_data_state() {
@@ -1863,6 +1864,42 @@ function update_trace_amplitude(plot, trace_number, base_array, amplitude) {
     } else {
         flip_shapes(plot, (trace_number-1)*2, 1);
     }
+}
+
+function scale_boxes_amplitude() {
+    // Find the maximum amplitude.
+    let max_amplitude = 1;
+    $(".dropzone").each(function () {
+        let plot = this;
+        let data = plot.data;
+        if (plot.id != "rf_chart" && plot.id != "adc_chart" && data.length > 1) {
+            // 0th index is dummy so skipping that.
+            for(let i=1; i<data.length; i++) {
+                if ("y" in data[i]) {
+                    let temp_max = Math.max(...data[i]["y"].map(a => Math.abs(a)));
+                    max_amplitude = Math.max(max_amplitude, temp_max);
+                }
+            }
+        }
+    });
+    // Update the size of boxes.
+    shape_height = max_amplitude + 0.1;
+    $(".dropzone").each(function () {
+        let plot = this;
+        if ("shapes" in plot.layout) {
+            var shapes = JSON.parse(JSON.stringify(plot.layout["shapes"]));
+            shapes.forEach(function (shape) {
+                shape["y1"] = Math.sign(shape["y1"]) * shape_height;
+            });
+        }
+        let yaxis = JSON.parse(JSON.stringify(plot.layout["yaxis"]));
+        yaxis.range = [-shape_height, shape_height];
+        let update = {
+            yaxis: yaxis,
+            shapes: shapes
+            };
+        Plotly.relayout(plot, update);
+    });
 }
 
 function load_parameters_array_dropdown() {
