@@ -42,6 +42,9 @@ var blocks = {}
 // To maintain the number of loops on each block.
 var block_to_loops = {}
 
+// To maintain the inner html of events for each block.
+var block_to_events_html = {}
+
 const event_type_to_icon_str = {
     "calc": "fa fa-calculator",
     "init": "fa fa-play",
@@ -54,7 +57,7 @@ var undo_stack = [];
 var redo_stack = [];
 const max_stack_length = 8;
 
-const current_version = "1.2";
+const current_version = "1.3";
 
 // Dummy arrays dictionary for array selection.
 const grad_100_2660_100 = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1, 0.0];
@@ -764,8 +767,8 @@ $(document).ready(function() {
         if (Object.keys(block_to_sdl_objects).length === 0) return;
         let configurations = save_configurations();
         let structure = generate_blocks_nesting_structure();
-        let events = generate_events_data();
-        send_data(block_to_sdl_objects, configurations, structure, events);
+        let serialized_events = serialize_events_data();
+        send_data(block_to_sdl_objects, configurations, structure, serialized_events);
     });
 
     $(document).on('click', '.array-dropdown', function () {
@@ -1082,6 +1085,10 @@ $(document).ready(function() {
             update_event(event_data);
         }
         $('#eventsModal').modal('toggle');
+        // save event data.
+        let block_name = $('#block-select').val();
+        let events_col_inner_html = $("#events-col")[0].innerHTML;
+        block_to_events_html[block_name] = events_col_inner_html;
     });
 
     $("#delete_event_btn").click(function () {
@@ -1680,7 +1687,8 @@ function reload_data(data) {
     block_color_counter = data["block_color_counter"];
     block_to_loops = data["block_to_loops"];
     array_name_to_array = data["array_name_to_array"];
-    $("#events-col")[0].innerHTML = data["events_col_inner_html"];
+    block_to_events_html = data["block_to_events_html"];
+    load_events_data(block_name);
     theme = data["theme"];
     let current_theme = document.documentElement.getAttribute('data-bs-theme');
     update_theme(current_theme);
@@ -1695,7 +1703,6 @@ function generate_current_data_state() {
     let theme = "dark";
     if (document.documentElement.getAttribute('data-bs-theme') == 'light') theme = "light";
     let configurations = save_configurations();
-    let events_col_inner_html = $("#events-col")[0].innerHTML;
     let current_state_data = {
         "plots_data": blocks,
         "plot_to_box_objects": plot_to_box_objects,
@@ -1706,7 +1713,7 @@ function generate_current_data_state() {
         "configurations": configurations,
         "block_to_loops": block_to_loops,
         "array_name_to_array": array_name_to_array,
-        "events_col_inner_html": events_col_inner_html
+        "block_to_events_html": block_to_events_html
     }
     return current_state_data;
 }
@@ -1893,7 +1900,7 @@ function scale_boxes_amplitude() {
             });
         }
         let yaxis = JSON.parse(JSON.stringify(plot.layout["yaxis"]));
-        yaxis.range = [-shape_height, shape_height];
+        yaxis.range = [-shape_height, shape_height+0.75];
         let update = {
             yaxis: yaxis,
             shapes: shapes
@@ -2266,6 +2273,9 @@ function save_block_data(block_name) {
         plot_data[plot.id] = [plot.data, plot.layout];
     });
     blocks[block_name] = plot_data;
+    // save event data for the block.
+    let events_col_inner_html = $("#events-col")[0].innerHTML;
+    block_to_events_html[block_name] = events_col_inner_html;
 }
 
 function load_block_data(block_name) {
@@ -2300,6 +2310,18 @@ function load_block_data(block_name) {
     }
     else {
         toggle_plot_color(true);
+    }
+    // Load events data for the block.
+    load_events_data(block_name);
+}
+
+function load_events_data(block_name) {
+    if (block_name in block_to_events_html) {
+        $("#events-col")[0].innerHTML = block_to_events_html[block_name];
+    } else {
+        $("#calc-events")[0].innerHTML = "";
+        $("#init-events")[0].innerHTML = "";
+        $("#sync-events")[0].innerHTML = "";
     }
 }
 
@@ -2474,12 +2496,19 @@ function create_data_attributes_string(event_data) {
     return data_attributes_str;
 }
 
-function generate_events_data() {
-    let events = [];
-    $(".event-btn").each(function(){
-        events.push($(this).data());
+function serialize_events_data() {
+    let events_data = {};
+    Object.keys(block_to_events_html).forEach(function (block_name){
+        $("#events-col")[0].innerHTML = block_to_events_html[block_name];
+        events_data[block_name] = [];
+        $(".event-btn").each(function(){
+            events_data[block_name].push($(this).data());
+        });
     });
-    return events;
+    // set current event data again.
+    let block_name = $('#block-select').val();
+    load_events_data(block_name);
+    return events_data;
 }
 
 const file = new File(['foo'], 'dummy_file.json', {
