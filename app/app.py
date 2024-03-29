@@ -37,8 +37,23 @@ def process():
     block_to_loops = data['block_to_loops']
     block_number_to_block_object = data["block_number_to_block_object"]
     events = data['events']
+
+    # embed events in the block to box objects.
+    for block_name in events:
+        block_events = events[block_name]
+        for event in block_events:
+            event_object = {"type": "event"}
+            for key in event:
+                if key == "bsPlacement" or key == "bsToggle":
+                    continue
+                if key == "eventType":
+                    event_object["axis"] = event[key]
+                else:
+                    event_object[key] = event[key]
+            block_to_box_objects[block_name].append(event_object)
+
     create_sdl_from_ui_inputs(block_to_box_objects, block_structure, block_to_loops, \
-                              block_number_to_block_object, configurations, events)
+                              block_number_to_block_object, configurations)
 
 def open_browser():
     webbrowser.open_new("http://127.0.0.1:5000")
