@@ -460,18 +460,18 @@ $(document).ready(function() {
         let starting_point = xInDataCoord;
 
         if (dragged.id == "rf_excitation_btn" && target.id != "rf_chart") {
-            alert("Object type not suitable for this axis.");
+            fire_alert("Object type not suitable for this axis.");
             return;
         } else if (dragged.id == "gradient_btn" && (target.id == "rf_chart" || target.id == "adc_chart")) {
-            alert("Object type not suitable for this axis.");
+            fire_alert("Object type not suitable for this axis.");
             return;
         } else if (dragged.id == "adc_readout_btn" && target.id != "adc_chart") {
-            alert("Object type not suitable for this axis.");
+            fire_alert("Object type not suitable for this axis.");
             return;
         }
 
         if (starting_point < 0 || starting_point > block_duration) {
-            alert("Invalid drop location");
+            fire_alert("Invalid drop location");
             return;
         }
 
@@ -749,9 +749,25 @@ $(document).ready(function() {
     });
 
     $("#reset-btn").click(function(){
-        reset_flag = 1;
-        localStorage.removeItem("data");
-        location.reload();
+        Swal.fire({
+            title: "Do you want to reset the page?",
+            showDenyButton: true,
+            // showCancelButton: true,
+            confirmButtonText: "Reset",
+            denyButtonText: `Cancel`,
+            confirmButtonColor: "red",
+            denyButtonColor: "green",
+          }).then((result) => {
+            if (result.isConfirmed) {
+            //   Swal.fire("Saved!", "", "success");
+                reset_flag = 1;
+                localStorage.removeItem("data");
+                location.reload();
+            }
+            // else if (result.isDenied) {
+            //   Swal.fire("Changes are not saved", "", "info");
+            // }
+        });
     });
 
     $("#generate-sdl-btn").click(function(){
@@ -1035,10 +1051,10 @@ $(document).ready(function() {
                     reload_data(data);
                     save_data();
                 } else {
-                    alert("Version not supported anymore");
+                    fire_alert("Version not supported anymore");
                 }
             } catch ({ name, message }) {
-                alert("Invalid Checkpoint File");
+                fire_alert("Invalid Checkpoint File");
             }
         };
     }
@@ -1729,7 +1745,7 @@ function undo_data() {
         localStorage.setItem('data', JSON.stringify(prev_state_data));
         reload_data(prev_state_data);
     } else {
-        alert("Cannot undo further!");
+        fire_alert("Cannot undo further!");
     }
 }
 
@@ -1744,7 +1760,7 @@ function redo_data() {
         localStorage.setItem('data', JSON.stringify(next_state_data));
         reload_data(next_state_data);
     } else {
-        alert("cannot redo further!");
+        fire_alert("Cannot redo further!");
     }
 }
 
@@ -2153,7 +2169,7 @@ function add_block_with_selected_boxes() {
         });
     }
     if (!selected_boxes.length) {
-        alert("no boxes selected!")
+        fire_alert("no boxes selected!");
         return false;
     }
     blocks[block_name] = block_data;
@@ -2511,6 +2527,14 @@ function serialize_events_data() {
     return events_data;
 }
 
+function fire_alert(message) {
+    Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: message
+      });
+}
+
 const file = new File(['foo'], 'dummy_file.json', {
     type: 'text/plain',
 });
@@ -2545,7 +2569,7 @@ function send_data(block_to_box_objects, configurations, block_structure, events
             console.log(response);
         },
         error: function(error) {
-            alert("ERROR: could not generate SDL file.")
+            fire_alert("Could not generate SDL file.");
             console.log(error);
         }
     });
