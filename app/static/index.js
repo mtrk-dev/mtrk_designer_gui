@@ -1624,6 +1624,20 @@ function save_configurations() {
     let seqstring = $('#seqstringInfoInput').val();
     let reconstruction = $('#reconstructionInfoInput').val();
     let pe_lines = $('#peLinesInfoInput').val();
+
+    // Add default values if left empty
+    if (format == "") { format = "mtrk-SDL"; }
+    if (version == "") { version = "1"; }
+    if (measurement == "") { measurement = "abc"; }
+    if (system == "") { system = "Skyra-XQ"; }
+    if (readout == "") { readout = "2"; }
+    if (description == "") { description = "MiniFlash"; }
+    if (slices == "") { slices = "1"; }
+    if (fov == "") { fov = "300"; }
+    if (seqstring == "") { seqstring = "YARRA"; }
+    if (reconstruction == "") { reconstruction = "%SiemensIceProgs%\\IceProgram2D"; }
+    if (pe_lines == "") { pe_lines = "128"; }
+
     configs['file'] = {
         'format': format,
         'version': version,
@@ -2587,7 +2601,7 @@ class Box {
     name = "";
     start_time = 0;
     anchor_time = 0;
-    amplitude = 1;
+    amplitude = null;
     variable_amplitude = false;
     flip_amplitude = false;
     step_change = null;
@@ -2622,6 +2636,26 @@ class Box {
         this.start_time = start_time;
         this.axis = axis;
         this.array_info.array = array;
+
+        // Add default values according to box type.
+        if (type == "rf") {
+            this.rf_duration = 2.560;
+            this.init_phase = 0;
+            this.thickness = 5;
+            this.flip_angle = 15;
+            this.purpose = "excitation";
+            this.rf_added_phase_type = "float";
+            this.rf_added_phase_float = 0;
+        } else if (type == "grad") {
+            this.amplitude = 1;
+        } else if (type == "adc") {
+            this.frequency = 0;
+            this.phase = 0;
+            this.adc_added_phase_type = "float";
+            this.adc_added_phase_float = 0;
+            this.samples = 128;
+            this.dwell_time = 30;
+        }
     }
 }
 
