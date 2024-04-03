@@ -750,6 +750,8 @@ $(document).ready(function() {
 
     $("#reset-btn").click(function(){
         Swal.fire({
+            icon: "warning",
+            iconColor: "#c35858",
             title: "Do you want to reset the page?",
             showDenyButton: true,
             // showCancelButton: true,
@@ -757,6 +759,8 @@ $(document).ready(function() {
             denyButtonText: `Cancel`,
             confirmButtonColor: "red",
             denyButtonColor: "green",
+            background: "#3c3c3c",
+            color: "white"
           }).then((result) => {
             if (result.isConfirmed) {
             //   Swal.fire("Saved!", "", "success");
@@ -2555,7 +2559,9 @@ function fire_alert(message) {
     Swal.fire({
         icon: "error",
         title: "Oops...",
-        text: message
+        text: message,
+        background: "#3c3c3c",
+        color: "white"
       });
 }
 
