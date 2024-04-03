@@ -784,7 +784,8 @@ $(document).ready(function() {
         let configurations = save_configurations();
         let structure = generate_blocks_nesting_structure();
         let serialized_events = serialize_events_data();
-        send_data(block_to_sdl_objects, configurations, structure, serialized_events);
+        let block_to_duration = generate_block_duration();
+        send_data(block_to_sdl_objects, configurations, structure, serialized_events, block_to_duration);
     });
 
     $(document).on('click', '.array-dropdown', function () {
@@ -2541,6 +2542,15 @@ function serialize_events_data() {
     return events_data;
 }
 
+function generate_block_duration() {
+    // TODO: add individual durations to each block.
+    let block_to_duration = {}
+    for (let block in blocks) {
+        block_to_duration[block] = block_duration;
+    }
+    return block_to_duration;
+}
+
 function fire_alert(message) {
     Swal.fire({
         icon: "error",
@@ -2566,7 +2576,7 @@ function download_file(file) {
     window.URL.revokeObjectURL(url);
 }
 
-function send_data(block_to_box_objects, configurations, block_structure, events) {
+function send_data(block_to_box_objects, configurations, block_structure, events, block_to_duration) {
     $.ajax({
         url: '/process',
         type: 'POST',
@@ -2577,7 +2587,8 @@ function send_data(block_to_box_objects, configurations, block_structure, events
             'block_structure': block_structure,
             'block_to_loops': block_to_loops,
             'block_number_to_block_object': block_number_to_block_object,
-            'events': events
+            'events': events,
+            "block_to_duration": block_to_duration
         }),
         success: function(response) {
             console.log(response);
