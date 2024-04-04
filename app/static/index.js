@@ -1458,7 +1458,7 @@ function load_modal_values(plot, trace_number) {
         }
     } else if (boxObj.type == "grad") {
         $('#inputConstantAmplitude').val(boxObj.amplitude);
-        $('#inputStepChange').val(boxObj.step_change);
+        // $('#inputStepChange').val(boxObj.step_change);
         $('#inputLoopNumber').val(boxObj.loop_number);
         $('#inputGradEquationName').val(boxObj.equation_info.name);
         $('#inputGradEquationExpression').val(boxObj.equation_info.expression);
@@ -1535,13 +1535,15 @@ function save_modal_values(plot, trace_number) {
     }
 
     // If the selected trace type is different than what it already is we change trace - fixed/variable.
-    if ($("#variableRadio").is(':checked')) {
-        if (!boxObj.variable_amplitude || array_changed_flag) {
-            change_trace_type(plot, trace_number, true);
-        }
-    } else {
-        if (boxObj.variable_amplitude) {
-            change_trace_type(plot, trace_number, false);
+    if (boxObj.type == "grad") {
+        if ($("#variableRadio").is(':checked')) {
+            if (!boxObj.variable_amplitude || array_changed_flag) {
+                change_trace_type(plot, trace_number, true);
+            }
+        } else {
+            if (boxObj.variable_amplitude) {
+                change_trace_type(plot, trace_number, false);
+            }
         }
     }
 
@@ -1576,7 +1578,7 @@ function save_modal_values(plot, trace_number) {
         boxObj.amplitude = $('#inputConstantAmplitude').val();
         boxObj.variable_amplitude = $('#variableRadio').is(':checked');
         boxObj.flip_amplitude = $('#flipAmplitudeCheck').is(':checked');
-        boxObj.step_change = $('#inputStepChange').val();
+        // boxObj.step_change = $('#inputStepChange').val();
         boxObj.loop_number = $('#inputLoopNumber').val();
         boxObj.equation_info.name = $('#inputGradEquationName').val();
         boxObj.equation_info.expression = $('#inputGradEquationExpression').val();
@@ -2668,7 +2670,7 @@ class Box {
     amplitude = null;
     variable_amplitude = false;
     flip_amplitude = false;
-    step_change = null;
+    // step_change = null;
     loop_number = null;
     isSelected = false;
     block = null;
