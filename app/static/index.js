@@ -16,8 +16,12 @@ const adc_readout_array = [0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
 // const block_array = [0, 0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.75, 0.7, 0.65, 0.6, 0.55, 0.5, 0.45, 0.4, 0.35, 0.3, 0.25, 0.2, 0.15, 0.1, 0.05, 0];
 
 const rf_pulse_array = [];
+const rf_phase_array = [];
 for (let i=0; i < 128; i++) {
     rf_pulse_array.push(rf_array[2*i]);
+}
+for (let i=0; i < rf_array.length; i++) {
+    if (i % 2 == 1) rf_phase_array.push(rf_array[i]);
 }
 const step_size = 100;
 
@@ -66,6 +70,7 @@ const grad_220_80_220 = [0.0, 0.0455, 0.0909, 0.1364, 0.1818, 0.2273, 0.2727, 0.
 const grad_30_3840_30 = [0.0, 0.3333, 0.6667, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.6667, 0.3333, 0.0];
 var array_name_to_array = {
     "RF Pulse": rf_pulse_array,
+    "RF Phase": rf_phase_array,
     "grad_100_2660_100": grad_100_2660_100,
     "grad_220_10_220": grad_220_10_220,
     "grad_220_80_220": grad_220_80_220,
@@ -416,6 +421,7 @@ if (data) {
 }
 
 load_parameters_array_dropdown();
+load_parameters_phase_array_dropdown();
 
 $(document).ready(function() {
     let dragged = null;
@@ -797,6 +803,9 @@ $(document).ready(function() {
     $(document).on('click', '.array-dropdown', function () {
         $('#array-dropdown-btn').text($(this).text());
     });
+    $(document).on('click', '.phase-array-dropdown', function () {
+        $('#phase-array-dropdown-btn').text($(this).text());
+    });
     // $(document).on('click', '#add-new-array-item', function () {
     //     $('#parametersModal').addClass('blurred');
     //     $('#arrayConfigModal').modal('toggle');
@@ -852,6 +861,7 @@ $(document).ready(function() {
 
             // populate the array selection again with the addition of new array.
             load_parameters_array_dropdown();
+            load_parameters_phase_array_dropdown();
             load_array_manager_select_options();
             $("#array-select").val(arrayName);
             update_array_manager_chart(validated_array);
@@ -1432,6 +1442,7 @@ function load_modal_values(plot, trace_number) {
     $('#inputStartTime').val(boxObj.start_time);
     $('#inputAnchorTime').val(boxObj.anchor_time);
     $('#array-dropdown-btn').text(boxObj.array_info.name);
+    $('#phase-array-dropdown-btn').text(boxObj.phase_array_info.name);
 
     if (boxObj.type == "rf") {
         $('#inputRfAddedPhaseType').val(boxObj.rf_added_phase_type);
@@ -1497,6 +1508,7 @@ function save_modal_values(plot, trace_number) {
 
     // if selected array has been changed, we change the box array.
     let selected_box_array_name = $('#array-dropdown-btn').text();
+    let selected_phase_array_name = $('#phase-array-dropdown-btn').text();
     let flip = $('#flipAmplitudeCheck').is(':checked');
     let array_changed_flag = false;
     if (selected_box_array_name != boxObj.array_info.name) {
@@ -1553,6 +1565,12 @@ function save_modal_values(plot, trace_number) {
             boxObj.purpose = "excitation";
         } else {
             boxObj.purpose = "refocusing";
+        }
+        boxObj.phase_array_info.name = selected_phase_array_name;
+        if (selected_phase_array_name != "Select Array") {
+            boxObj.phase_array_info.array = array_name_to_array[selected_phase_array_name];
+        } else {
+            boxObj.phase_array_info.array = [];
         }
     } else if (boxObj.type == "grad") {
         boxObj.amplitude = $('#inputConstantAmplitude').val();
@@ -1971,6 +1989,19 @@ function load_parameters_array_dropdown() {
     }
     // ul.innerHTML += '<li><hr class="dropdown-divider"></li> \
     // <li id="add-new-array-item"><a class="dropdown-item">&#43;</a></li>';
+}
+
+function load_parameters_phase_array_dropdown() {
+    let ul = document.getElementById("phase-array-dropdown-menu");
+    ul.innerHTML = '';
+    ul.innerHTML += '<li><a class="dropdown-item phase-array-dropdown">Select Array</a></li>';
+    for (const [key, value] of Object.entries(array_name_to_array)) {
+        let li = document.createElement("li");
+        li.appendChild(document.createTextNode(key));
+        li.setAttribute("id", key + "-array-item");
+        li.setAttribute("class", "dropdown-item phase-array-dropdown")
+        ul.appendChild(li);
+    }
 }
 
 function validateArrayName(arrayName) {
@@ -2659,6 +2690,10 @@ class Box {
         name: "Default Array",
         array: []
     };
+    phase_array_info = {
+        name: "Select Array",
+        array: []
+    }
     equation_info = {
         name: "",
         expression: ""
