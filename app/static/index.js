@@ -284,6 +284,7 @@ adc_layout["margin"]["b"] = 30;
 // We will use the shape template and keep adding to the total shapes in one axis.
 var shapes_array = [];
 var shape_height = 1.1;
+const default_shape_height = 1.1;
 var shape_template = 
     {
       type: 'rect',
@@ -494,7 +495,8 @@ $(document).ready(function() {
         var shape = JSON.parse(JSON.stringify(shape_template));
         shape["x0"] = starting_point;
         shape["x1"] = starting_point + multiplier*(dragged_array.length/step_size);
-        shape["y1"] = shape_height;
+        if (target.id == "rf_chart" || target.id == "adc_chart") shape["y1"] = default_shape_height;
+        else { shape["y1"] = shape_height; }
         let added_shapes=[];
         if ("shapes" in target.layout) { added_shapes = target.layout.shapes;}
         added_shapes.push(shape);
@@ -931,6 +933,7 @@ $(document).ready(function() {
         save_block_data(prev_block);
         let current_block = $(this).val();
         load_block_data(current_block);
+        scale_boxes_amplitude();
     });
 
     $('#array-select').change(function(){
@@ -1205,13 +1208,16 @@ function move_shape_to_zero_line(plot, shape_number) {
     // if (plot.data[trace_number]["mode"]=="markers") shapes[shape_number]["y0"] = -shape_height;
     shapes[shape_number]["y0"] = 0;
 
+    let height = shape_height;
+    if (plot.id == "rf_chart" || plot.id == "adc_chart") height = default_shape_height;
+
     // changing shape if the data is negative.
     let y = plot.data[trace_number]["y"];
     let middle_element = y[Math.floor(y.length / 2)];
     if (middle_element < 0) {
-        shapes[shape_number]["y1"] = -shape_height;
+        shapes[shape_number]["y1"] = -height;
     } else {
-        shapes[shape_number]["y1"] = shape_height;
+        shapes[shape_number]["y1"] = height;
     }
 
     var update = {
@@ -1303,20 +1309,20 @@ function get_trace_dimensions(plot, trace_number) {
     return [width, height];
 }
 
-function revert_shape_change(plot, shape_number) {
-    let shapes = JSON.parse(JSON.stringify(plot.layout["shapes"]));
-    let trace_number = (shape_number/2)+1;
-    if (plot.data[trace_number]["mode"]=="markers") shapes[shape_number]["y0"] = -shape_height;
-    else shapes[shape_number]["y0"] = 0;
-    shapes[shape_number]["y1"] = shape_height;
-    let x_arr = plot.data[trace_number]["x"];
-    shapes[shape_number]["x0"] = x_arr[0];
-    shapes[shape_number]["x1"] = x_arr.slice(-1)[0];
-    let update = {
-        shapes: shapes
-        };
-    Plotly.relayout(plot, update);
-}
+// function revert_shape_change(plot, shape_number) {
+//     let shapes = JSON.parse(JSON.stringify(plot.layout["shapes"]));
+//     let trace_number = (shape_number/2)+1;
+//     if (plot.data[trace_number]["mode"]=="markers") shapes[shape_number]["y0"] = -shape_height;
+//     else shapes[shape_number]["y0"] = 0;
+//     shapes[shape_number]["y1"] = shape_height;
+//     let x_arr = plot.data[trace_number]["x"];
+//     shapes[shape_number]["x0"] = x_arr[0];
+//     shapes[shape_number]["x1"] = x_arr.slice(-1)[0];
+//     let update = {
+//         shapes: shapes
+//         };
+//     Plotly.relayout(plot, update);
+// }
 
 function change_trace_type(plot, trace_number, toVariable) {
     let y = plot.data[trace_number]["y"];
@@ -1368,9 +1374,7 @@ function change_trace_type(plot, trace_number, toVariable) {
 function change_shapes_variable(plot, shape_number, toVariable) {
     let line_shape_number = shape_number + 1;
     let box_shape_number = shape_number;
-    let shapes = JSON.parse(JSON.stringify(plot.layout["shapes"])); 
-    // shapes[line_shape_number]["y0"] = -shape_height;
-    // shapes[box_shape_number]["y0"] = -shape_height;
+    let shapes = JSON.parse(JSON.stringify(plot.layout["shapes"]));
     if (toVariable) shapes[box_shape_number]["fillcolor"] = 'rgba(206 249 113, 0.1)';
     else shapes[box_shape_number]["fillcolor"] = 'rgba(129, 133, 137, 0.2)';
     var update = {
@@ -1929,19 +1933,28 @@ function scale_boxes_amplitude() {
     shape_height = max_amplitude + 0.1;
     $(".dropzone").each(function () {
         let plot = this;
-        if ("shapes" in plot.layout) {
-            var shapes = JSON.parse(JSON.stringify(plot.layout["shapes"]));
-            shapes.forEach(function (shape) {
-                shape["y1"] = Math.sign(shape["y1"]) * shape_height;
-            });
+        if (plot.id != "rf_chart" && plot.id != "adc_chart") {
+            if ("shapes" in plot.layout) {
+                var shapes = JSON.parse(JSON.stringify(plot.layout["shapes"]));
+                shapes.forEach(function (shape) {
+                    shape["y1"] = Math.sign(shape["y1"]) * shape_height;
+                });
+            }
+            if ("annotations" in plot.layout) {
+                var annotations = JSON.parse(JSON.stringify(plot.layout["annotations"]));
+                annotations.forEach(function (annotation) {
+                    annotation["y"] = shape_height + 0.75;
+                });
+            }
+            let yaxis = JSON.parse(JSON.stringify(plot.layout["yaxis"]));
+            yaxis.range = [-shape_height, shape_height+0.75];
+            let update = {
+                yaxis: yaxis,
+                shapes: shapes,
+                annotations
+                };
+            Plotly.relayout(plot, update);
         }
-        let yaxis = JSON.parse(JSON.stringify(plot.layout["yaxis"]));
-        yaxis.range = [-shape_height, shape_height+0.75];
-        let update = {
-            yaxis: yaxis,
-            shapes: shapes
-            };
-        Plotly.relayout(plot, update);
     });
 }
 
@@ -2245,6 +2258,8 @@ function add_dummy_block_boxes(seen_plots, starting_point, ending_point) {
             let block_color = block_colors[block_color_counter];
             shape["x0"] = starting_point;
             shape["x1"] = ending_point;
+            if (target.id == "rf_chart" || target.id == "adc_chart") shape["y1"] = default_shape_height;
+            else { shape["y1"] = shape_height; }
             shape["line"] =  {
                 color: block_color+"FF",
                 width: 1,
