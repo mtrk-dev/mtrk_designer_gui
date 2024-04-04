@@ -1641,6 +1641,7 @@ function save_configurations() {
     if (fov == "") { fov = "300"; }
     if (seqstring == "") { seqstring = "YARRA"; }
     if (reconstruction == "") { reconstruction = "%SiemensIceProgs%\\IceProgram2D"; }
+    else { reconstruction = reconstruction.replace(/\\\\/g, "\\"); }
     if (pe_lines == "") { pe_lines = "128"; }
 
     configs['file'] = {
