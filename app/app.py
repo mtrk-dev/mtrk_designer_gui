@@ -43,12 +43,12 @@ def process():
     for block_name in events:
         block_events = events[block_name]
         for event in block_events:
-            event_object = {"type": "event"}
+            event_object = {"axis": "event"}
             for key in event:
                 if key == "bsPlacement" or key == "bsToggle":
                     continue
                 if key == "eventType":
-                    event_object["axis"] = event[key]
+                    event_object["type"] = event[key]
                 else:
                     event_object[key] = event[key]
             block_to_box_objects[block_name].append(event_object)
