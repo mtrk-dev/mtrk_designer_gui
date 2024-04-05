@@ -139,6 +139,12 @@
     padding-right: 0px;
 }
 
+#blockDurationSpan {
+    font-size: 0.8rem;
+    padding-left: 3%;
+    padding-right: 3%;
+}
+
 /* .group-loop-input {
     position: absolute;
     left: 20px;
