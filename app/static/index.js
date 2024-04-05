@@ -1519,21 +1519,6 @@ function save_modal_values(plot, trace_number) {
         array_changed_flag = true;
     }
 
-    // If the amplitude for a grad box has been changed/flipped we update and adjust the scale.
-    if (boxObj.type == "grad") {
-        let input_constant_amplitude = $('#inputConstantAmplitude').val();
-        let base_array = [];
-        if (selected_box_array_name == "Default Array") base_array = axis_id_to_default_array[plot.id]
-        else base_array = array_name_to_array[selected_box_array_name]
-        if (!(input_constant_amplitude == boxObj.amplitude && flip == boxObj.flip_amplitude) || array_changed_flag) {
-            if (flip) {
-                input_constant_amplitude *= -1;
-            }
-            update_trace_amplitude(plot, trace_number, base_array, input_constant_amplitude);
-            scale_boxes_amplitude();
-        }
-    }
-
     // If the selected trace type is different than what it already is we change trace - fixed/variable.
     if (boxObj.type == "grad") {
         if ($("#variableRadio").is(':checked')) {
@@ -1544,6 +1529,21 @@ function save_modal_values(plot, trace_number) {
             if (boxObj.variable_amplitude) {
                 change_trace_type(plot, trace_number, false);
             }
+        }
+    }
+
+    // If the amplitude for a grad box has been changed/flipped we update and adjust the scale.
+    if (boxObj.type == "grad" && (!$("#variableRadio").is(':checked'))) {
+        let input_constant_amplitude = $('#inputConstantAmplitude').val();
+        let base_array = [];
+        if (selected_box_array_name == "Default Array") base_array = axis_id_to_default_array[plot.id]
+        else base_array = array_name_to_array[selected_box_array_name]
+        if (!(input_constant_amplitude == boxObj.amplitude && flip == boxObj.flip_amplitude) || array_changed_flag) {
+            if (flip) {
+                input_constant_amplitude *= -1;
+            }
+            update_trace_amplitude(plot, trace_number, base_array, input_constant_amplitude);
+            scale_boxes_amplitude();
         }
     }
 
@@ -1575,13 +1575,17 @@ function save_modal_values(plot, trace_number) {
             boxObj.phase_array_info.array = [];
         }
     } else if (boxObj.type == "grad") {
-        boxObj.amplitude = $('#inputConstantAmplitude').val();
+        if (!$('#variableRadio').is(':checked')) {
+            boxObj.amplitude = $('#inputConstantAmplitude').val();
+        }
         boxObj.variable_amplitude = $('#variableRadio').is(':checked');
         boxObj.flip_amplitude = $('#flipAmplitudeCheck').is(':checked');
         // boxObj.step_change = $('#inputStepChange').val();
-        boxObj.loop_number = $('#inputLoopNumber').val();
-        boxObj.equation_info.name = $('#inputGradEquationName').val();
-        boxObj.equation_info.expression = $('#inputGradEquationExpression').val();
+        if (!$('#variableRadio').is(':checked')) {
+            boxObj.loop_number = $('#inputLoopNumber').val();
+            boxObj.equation_info.name = $('#inputGradEquationName').val();
+            boxObj.equation_info.expression = $('#inputGradEquationExpression').val();
+        }
     } else {
         // Update the adc trace if adc_duration is changed.
         let new_duration = $('#inputAdcDuration').val();
