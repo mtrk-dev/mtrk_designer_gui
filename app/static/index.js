@@ -61,7 +61,7 @@ var undo_stack = [];
 var redo_stack = [];
 const max_stack_length = 8;
 
-const current_version = "1.3";
+const current_version = "1.4";
 
 // Dummy arrays dictionary for array selection.
 const grad_100_2660_100 = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1, 0.0];
@@ -1112,6 +1112,9 @@ $(document).ready(function() {
             event_data["input-init-action-gradients"] = $("#inputInitActionGradients").val();
         } else if (selected_action == "sync") {
             event_data["input-sync-time"] = $("#inputSyncTime").val();
+            event_data["input-sync-duration"] = $("#inputSyncDuration").val();
+            event_data["input-sync-object"] = $("#inputSyncObject").val();
+            event_data["input-sync-event-param"] = $("#inputSyncEventParam").val();
         }
         if (selected_event_btn == null) {
             add_new_event(event_data);
@@ -1160,6 +1163,9 @@ $(document).on("click", "#add-event-btn", function(){
     $("#inputCalcIncrement").val('');
     $("#inputInitActionGradients").val('');
     $("#inputSyncTime").val('');
+    $("#inputSyncDuration").val('');
+    $("#inputSyncObject").val('');
+    $("#inputSyncEventParam").val('');
     $("#delete_event_btn").hide();
     $('#eventsModal').modal('toggle');
     selected_event_btn = null;
@@ -1184,6 +1190,9 @@ $(document).on("click", ".event-btn", function () {
         $("#inputInitActionGradients").val(clicked_event_data["inputInitActionGradients"]);
     } else if (event_type == "sync") {
         $("#inputSyncTime").val(clicked_event_data["inputSyncTime"]);
+        $("#inputSyncDuration").val(clicked_event_data["inputSyncDuration"]);
+        $("#inputSyncObject").val(clicked_event_data["inputSyncObject"]);
+        $("#inputSyncEventParam").val(clicked_event_data["inputSyncEventParam"]);
     }
 
     $('#eventsModal').modal('toggle');
