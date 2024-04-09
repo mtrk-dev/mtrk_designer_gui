@@ -1493,6 +1493,12 @@ function load_block_modal_values(plot, trace_number) {
     blockObj = block_number_to_block_object[boxObj.block];
     $('#inputBlockName').val(blockObj.name);
     $('#blockStartTime').val(blockObj.start_time);
+    $('#inputBlockMessage').val(blockObj.message);
+    if (blockObj.print_counter) {
+        $("#printCounterCheck").prop("checked", true);
+    } else {
+        $("#printCounterCheck").prop("checked", false);
+    }
 }
 
 function save_modal_values(plot, trace_number) {
@@ -1639,6 +1645,8 @@ function save_block_modal_values(plot, trace_number) {
 
     blockObj.name = input_block_name;
     blockObj.start_time = parseFloat(block_start_time);
+    blockObj.message = $('#inputBlockMessage').val();
+    blockObj.print_counter = $('#printCounterCheck').is(':checked');
 }
 
 function save_configurations() {
@@ -2736,6 +2744,8 @@ class Box {
 class Block {
     name = "";
     start_time = 0;
+    message = "";
+    print_counter = false;
 
     constructor(name, start_time) {
         this.name = name;
