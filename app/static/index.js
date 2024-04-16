@@ -1467,7 +1467,6 @@ function load_modal_values(plot, trace_number) {
         }
     } else if (boxObj.type == "grad") {
         $('#inputConstantAmplitude').val(boxObj.amplitude);
-        // $('#inputStepChange').val(boxObj.step_change);
         $('#inputLoopNumber').val(boxObj.loop_number);
         $('#inputGradEquationName').val(boxObj.equation_info.name);
         $('#inputGradEquationExpression').val(boxObj.equation_info.expression);
@@ -1592,15 +1591,13 @@ function save_modal_values(plot, trace_number) {
     } else if (boxObj.type == "grad") {
         if (!$('#variableRadio').is(':checked')) {
             boxObj.amplitude = $('#inputConstantAmplitude').val();
-        }
-        boxObj.variable_amplitude = $('#variableRadio').is(':checked');
-        boxObj.flip_amplitude = $('#flipAmplitudeCheck').is(':checked');
-        // boxObj.step_change = $('#inputStepChange').val();
-        if (!$('#variableRadio').is(':checked')) {
+        } else {
             boxObj.loop_number = $('#inputLoopNumber').val();
             boxObj.equation_info.name = $('#inputGradEquationName').val();
             boxObj.equation_info.expression = $('#inputGradEquationExpression').val();
         }
+        boxObj.variable_amplitude = $('#variableRadio').is(':checked');
+        boxObj.flip_amplitude = $('#flipAmplitudeCheck').is(':checked');
     } else {
         // Update the adc trace if adc_duration is changed.
         let new_duration = $('#inputAdcDuration').val();
