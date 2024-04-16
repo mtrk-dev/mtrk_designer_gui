@@ -2298,7 +2298,7 @@ function add_dummy_block_boxes(seen_plots, starting_point, ending_point) {
             ending_point = parseFloat(ending_point);
             for (let i=starting_point; i<=ending_point; i+=(1/step_size)) {
                 x_data.push(i);
-                y_data.push(0.8);
+                y_data.push(0);
             }
             let data = {};
             data["y"] = y_data;
@@ -2332,6 +2332,9 @@ function add_dummy_block_boxes(seen_plots, starting_point, ending_point) {
             let middle_point = (starting_point+ending_point)/2;
             annotation["x"] = middle_point;
             annotation["text"] = "Block_"+(block_color_counter+1) + " (x1)";
+            if (target.id != "rf_chart" && target.id != "adc_chart") {
+                if (shape_height > default_shape_height) annotation["y"] = shape_height + 0.5;
+            }
             let added_annotations=[];
             if ("annotations" in target.layout) { added_annotations = target.layout.annotations;}
             added_annotations.push(annotation);
