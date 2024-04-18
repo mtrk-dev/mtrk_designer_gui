@@ -764,7 +764,7 @@ $(document).ready(function() {
             showDenyButton: true,
             // showCancelButton: true,
             confirmButtonText: "Reset",
-            denyButtonText: `Cancel`,
+            denyButtonText: "Cancel",
             confirmButtonColor: "red",
             denyButtonColor: "green",
             background: "#3c3c3c",
@@ -1343,8 +1343,11 @@ function get_trace_dimensions(plot, trace_number) {
 //     Plotly.relayout(plot, update);
 // }
 
-function change_trace_type(plot, trace_number, toVariable) {
-    let y = plot.data[trace_number]["y"];
+function change_trace_type(plot, trace_number, box_array_name, toVariable) {
+    let  y = [];
+    if (box_array_name == "Default Array") y = axis_id_to_default_array[plot.id];
+    else y = array_name_to_array[box_array_name];
+
     let x = plot.data[trace_number]["x"];
     let line = plot.data[trace_number]["line"];
     let hovertemplate = plot.data[trace_number]["hovertemplate"];
@@ -1358,16 +1361,17 @@ function change_trace_type(plot, trace_number, toVariable) {
     let data = {};
 
     if (toVariable) {
+        let max_amplitude = shape_height - 0.1;
         for (let i=0; i<y.length; i++) {
             let val = y[i];
             x_data.push(x[i]);
-            x_data.push(x[i] + 0.0001);
-            x_data.push(x[i] + 0.0002);
-            x_data.push(x[i] + 0.0003);
-            y_data.push(val);
-            y_data.push(val*0.75);
-            y_data.push(val*0.5);
-            y_data.push(val*0.25);
+            x_data.push(x[i] + 0.0000001);
+            x_data.push(x[i] + 0.0000002);
+            x_data.push(x[i] + 0.0000003);
+            y_data.push(val * max_amplitude);
+            y_data.push(val * 0.75 * max_amplitude);
+            y_data.push(val * 0.5 * max_amplitude);
+            y_data.push(val * 0.25 * max_amplitude);
         }
         data["type"] = "scatter";
         data["mode"] = "markers";
@@ -1376,8 +1380,10 @@ function change_trace_type(plot, trace_number, toVariable) {
             size: 2,
         };
     } else {
-        for (let i=0; i<y.length; i+=4) {
+        for (let i=0; i<x.length; i+=4) {
             x_data.push(x[i]);
+        }
+        for (let i=0; i<y.length; i+=1) {
             y_data.push(y[i]);
         }
     }
@@ -1394,7 +1400,11 @@ function change_shapes_variable(plot, shape_number, toVariable) {
     let line_shape_number = shape_number + 1;
     let box_shape_number = shape_number;
     let shapes = JSON.parse(JSON.stringify(plot.layout["shapes"]));
-    if (toVariable) shapes[box_shape_number]["fillcolor"] = 'rgba(206 249 113, 0.1)';
+    if (toVariable) {
+        shapes[box_shape_number]["fillcolor"] = 'rgba(206 249 113, 0.1)';
+        shapes[box_shape_number]["y1"] = shape_height;
+        shapes[line_shape_number]["y1"] = shape_height;
+    }
     else shapes[box_shape_number]["fillcolor"] = 'rgba(129, 133, 137, 0.2)';
     var update = {
         shapes: shapes
@@ -1534,14 +1544,17 @@ function save_modal_values(plot, trace_number) {
     }
 
     // If the selected trace type is different than what it already is we change trace - fixed/variable.
+    let trace_type_changed_flag = false;
     if (boxObj.type == "grad") {
         if ($("#variableRadio").is(':checked')) {
             if (!boxObj.variable_amplitude || array_changed_flag) {
-                change_trace_type(plot, trace_number, true);
+                change_trace_type(plot, trace_number, selected_box_array_name, true);
+                trace_type_changed_flag = true;
             }
         } else {
             if (boxObj.variable_amplitude) {
-                change_trace_type(plot, trace_number, false);
+                change_trace_type(plot, trace_number, selected_box_array_name, false);
+                trace_type_changed_flag = true;
             }
         }
     }
@@ -1552,7 +1565,7 @@ function save_modal_values(plot, trace_number) {
         let base_array = [];
         if (selected_box_array_name == "Default Array") base_array = axis_id_to_default_array[plot.id]
         else base_array = array_name_to_array[selected_box_array_name]
-        if (!(input_constant_amplitude == boxObj.amplitude && flip == boxObj.flip_amplitude) || array_changed_flag) {
+        if (!(input_constant_amplitude == boxObj.amplitude && flip == boxObj.flip_amplitude) || array_changed_flag || trace_type_changed_flag) {
             if (flip) {
                 input_constant_amplitude *= -1;
             }
@@ -1964,7 +1977,7 @@ function scale_boxes_amplitude() {
         if (plot.id != "rf_chart" && plot.id != "adc_chart" && data.length > 1) {
             // 0th index is dummy so skipping that.
             for(let i=1; i<data.length; i++) {
-                if ("y" in data[i]) {
+                if ("y" in data[i] && (data[i]["type"] != "scatter")) {
                     let temp_max = Math.max(...data[i]["y"].map(a => Math.abs(a)));
                     max_amplitude = Math.max(max_amplitude, temp_max);
                 }
@@ -1996,6 +2009,66 @@ function scale_boxes_amplitude() {
                 annotations
                 };
             Plotly.relayout(plot, update);
+        }
+    });
+    scale_variable_traces();
+}
+
+function scale_variable_traces() {
+    let max_amplitude = shape_height - 0.1;
+
+    $(".dropzone").each(function () {
+        let plot = this;
+        let data = plot.data;
+        if (plot.id != "rf_chart" && plot.id != "adc_chart" && data.length > 1) {
+            let trace_numbers = [];
+            for(let i=1; i<data.length; i++) {
+                if ("type" in data[i] && data[i]["type"]=="scatter") {
+                    trace_numbers.push(i);
+                }
+            }
+            // For each variable trace, scale its original array to max amplitude.
+            trace_numbers.forEach(function (trace_number) {
+                let y = [];
+                let x = plot.data[trace_number]["x"];
+                let line = plot.data[trace_number]["line"];
+                let hovertemplate = plot.data[trace_number]["hovertemplate"];
+
+                let block_name = $('#block-select').val();
+                let boxObjCopy = JSON.parse(JSON.stringify(plot_to_box_objects[block_name][plot.id][trace_number-1]));
+                let array_name = boxObjCopy.array_info.name;
+
+                if (array_name == "Default Array") y = axis_id_to_default_array[plot.id];
+                else y = array_name_to_array[array_name];
+
+                y = y.map(val => val * max_amplitude);
+
+                let y_data_new = [];
+                for (i=0; i<x.length; i++) {
+                    let val = y[i];
+                    y_data_new.push(val);
+                    y_data_new.push(val*0.75);
+                    y_data_new.push(val*0.5);
+                    y_data_new.push(val*0.25);
+                }
+
+                // delete the old trace.
+                Plotly.deleteTraces(plot, trace_number);
+
+                // Draw a trace at the new location
+                let new_data = {};
+                new_data["y"] = y_data_new;
+                new_data["x"] = x;
+                new_data["line"] = line;
+                new_data["hovertemplate"] = hovertemplate;
+                new_data["type"] = "scatter";
+                new_data["mode"] = "markers";
+                new_data["marker"] = {
+                    color: line.color,
+                    size: 2,
+                };
+                Plotly.addTraces(plot, new_data, trace_number);
+            });
         }
     });
 }
