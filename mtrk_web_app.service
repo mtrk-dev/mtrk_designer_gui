@@ -3,7 +3,7 @@ Description=MTRK web application
 After=network.target
 
 [Service]
-User=mtrk
+User=root
 WorkingDirectory=/opt/mtrk_designer_gui/app
 ExecStart=/opt/mtrk_designer_gui/app/venv/bin/flask run --host=0.0.0.0
 Restart=always

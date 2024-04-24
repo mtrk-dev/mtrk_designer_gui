@@ -15,7 +15,7 @@ pip install -r mtrk_designer_api/requirements.txt
 echo "----------------- Installed requiremenents --------------------------"
 echo "--------------- Starting the MTRK web app service -------------------"
 # Add the service file and run the mtrk systemd service.
-sudo cp mtrk_web_app.service /etc/systemd/system
+sudo cp /opt/mtrk_designer_gui/mtrk_web_app.service /etc/systemd/system
 sudo systemctl daemon-reload
 sudo systemctl start mtrk_web_app
 
