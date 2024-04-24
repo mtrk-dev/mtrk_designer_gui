@@ -4,7 +4,7 @@ import json
 
 import os
 import sys
-path = os.path.abspath("mtrk_sdl_generator_anais")
+path = os.path.abspath("mtrk_designer_api")
 sys.path.append(path)
 
 from backendToUi import *
