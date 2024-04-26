@@ -4,7 +4,7 @@ echo "------------ Running the install script ---------------"
 
 # setting up nginx and hosting static files for viewer
 sudo apt update
-sudo apt install nginx
+sudo apt install nginx -y
 sudo systemctl start nginx
 sudo systemctl enable nginx
 sudo ufw allow 'Nginx Full'
