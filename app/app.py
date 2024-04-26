@@ -55,6 +55,7 @@ def process():
 
     create_sdl_from_ui_inputs(block_to_box_objects, block_structure, block_to_loops, \
                               block_to_duration, block_number_to_block_object, configurations)
+    return "success"
 
 def open_browser():
     webbrowser.open_new("http://127.0.0.1:5000")
