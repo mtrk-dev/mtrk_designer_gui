@@ -27,16 +27,6 @@
                     <input id="blockDurationInput" placeholder="10" class="form-control" aria-label="Block Duration">
                     <button id="block-time-btn" type="button" class="btn btn-secondary">&#10003;</button>
                   </div>
-                  <!-- <div class="input-group mb-3">
-                    <span class="input-group-text">TR (ms)</span>
-                    <input id="kernelTimeInput" placeholder="10" class="form-control" aria-label="Kernel Time">
-                    <button id="kernel-time-btn" type="button" class="btn btn-secondary">&#10003;</button>
-                  </div>
-                  <div class="input-group mb-3">
-                    <span class="input-group-text">TE (ms)</span>
-                    <input id="" placeholder="10" class="form-control" aria-label="Kernel Time">
-                    <button id="" type="button" class="btn btn-secondary">&#10003;</button>
-                  </div> -->
                   <div>
                     <a id="settings-btn" class="btn btn-secondary" role="button" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Settings">
                       <i class="fa fa-wrench"></i>
@@ -54,94 +44,9 @@
                     <button id="rf_excitation_btn" type="button" class="btn btn-secondary drag" draggable="true">RF</button>
                     <button id="gradient_btn" type="button" class="btn btn-secondary drag" draggable="true">Gradient</button>
                     <button id="adc_readout_btn" type="button" class="btn btn-secondary drag" draggable="true">ADC</button>
-                    <!-- <button id="" type="button" class="btn btn-secondary drag" draggable="false">Object</button>
-                    <button id="" type="button" class="btn btn-secondary drag" draggable="false">Object</button>
-                    <button id="" type="button" class="btn btn-secondary drag" draggable="false">Object</button>
-                    <button id="" type="button" class="btn btn-secondary drag" draggable="false">Object</button> -->
+                    <!-- <button id="" type="button" class="btn btn-secondary drag" draggable="false">Object</button> -->
                   </div>
                 </div>
-                <!-- <div class="row">
-                  <div class="accordion" id="blocksAccordion">
-                    <div class="accordion-item">
-                      <h2 class="accordion-header" id="blockHeading">
-                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#blockCollapse" aria-expanded="false" aria-controls="blockCollapse">
-                          Blocks
-                        </button>
-                      </h2>
-                      <div id="blockCollapse" class="accordion-collapse collapse" aria-labelledby="blockHeading" data-bs-parent="#blocksAccordion">
-                        <div class="accordion-body">
-                          <div class="accordion" id="blockDetailsAccordion">
-                            <div class="accordion-item">
-                              <h2 class="accordion-header" id="blockHeading">
-                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#blockItem1" aria-expanded="false" aria-controls="blockItem1">
-                                  Block 1
-                                </button>
-                              </h2>
-                              <div id="blockItem1" class="accordion-collapse collapse" aria-labelledby="blockHeading" data-bs-parent="#blockDetailsAccordion">
-                                <div class="accordion-body">
-                                  <div class="accordion-input-item">
-                                    <label for="formGroupExampleInput" class="form-label accordion-input-label">Dummy</label>
-                                    <input type="text" class="form-control" id="formGroupExampleInput" placeholder="Block_TR">
-                                  </div>
-                                  <div class="accordion-input-item">
-                                    <label for="formGroupExampleInput" class="form-label accordion-input-label">Dummy</label>
-                                    <input type="number" class="form-control" id="formGroupExampleInput" placeholder=128>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                          <button type="button" class="btn btn-secondary" id="add-block-btn">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
-                              <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"></path>
-                            </svg>
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div> -->
-                <!-- <div class="row">
-                  <div class="accordion" id="loopsAccordion">
-                    <div class="accordion-item">
-                      <h2 class="accordion-header" id="headingTwo2">
-                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo2" aria-expanded="false" aria-controls="collapseTwo2">
-                          Loops
-                        </button>
-                      </h2>
-                      <div id="collapseTwo2" class="accordion-collapse collapse" aria-labelledby="headingTwo2" data-bs-parent="#loopsAccordion">
-                        <div class="accordion-body">
-                          <div class="accordion" id="loopDetailsAccordion">
-                            <div class="accordion-item">
-                              <h2 class="accordion-header" id="headingTwo22">
-                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo22" aria-expanded="false" aria-controls="collapseTwo22">
-                                  Loop 1
-                                </button>
-                              </h2>
-                              <div id="collapseTwo22" class="accordion-collapse collapse" aria-labelledby="headingTwo22" data-bs-parent="#loopDetailsAccordion">
-                                <div class="accordion-body">
-                                  <div class="accordion-input-item">
-                                    <label for="formGroupExampleInput" class="form-label accordion-input-label">Block</label>
-                                    <input type="text" class="form-control" id="formGroupExampleInput" placeholder="Block_TR">
-                                  </div>
-                                  <div class="accordion-input-item">
-                                    <label for="formGroupExampleInput" class="form-label accordion-input-label">Range</label>
-                                    <input type="number" class="form-control" id="formGroupExampleInput" placeholder=128>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                          <button type="button" class="btn btn-secondary" id="add-loop-btn">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
-                              <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"></path>
-                            </svg>
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div> -->
                 <div class="row">
                   <div class="col">
                     <div hidden >
@@ -165,7 +70,6 @@
                 <div id="phase_chart" class="dropzone"></div>
                 <div id="readout_chart" class="dropzone"></div>
                 <div id="adc_chart" class="dropzone"></div>
-
                 <div class="modal fade" id="parametersModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
                   <div class="modal-dialog" role="document">
                     <div class="modal-content">
@@ -404,7 +308,6 @@
                         </div>
                       </div>
                       <div class="modal-footer">
-                        <!-- <button id="group_block_inputs_btn" type="button" class="btn btn-success">Add Group</button> -->
                         <button id="loops_modal_close_btn" type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                         <button id="loops_save_changes_btn" type="button" class="btn btn-primary">Save changes</button>
                       </div>

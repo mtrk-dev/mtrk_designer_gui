@@ -56,8 +56,6 @@
 #add-event-btn {
     font-size: 14px;
     background: transparent;
-    /* color: #49b149; */
-    /* border: 1px solid #49b149; */
     margin-top: 15%;
 }
 
@@ -145,32 +143,6 @@
     padding-right: 3%;
 }
 
-/* .group-loop-input {
-    position: absolute;
-    left: 20px;
-    width: 10%;
-    padding: 0.375rem 0.75rem;
-    font-size: 1rem;
-    font-weight: 400;
-    line-height: 1.5;
-    color: var(--bs-body-color);
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
-    background-color: var(--bs-body-bg);
-    background-clip: padding-box;
-    border: var(--bs-border-width) solid var(--bs-border-color);
-    border-radius: var(--bs-border-radius);
-    transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
-} */
-
-/* .block-loop-item::before {
-    content: "-";
-    position: absolute;
-    color: #6b6363;
-    left: -8%;
-} */
-
 .loops-group {
     position: relative;
 }
@@ -209,7 +181,6 @@
 
 ::-webkit-scrollbar-track {
     border-radius: 8px;
-    /* background-color: #e7e7e7; */
     border: 1px solid #cacaca00;
 }
 

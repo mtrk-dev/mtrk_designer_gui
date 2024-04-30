@@ -8,7 +8,6 @@ path = os.path.abspath("mtrk_designer_api")
 sys.path.append(path)
 
 from backendToUi import *
-# from transform import *
 
 import webbrowser
 from threading import Timer

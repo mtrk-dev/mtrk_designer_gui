@@ -1,19 +1,7 @@
-// import data from "./miniflash.json" assert { type: 'json' };
-
-// Taking standard x-axis for all the plots.
-// const x_standard = []
-// for (let i=0; i<20000; i+=10) {
-//     x_standard.push(i/1000);
-// }
-
-// storing the objects
-// const objects = data["objects"];
-
 const dummy_data = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1, 0.0]
 const rf_array = [3.13304e-005,3.14159,0.000275274,3.14159,0.000741752,3.14159,0.00140054,3.14159,0.00221321,3.14159,0.0031333,3.14159,0.00410657,3.14159,0.00507138,3.14159,0.00595912,3.14159,0.00669486,3.14159,0.00719792,3.14159,0.00738272,3.14159,0.00715954,3.14159,0.0064355,3.14159,0.00511552,3.14159,0.00310332,3.14159,0.00030259,3.14159,0.00338198,0,0.00804349,0,0.0137717,0,0.0206519,0,0.0287638,0,0.0381802,0,0.0489663,0,0.0611784,0,0.0748629,0,0.0900558,0,0.106781,0,0.125052,0,0.144867,0,0.166213,0,0.189063,0,0.213376,0,0.239097,0,0.266157,0,0.294475,0,0.323954,0,0.354486,0,0.385951,0,0.418216,0,0.451138,0,0.484565,0,0.518335,0,0.552279,0,0.586221,0,0.619982,0,0.653377,0,0.686221,0,0.718326,0,0.749508,0,0.779582,0,0.80837,0,0.835698,0,0.861398,0,0.885311,0,0.90729,0,0.927195,0,0.9449,0,0.960293,0,0.973275,0,0.983763,0,0.991689,0,0.997001,0,0.999666,0,0.999666,0,0.997001,0,0.991689,0,0.983763,0,0.973275,0,0.960293,0,0.9449,0,0.927195,0,0.90729,0,0.885311,0,0.861398,0,0.835698,0,0.80837,0,0.779582,0,0.749508,0,0.718326,0,0.686221,0,0.653377,0,0.619982,0,0.586221,0,0.552279,0,0.518335,0,0.484565,0,0.451138,0,0.418216,0,0.385951,0,0.354486,0,0.323954,0,0.294475,0,0.266157,0,0.239097,0,0.213376,0,0.189063,0,0.166213,0,0.144867,0,0.125052,0,0.106781,0,0.0900558,0,0.0748629,0,0.0611784,0,0.0489663,0,0.0381802,0,0.0287638,0,0.0206519,0,0.0137717,0,0.00804349,0,0.00338198,0,0.00030259,3.14159,0.00310332,3.14159,0.00511552,3.14159,0.0064355,3.14159,0.00715954,3.14159,0.00738272,3.14159,0.00719792,3.14159,0.00669486,3.14159,0.00595912,3.14159,0.00507138,3.14159,0.00410657,3.14159,0.0031333,3.14159,0.00221321,3.14159,0.00140054,3.14159,0.000741752,3.14159,0.000275274,3.14159,3.13304e-005,3.14159]
 const grad_slice_select_array = [0.0, 0.0455, 0.0909, 0.1364, 0.1818, 0.2273, 0.2727, 0.3182, 0.3636, 0.4091, 0.4545, 0.5, 0.5455, 0.5909, 0.6364, 0.6818, 0.7273, 0.7727, 0.8182, 0.8636, 0.9091, 0.9545, 1.0, 1.0, 0.9545, 0.9091, 0.8636, 0.8182, 0.7727, 0.7273, 0.6818, 0.6364, 0.5909, 0.5455, 0.5, 0.4545, 0.4091, 0.3636, 0.3182, 0.2727, 0.2273, 0.1818, 0.1364, 0.0909, 0.0455, 0.0]
 const adc_readout_array = [0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0]
-// const block_array = [0, 0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.75, 0.7, 0.65, 0.6, 0.55, 0.5, 0.45, 0.4, 0.35, 0.3, 0.25, 0.2, 0.15, 0.1, 0.05, 0];
 
 const rf_pulse_array = [];
 const rf_phase_array = [];
@@ -123,79 +111,45 @@ const axis_id_to_default_array = {
 }
 
 const plot_rf_data = {
-// x: x_standard,
-// y: dummy_data,
-// xaxis: 'x1',
-// yaxis: 'y1',
-// type: 'scatter',
-name: 'RF pulse',
-line: {
-    color: "blue",
-}
-// hovertemplate: '<b>' + text + '</b><br> %{y:.2f}<extra></extra>'
+    name: 'RF pulse',
+    line: {
+        color: "blue",
+    }
 };
 
 const plot_slice_data = {
-// x: x_standard,
-// y: dummy_data,
-// xaxis: 'x2',
-// yaxis: 'y2',
-// type: 'scatter',
-name: 'slice',
-line: {
-    color: 'orange',
-  }
-// text: slice_text,
-// hovertemplate: '<b> %{text}</b><br> %{y:.2f}<extra></extra>'
+    name: 'slice',
+    line: {
+        color: 'orange',
+    }
 };
 
 const plot_phase_data = {
-// x: x_standard,
-// y: dummy_data,
-// xaxis: 'x3',
-// yaxis: 'y3',
-// type: 'scatter',
-name: 'phase',
-line: {
-    color: 'green',
-  }
-// text: phase_text,
-// hovertemplate: '<b> %{text}</b><br> %{y:.2f}<extra></extra>'
+    name: 'phase',
+    line: {
+        color: 'green',
+    }
 };
 
 const plot_readout_data = {
-// x: x_standard,
-// y: dummy_data,
-// xaxis: 'x4',
-// yaxis: 'y4',
-// type: 'scatter',
-name: 'readout',
-line: {
-    color: 'red',
-  }
-// text: readout_text,
-// hovertemplate: '<b> %{text}</b><br> %{y:.2f}<extra></extra>'
+    name: 'readout',
+    line: {
+        color: 'red',
+    }
 };
 
 const plot_adc_data = {
-// x: x_standard,
-// y: dummy_data,
-// xaxis: 'x5',
-// yaxis: 'y5',
-// type: 'scatter',
-name: 'ADC',
-line: {
-    color: 'violet',
-  }
-// text: adc_text,
-// hovertemplate: '<b> %{text}</b><br> %{y:.2f}<extra></extra>'
+    name: 'ADC',
+    line: {
+        color: 'violet',
+    }
 };
 
 const plot_array_data = {
     name: 'Array',
     line: {
         color: 'pink',
-      }
+    }
 };
 
 const layout = {
@@ -350,11 +304,6 @@ const config = {
     },
     doubleClick: false,
     displayModeBar: false,
-    // modeBarButtonsToAdd: ['select2d'],
-    // modeBarButtonsToRemove: ['pan2d','lasso2d','resetScale2d','zoomOut2d', 
-    // "hoverClosestGl2d", "hoverClosestPie", "toggleHover", "resetViews", "toImage", "sendDataToCloud", "toggleSpikelines", "resetViewMapbox",
-    // "hoverClosestCartesian", "hoverCompareCartesian", "zoom2d", "pan2d", "lasso2d", "zoomIn2d", "zoomOut2d", "autoScale2d", "resetScale2d"],
-    // displaylogo: false,
 }
 
 Plotly.newPlot('rf_chart', [plot_rf_data], rf_layout, config);
@@ -540,19 +489,7 @@ $(document).ready(function() {
         $( "#save-plot-btn" ).trigger( "click" );
         });
     });
-    // sync zoom among all plots.
-    // var plots = [rf_chart, slice_chart, phase_chart, readout_chart, adc_chart];
-    // function relayout(ed) {
-    //     plots.forEach((plot, i) => {
-    //         let x = plot.layout.xaxis;
-    //         if (ed["xaxis.autorange"] && x.autorange) return;
-    //         if (
-    //         x.range[0] != ed["xaxis.range[0]"] ||
-    //         x.range[1] != ed["xaxis.range[1]"]
-    //         )
-    //         Plotly.relayout(plot, ed);
-    //     });
-    // }
+
     $(".dropzone").each(function () {
         var plot = this;
         plot.on("plotly_relayout", function(ed) {
@@ -588,16 +525,6 @@ $(document).ready(function() {
                     } else if (starting_point > block_duration) {
                         starting_point = block_duration - 1;
                     }
-
-                    // Not needed for now as we have disabled stretching/squeezing.
-                    // If the width or height of the shape is changed, it has been stretched/squeezed not moved.
-                    // var dimensions = get_trace_dimensions(plot, trace_number);
-                    // if (Math.abs((ending_point - starting_point) - dimensions[0]) > 2 || Math.abs((y1_val - y0_val) - dimensions[1]) > 0.25) {
-                    //     console.log("Stretched/squeezed not moved!!!");
-                    //     // We revert the stretch/squeeze and return.
-                    //     revert_shape_change(plot, shape_number);
-                    //     return;
-                    // }
 
                     // If the y0 value is not zero after moving for a shape, we want to move the shape to zero.
                     if (Math.abs(y0_val) != 0) {
@@ -771,14 +698,10 @@ $(document).ready(function() {
             color: "white"
           }).then((result) => {
             if (result.isConfirmed) {
-            //   Swal.fire("Saved!", "", "success");
                 reset_flag = 1;
                 localStorage.removeItem("data");
                 location.reload();
             }
-            // else if (result.isDenied) {
-            //   Swal.fire("Changes are not saved", "", "info");
-            // }
         });
     });
 
@@ -806,10 +729,7 @@ $(document).ready(function() {
     $(document).on('click', '.phase-array-dropdown', function () {
         $('#phase-array-dropdown-btn').text($(this).text());
     });
-    // $(document).on('click', '#add-new-array-item', function () {
-    //     $('#parametersModal').addClass('blurred');
-    //     $('#arrayConfigModal').modal('toggle');
-    // })
+
     $('#arrayConfigModal').on('hidden.bs.modal', function () {
         $('#parametersModal').removeClass('blurred');
         $('#inputArrayName').val("");
@@ -992,57 +912,6 @@ $(document).ready(function() {
             $(".sync-params").show();
         }
     });
-
-    // TODO: can be removed in the future.
-    // $('#group_block_inputs_btn').click(function(){
-    //     let start = Number.MAX_VALUE;
-    //     let end = Number.MIN_VALUE;
-    //     $(".block-loop-item").each(function() {
-    //         if ($(this).hasClass("active")) {
-    //             $(this).toggleClass("active");
-    //             if ($(this)[0].offsetTop < start) {
-    //                 $(this).attr('id', 'blockLoopItem'+parseInt($(this)[0].offsetTop));
-    //             }
-    //             start = Math.min(start, $(this)[0].offsetTop);
-    //             end = Math.max(end, $(this)[0].offsetTop);
-    //         }
-    //     });
-    //     // Add input group to take the number of loops for the group.
-    //     let input = `
-    //         <div style="top: ${start}px; width: 12%; position: absolute">
-    //             <div class="input-group">
-    //                 <span class="input-group-text">x</span>
-    //                 <input type="number" class="form-control" placeholder=1>
-    //             </div>
-    //             <a class="btn btn-sm delete-group-btn" role="button"
-    //                 style="background: none; border: none; padding-top: 0px; margin-top: -10%"
-    //                 data-bs-toggle="tooltip" data-bs-placement="bottom" title="Delete Group">
-    //                     <i class="fa fa-trash-o"></i>
-    //             </a>
-    //         </div>
-    //     `;
-    //     $("#nestingCol").append(input);
-
-    //     // Add a vertical line before the first element.
-    //     let styleElem = document.head.appendChild(document.createElement("style"));
-    //     styleElem.innerHTML = `#blockLoopItem${parseInt(start)}:before{
-    //         content: " ";
-    //         display: block;
-    //         position: absolute;
-    //         border-left: solid 1px #4d4545;
-    //         height: ${end-start+20}px;
-    //         left: -8%;
-    //     }`;
-
-    //     $(".delete-group-btn").click(function() {
-    //         let top = parseInt(this.parentNode.style.top);
-    //         let styleElem = document.head.appendChild(document.createElement("style"));
-    //         styleElem.innerHTML = `#blockLoopItem${parseInt(top)}:before{
-    //             display: none;
-    //         }`;
-    //         this.parentNode.remove();
-    //     });
-    // });
 
     $("#loops_save_changes_btn").click(function() {
         $.each($('.loops-input'), function(index, input) {
@@ -1327,21 +1196,6 @@ function get_trace_dimensions(plot, trace_number) {
     let height = Math.max(...y_arr) - Math.min(...y_arr);
     return [width, height];
 }
-
-// function revert_shape_change(plot, shape_number) {
-//     let shapes = JSON.parse(JSON.stringify(plot.layout["shapes"]));
-//     let trace_number = (shape_number/2)+1;
-//     if (plot.data[trace_number]["mode"]=="markers") shapes[shape_number]["y0"] = -shape_height;
-//     else shapes[shape_number]["y0"] = 0;
-//     shapes[shape_number]["y1"] = shape_height;
-//     let x_arr = plot.data[trace_number]["x"];
-//     shapes[shape_number]["x0"] = x_arr[0];
-//     shapes[shape_number]["x1"] = x_arr.slice(-1)[0];
-//     let update = {
-//         shapes: shapes
-//         };
-//     Plotly.relayout(plot, update);
-// }
 
 function change_trace_type(plot, trace_number, box_array_name, toVariable) {
     let  y = [];
@@ -2227,38 +2081,6 @@ function select_box(trace_number, plot) {
         shapes: shapes
         };
     Plotly.relayout(plot, update);
-}
-
-// TODO - not being used now. Remove in the future.
-function update_block_box(toBlock, trace_number, plot, start_time) {
-    let shape_number = (trace_number-1)*2;
-    let shapes = JSON.parse(JSON.stringify(plot.layout["shapes"]));
-    let annotation_number = trace_number - 1;
-    let annotations = JSON.parse(JSON.stringify(plot.layout["annotations"]));
-
-    if (toBlock) {
-        annotations[annotation_number]["text"] = "Block "+(block_color_counter+1);
-        annotations[annotation_number]["x"] = start_time+2.5;
-        let block_color = block_colors[block_color_counter];
-        shapes[shape_number]["line"] =  {
-            color: block_color+"FF",
-            width: 1,
-          };
-        shapes[shape_number]["fillcolor"] = block_color + "2F";
-    } else {
-        annotations[annotation_number]["text"] = "";
-        shapes[shape_number]["line"] =  {
-            color: 'rgb(129, 133, 137)',
-            width: 1
-          };
-    }
-    var update = {
-        annotations: annotations,
-        shapes: shapes,
-        };
-    Plotly.relayout(plot, update);
-    change_box_array(plot, trace_number, parseFloat(start_time), block_array);
-    update_trace(trace_number, plot);
 }
 
 function update_trace(trace_number, plot) {
