@@ -715,7 +715,10 @@ $(document).ready(function() {
             }
             block_to_sdl_objects[block] = sdl_objects;
         }
-        if (Object.keys(block_to_sdl_objects).length === 0) return;
+        if (Object.keys(block_to_sdl_objects).length === 0) {
+            fire_alert("Add boxes to generate SDL file.");
+            return;
+        }
         let configurations = save_configurations();
         let structure = generate_blocks_nesting_structure();
         let serialized_events = serialize_events_data();
@@ -2538,13 +2541,10 @@ function fire_alert(message) {
       });
 }
 
-const file = new File(['foo'], 'dummy_file.json', {
-    type: 'text/plain',
-});
 function download_file(file) {
-    const link = document.createElement('a');
-    const url = URL.createObjectURL(file);
-    window.open(url, '_blank').focus();
+    let link = document.createElement('a');
+    let url = URL.createObjectURL(file);
+    // window.open(url, '_blank');
 
     link.href = url;
     link.download = file.name;
@@ -2571,6 +2571,9 @@ function send_data(block_to_box_objects, configurations, block_structure, events
         }),
         success: function(response) {
             console.log(response);
+            let response_blob = new Blob([response], { type: 'application/json' });
+            let response_file = new File([response_blob], 'output_sdl_file.mtrk');
+            download_file(response_file);
         },
         error: function(error) {
             fire_alert("Could not generate SDL file.");
