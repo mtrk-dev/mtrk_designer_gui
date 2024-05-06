@@ -16,7 +16,7 @@ const step_size = 100;
 const block_colors = ["#cf7856", "#978eff", "#5343ff", "#ff7f50", "#ff0065", "#77b6df", "#457480", "#ba029c", "#31e658", "#9be5cc", "#facade", "#fab1ed", "#deface", "#c0ffee", "#beaded", "#a3b899", "#ffaa51", "#216c5c"]
 var block_color_counter = 0;
 
-var block_duration = 10;
+var block_range = [0, 10];
 
 plot_to_box_objects_template = {
     'rf_chart': [],
@@ -187,7 +187,7 @@ const layout = {
         },
         "gridcolor": "rgba(255,255,255,0.05)",
         "zerolinecolor": "rgba(255,255,255,0.1)",
-        range: [0, block_duration],
+        range: block_range,
         fixedrange: true,
     },
     yaxis: {
@@ -330,7 +330,7 @@ array_chart_layout = {
         "zerolinecolor": "rgba(255,255,255,0.05)",
         showticklabels: false,
         fixedrange: true,
-        range: [0, block_duration],
+        range: block_range,
     },
     yaxis: {
         "gridcolor": "rgba(255,255,255,0.05)",
@@ -426,7 +426,7 @@ $(document).ready(function() {
             return;
         }
 
-        if (starting_point < 0 || starting_point > block_duration) {
+        if (starting_point < block_range[0] || starting_point > block_range[1]) {
             fire_alert("Invalid drop location");
             return;
         }
@@ -520,10 +520,10 @@ $(document).ready(function() {
                             var y1_val = ed[key];
                         }
                     }
-                    if (starting_point < 0) {
-                        starting_point = 0;
-                    } else if (starting_point > block_duration) {
-                        starting_point = block_duration - 1;
+                    if (starting_point < block_range[0]) {
+                        starting_point = block_range[0];
+                    } else if (starting_point > block_range[1]) {
+                        starting_point = block_range[1] - 1;
                     }
 
                     // If the y0 value is not zero after moving for a shape, we want to move the shape to zero.
@@ -646,15 +646,21 @@ $(document).ready(function() {
     });
 
     $("#block-time-btn").click(function () {
-        block_duration = parseInt($("#blockDurationInput").val());
+        block_range[1] = parseInt($("#blockDurationInput").val());
         $(".dropzone").each(function () {
             var plot = this;
             // Change the range and relayout plot.
             let update = {
-                "xaxis.range": [0, block_duration]
+                "xaxis.range": block_range
                 };
             Plotly.relayout(plot, update);
-            recalculate_mouse_to_plot_conversion_variables();
+        });
+        recalculate_mouse_to_plot_conversion_variables();
+        // Update slider to new values
+        let slider = $("#blockDurationSlider").data("ionRangeSlider");
+        slider.update({
+            from: block_range[0],
+            to: block_range[1]
         });
     });
 
@@ -1069,6 +1075,36 @@ $(document).on("click", ".event-btn", function () {
 
     $('#eventsModal').modal('toggle');
 })
+
+// Block duration range slider configuration
+$("#blockDurationSlider").ionRangeSlider({
+    type: "double",
+    skin: "flat",
+    grid: true,
+    min: 0,
+    max: 30,
+    from: 0,
+    to: 10,
+    step: 1,
+    hide_min_max: true,
+    hide_from_to: false,
+    drag_interval: true,
+    min_interval: 5,
+    // postfix: "ms",
+    onFinish: function (data) {
+        block_range = [data.from, data.to];
+        // relayout the plot with new range selection.
+        $(".dropzone").each(function () {
+            let plot = this;
+            let update = {
+                "xaxis.range": block_range
+            };
+            Plotly.relayout(plot, update);
+        });
+        recalculate_mouse_to_plot_conversion_variables();
+        $("#blockDurationInput").val(data.to);
+    }
+});
 
 // Pre processing code to convert the mouse point x-value to plot's xaxis value.
 var xaxis = rf_chart._fullLayout.xaxis;
@@ -2311,7 +2347,7 @@ function load_block_data(block_name) {
         // changing the height to handle the case where plot dimension has been changed after block creation.
         layout["height"] = window.innerHeight/5;
         layout["width"] =  rf_chart.offsetWidth;
-        layout["xaxis"]["range"] = [0, block_duration];
+        layout["xaxis"]["range"] = block_range;
         Plotly.react(plot, plot_data[0], layout);
     });
     // For the cases when different theme was selected during block creation.
@@ -2526,7 +2562,7 @@ function generate_block_duration() {
     // TODO: add individual durations to each block.
     let block_to_duration = {}
     for (let block in blocks) {
-        block_to_duration[block] = block_duration;
+        block_to_duration[block] = block_range[1];
     }
     return block_to_duration;
 }
