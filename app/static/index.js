@@ -1667,6 +1667,7 @@ function reload_data(data) {
         let layout = plot_data[1];
         layout["height"] = window.innerHeight/5;
         layout["width"] =  rf_chart.offsetWidth;
+        layout["xaxis"]["range"] = block_range;
         Plotly.react(plot, plot_data[0], layout);
     });
     blocks = data["plots_data"];
