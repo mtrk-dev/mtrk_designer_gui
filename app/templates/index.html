@@ -82,9 +82,7 @@
                     <div class="modal-content">
                       <div class="modal-header">
                         <h5 class="modal-title" id="exampleModalLabel">Parameters</h5>
-                        <button id="modal_close_logo_btn" type="button" class="close" data-dismiss="modal" aria-label="Close">
-                          <span aria-hidden="true">&times;</span>
-                        </button>
+                        <button id="modal_close_logo_btn" type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
                       </div>
                       <div class="modal-body">
                         <form id="parametersForm" action="">
@@ -212,7 +210,20 @@
                         </form>
                       </div>
                       <div class="modal-footer">
-                        <button id="delete_object_btn" type="button" class="btn btn-danger">Delete Object</button>
+                        <button id="delete_object_btn" type="button" class="btn btn-danger">Delete</button>
+                        <div class="btn-group dropup">
+                          <button id="duplicate_object_btn" type="button" class="btn btn-success dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                            Duplicate
+                          </button>
+                          <ul class="dropdown-menu">
+                            <h6 class="dropdown-header">Select Axis</h6>
+                            <li><a class="dropdown-item duplicate-dropdown-item">rf</a></li>
+                            <li><a class="dropdown-item duplicate-dropdown-item">slice</a></li>
+                            <li><a class="dropdown-item duplicate-dropdown-item">phase</a></li>
+                            <li><a class="dropdown-item duplicate-dropdown-item">read</a></li>
+                            <li><a class="dropdown-item duplicate-dropdown-item">adc</a></li>
+                          </ul>
+                        </div>
                         <button id="modal_close_btn" type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                         <button id="save_changes_btn" type="button" class="btn btn-primary">Save changes</button>
                       </div>

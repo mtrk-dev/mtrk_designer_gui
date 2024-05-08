@@ -79,11 +79,11 @@ const object_to_type = {
 }
 
 const axis_id_to_color = {
-    "rf_chart" : "magenta",
+    "rf_chart" : "#2F58CD",
     "slice_chart" : "magenta",
     "phase_chart" : "magenta",
     "readout_chart": "magenta",
-    "adc_chart": "magenta"
+    "adc_chart": "#4E9F3D"
 }
 
 const axis_id_to_axis_name = {
@@ -610,6 +610,25 @@ $(document).ready(function() {
         let block_name = $('#block-select').val();
         plot_to_box_objects[block_name][plot.id].splice(selected_trace_number-1, 1);
         scale_boxes_amplitude();
+    });
+
+    $(".duplicate-dropdown-item").on( "click", function(e) {
+        let target_plot_name = axis_name_to_axis_id[$(e.target).text()];
+        let target_plot = document.getElementById(target_plot_name);
+        let plot = selected_plot;
+        if (plot.id == "rf_chart" && target_plot.id != "rf_chart") {
+            fire_alert("Object type not suitable for this axis.");
+            return;
+        } else if ((plot.id == "slice_chart"  || plot.id == "phase_chart" || plot.id == "readout_chart")
+            && (target_plot.id == "rf_chart" || target_plot.id == "adc_chart")) {
+            fire_alert("Object type not suitable for this axis.");
+            return;
+        } else if (plot.id == "adc_chart" && target_plot.id != "adc_chart") {
+            fire_alert("Object type not suitable for this axis.");
+            return;
+        }
+        $('#parametersModal').modal('toggle');
+        duplicate_box(plot, selected_trace_number, target_plot);
     });
 
     $("#block_delete_object_btn").on( "click", function(event) {
@@ -2184,8 +2203,8 @@ function add_block_with_selected_boxes() {
                 block_data[plot.id][1]["annotations"].push(JSON.parse(JSON.stringify(annotation)));
 
                 // Calculating the block start time and end time.
-                start_time = Math.min(start_time, boxObj.start_time);
-                end_time = Math.max(end_time, boxObj.start_time + parseFloat(trace["y"].length/step_size));
+                start_time = Math.min(start_time, shape["x0"]);
+                end_time = Math.max(end_time, shape["x1"]);
 
                 Plotly.deleteTraces(plot, trace_number);
                 delete_shapes(plot, (trace_number-1)*2);
@@ -2294,6 +2313,43 @@ function add_dummy_block_boxes(seen_plots, starting_point, ending_point) {
             plot_to_box_objects[block_name][target.id].push(boxObj);
         }
     }
+}
+
+function duplicate_box(plot, trace_number, target_plot) {
+    // Adding the new trace to the plot.
+    let new_data = JSON.parse(JSON.stringify(plot.data[trace_number]));
+    Plotly.addTraces(target_plot, new_data);
+
+    // Adding the new shapes and annotations to the plot.
+    let shape_number = (trace_number-1)*2;
+    let line_shape_number = shape_number + 1;
+    let annotation_number = trace_number-1;
+    let new_shape = JSON.parse(JSON.stringify(plot.layout["shapes"][shape_number]));
+    let new_line_shape = JSON.parse(JSON.stringify(plot.layout["shapes"][line_shape_number]));
+    let new_annotation = JSON.parse(JSON.stringify(plot.layout["annotations"][annotation_number]));
+
+    let shapes = [];
+    let annotations = [];
+    if ("shapes" in target_plot.layout) { shapes = target_plot.layout.shapes;}
+    if ("annotations" in target_plot.layout) { annotations = target_plot.layout.annotations;}
+    shapes.push(new_shape);
+    shapes.push(new_line_shape);
+    annotations.push(new_annotation);
+
+    let update = {
+        shapes: shapes,
+        annotations: annotations
+    };
+    Plotly.relayout(target_plot, update);
+
+    // Adding the new duplicate box object to the plot to box objects map.
+    let block_name = $('#block-select').val();
+    let boxObj = plot_to_box_objects[block_name][plot.id][trace_number-1];
+    // Creating a deep copy of the box object.
+    let boxObjCopy = Object.assign(Object.create(Object.getPrototypeOf(boxObj),), JSON.parse(JSON.stringify(boxObj)),);
+    boxObjCopy.axis = axis_id_to_axis_name[target_plot.id];
+    boxObjCopy.name = boxObj.name + "_copy";
+    plot_to_box_objects[block_name][target_plot.id].push(boxObjCopy);
 }
 
 function update_array_manager_chart(y_data) {
