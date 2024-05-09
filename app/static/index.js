@@ -385,6 +385,13 @@ $(document).ready(function() {
                 "filter": "blur(3px)",
                 "fill": "#4c96dd4d",
             });
+            if (dragged.id == "rf_excitation_btn") {
+                event.dataTransfer.setDragImage(rf_drag_image, 0, 0);
+            } else if (dragged.id == "gradient_btn") {
+                event.dataTransfer.setDragImage(grad_drag_image, 0, 0);
+            } else if (dragged.id == "adc_readout_btn") {
+                event.dataTransfer.setDragImage(adc_drag_image, 0, 0);
+            }
         });
         source.addEventListener("dragend", (event) => {
             // hide droppable zones.
@@ -1125,6 +1132,14 @@ $("#blockDurationSlider").ionRangeSlider({
         $("#blockDurationInput").val(data.to);
     }
 });
+
+// Initialize drag images
+let rf_drag_image = new Image();
+let grad_drag_image = new Image();
+let adc_drag_image = new Image();
+rf_drag_image.src = "/static/drag_images/rf.png";
+grad_drag_image.src = "/static/drag_images/gradient.png";
+adc_drag_image.src = "/static/drag_images/adc.png";
 
 // Pre processing code to convert the mouse point x-value to plot's xaxis value.
 var xaxis = rf_chart._fullLayout.xaxis;
