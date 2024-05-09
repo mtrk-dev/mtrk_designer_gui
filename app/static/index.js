@@ -720,7 +720,8 @@ $(document).ready(function() {
             confirmButtonColor: "red",
             denyButtonColor: "green",
             background: "#3c3c3c",
-            color: "white"
+            color: "white",
+            didOpen: () => Swal.getConfirmButton().blur(),
           }).then((result) => {
             if (result.isConfirmed) {
                 reset_flag = 1;
