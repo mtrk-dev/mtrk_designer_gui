@@ -59,6 +59,13 @@
     margin-top: 15%;
 }
 
+#plot-size-btn {
+    font-size: 14px;
+    background: transparent;
+    margin-top: 15%;
+    border: none;
+}
+
 #saved-msg {
     padding: 5px;
     margin-top: 8%;
@@ -135,6 +142,10 @@
 
 #object-btns-group {
     padding-right: 0px;
+}
+
+#object-btns-group button {
+    border-color: #ffffff1f;
 }
 
 #blockDurationSpan {

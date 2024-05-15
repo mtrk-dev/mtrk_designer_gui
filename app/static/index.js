@@ -1102,6 +1102,17 @@ $(document).on("click", ".event-btn", function () {
     $('#eventsModal').modal('toggle');
 })
 
+// Add click handler the plot size button.
+$(document).on("click", "#plot-size-btn", function () {
+    if ($("#leftSidebar").is(":visible")) {
+        maximize_plot_area();
+        $("#plot-size-icon").removeClass("fa-expand").addClass("fa-compress");
+    } else {
+        minimize_plot_area();
+        $("#plot-size-icon").removeClass("fa-compress").addClass("fa-expand");
+    }
+});
+
 // Block duration range slider configuration
 $("#blockDurationSlider").ionRangeSlider({
     type: "double",
@@ -1723,6 +1734,8 @@ function reload_data(data) {
     load_block_select_options();
     $('#block-select').val(block_name);
     scale_boxes_amplitude();
+    // In case the plot was expanded before data reload.
+    $("#plot-size-icon").removeClass("fa-compress").addClass("fa-expand");
 }
 
 function generate_current_data_state() {
@@ -2646,6 +2659,36 @@ function generate_block_duration() {
         block_to_duration[block] = block_range[1];
     }
     return block_to_duration;
+}
+
+function maximize_plot_area() {
+    $("#leftSidebar").hide();
+    $("#rightSidebar").hide();
+    $("#plot-col").removeClass("col-lg-8").addClass("col-lg-11");
+    let update = {
+        "height": window.innerHeight/5,
+        "width": rf_chart.offsetWidth,
+    }
+    Plotly.relayout(rf_chart, update);
+    Plotly.relayout(slice_chart, update);
+    Plotly.relayout(phase_chart, update);
+    Plotly.relayout(readout_chart, update);
+    Plotly.relayout(adc_chart, update);
+}
+
+function minimize_plot_area() {
+    $("#leftSidebar").show();
+    $("#rightSidebar").show();
+    $("#plot-col").removeClass("col-lg-11").addClass("col-lg-8");
+    let update = {
+        "height": window.innerHeight/5,
+        "width": rf_chart.offsetWidth,
+    }
+    Plotly.relayout(rf_chart, update);
+    Plotly.relayout(slice_chart, update);
+    Plotly.relayout(phase_chart, update);
+    Plotly.relayout(readout_chart, update);
+    Plotly.relayout(adc_chart, update);
 }
 
 function fire_alert(message) {
