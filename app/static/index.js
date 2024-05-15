@@ -594,12 +594,11 @@ $(document).ready(function() {
 
     $("#save_changes_btn").on( "click", function(event) {
         let plot = selected_plot;
-        let elements = document.forms["parametersForm"].getElementsByTagName("input");
-        elements = Array.from(elements);
-        save_modal_values(plot, selected_trace_number);
-        $('#parametersModal').modal('toggle');
-        // auto-save data.
-        $( "#save-plot-btn" ).trigger( "click" );
+        if (save_modal_values(plot, selected_trace_number)) {
+            $('#parametersModal').modal('toggle');
+            // auto-save data.
+            $( "#save-plot-btn" ).trigger( "click" );
+        }
     });
 
     $("#block_save_changes_btn").on( "click", function(event) {
@@ -1448,6 +1447,10 @@ function load_block_modal_values(plot, trace_number) {
 }
 
 function save_modal_values(plot, trace_number) {
+    if (!validateBoxName($('#inputName').val())) {
+        fire_alert("Name cannot be empty.");
+        return false;
+    }
     let block_name = $('#block-select').val();
     boxObj = plot_to_box_objects[block_name][plot.id][trace_number-1];
     boxObj.name = $('#inputName').val();
@@ -1553,6 +1556,7 @@ function save_modal_values(plot, trace_number) {
         boxObj.samples = $('#inputAdcSamples').val();
         boxObj.dwell_time = $('#inputAdcDwellTime').val();
     }
+    return true;
 }
 
 function save_block_modal_values(plot, trace_number) {
@@ -2036,6 +2040,10 @@ function load_parameters_phase_array_dropdown() {
 
 function validateArrayName(arrayName) {
     return !(arrayName == "");
+}
+
+function validateBoxName(boxName) {
+    return !(boxName.trim().length === 0);
 }
 
 function validateArrayValues(arrayValues) {
