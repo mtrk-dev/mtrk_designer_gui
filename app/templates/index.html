@@ -111,7 +111,7 @@
                             </div>
                           </div>
                           <div class="form-group rf-param">
-                            <label for="inputRFType">RF Type</label>
+                            <div>RF Type</div>
                             <div class="form-check">
                               <input class="form-check-input" type="radio" name="rfRadios" id="rfExcitationRadio" value="excitation" checked>
                               <label class="form-check-label" for="rfExcitationRadio">
@@ -138,16 +138,16 @@
                             <input type="number" class="form-control form-control-sm" id="inputRfFlipAngle" placeholder=1>
                           </div>
                           <div class="form-group grad-param">
-                            <label for="inputAmplitude">Amplitude (mT/m)</label>
+                            <div>Amplitude (mT/m)</div>
                             <div class="form-check">
                               <input class="form-check-input" type="radio" name="exampleRadios" id="constantRadio" value="constant" checked>
-                              <label class="form-check-label" for="exampleRadios1">
+                              <label class="form-check-label" for="constantRadio">
                                 Constant
                               </label>
                             </div>
                             <div class="form-check">
                               <input class="form-check-input" type="radio" name="exampleRadios" id="variableRadio" value="variable">
-                              <label class="form-check-label" for="exampleRadios2">
+                              <label class="form-check-label" for="variableRadio">
                                 Variable
                               </label>
                             </div>
@@ -405,19 +405,19 @@
                             <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#parametersAccordion">
                               <div class="accordion-body">
                                 <div class="accordion-input-item">
-                                  <label for="formGroupExampleInput" class="form-label accordion-input-label">Format</label>
+                                  <label for="formatConfigInput" class="form-label accordion-input-label">Format</label>
                                   <input type="text" class="form-control" id="formatConfigInput" placeholder="mtrk-SDL">
                                 </div>
                                 <div class="accordion-input-item">
-                                  <label for="formGroupExampleInput" class="form-label accordion-input-label">Version</label>
+                                  <label for="versionConfigInput" class="form-label accordion-input-label">Version</label>
                                   <input type="number" class="form-control" id="versionConfigInput" placeholder=1>
                                 </div>
                                 <div class="accordion-input-item">
-                                  <label for="formGroupExampleInput" class="form-label accordion-input-label">Measurement</label>
+                                  <label for="measurementConfigInput" class="form-label accordion-input-label">Measurement</label>
                                   <input type="text" class="form-control" id="measurementConfigInput" placeholder="abc">
                                 </div>
                                 <div class="accordion-input-item">
-                                  <label for="formGroupExampleInput" class="form-label accordion-input-label">System</label>
+                                  <label for="systemConfigInput" class="form-label accordion-input-label">System</label>
                                   <input type="text" class="form-control" id="systemConfigInput" placeholder="Skyra-XQ">
                                 </div>
                               </div>
@@ -432,7 +432,7 @@
                             <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#parametersAccordion">
                               <div class="accordion-body">
                                 <div class="accordion-input-item">
-                                  <label for="formGroupExampleInput" class="form-label accordion-input-label">Readout OS</label>
+                                  <label for="readoutSettingInput" class="form-label accordion-input-label">Readout OS</label>
                                   <input type="number" class="form-control" id="readoutSettingInput" placeholder=2>
                                 </div>
                               </div>
@@ -447,27 +447,27 @@
                             <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#parametersAccordion">
                               <div class="accordion-body">
                                 <div class="accordion-input-item">
-                                  <label for="formGroupExampleInput" class="form-label accordion-input-label">Description</label>
+                                  <label for="descriptionInfoInput" class="form-label accordion-input-label">Description</label>
                                   <input type="text" class="form-control" id="descriptionInfoInput" placeholder="MiniFlash">
                                 </div>
                                 <div class="accordion-input-item">
-                                  <label for="formGroupExampleInput" class="form-label accordion-input-label">Slices</label>
+                                  <label for="slicesInfoInput" class="form-label accordion-input-label">Slices</label>
                                   <input type="number" class="form-control" id="slicesInfoInput" placeholder=1>
                                 </div>
                                 <div class="accordion-input-item">
-                                  <label for="formGroupExampleInput" class="form-label accordion-input-label">FOV</label>
+                                  <label for="fovInfoInput" class="form-label accordion-input-label">FOV</label>
                                   <input type="number" class="form-control" id="fovInfoInput" placeholder=300>
                                 </div>
                                 <div class="accordion-input-item">
-                                  <label for="formGroupExampleInput" class="form-label accordion-input-label">Seqstring</label>
+                                  <label for="seqstringInfoInput" class="form-label accordion-input-label">Seqstring</label>
                                   <input type="text" class="form-control" id="seqstringInfoInput" placeholder="YARRA">
                                 </div>
                                 <div class="accordion-input-item">
-                                  <label for="formGroupExampleInput" class="form-label accordion-input-label">Reconstruction</label>
+                                  <label for="reconstructionInfoInput" class="form-label accordion-input-label">Reconstruction</label>
                                   <input type="text" class="form-control" id="reconstructionInfoInput" placeholder="%SiemensIceProgs%\\IceProgram2D">
                                 </div>
                                 <div class="accordion-input-item">
-                                  <label for="formGroupExampleInput" class="form-label accordion-input-label">PE Lines</label>
+                                  <label for="peLinesInfoInput" class="form-label accordion-input-label">PE Lines</label>
                                   <input type="number" class="form-control" id="peLinesInfoInput" placeholder=128>
                                 </div>
                               </div>
