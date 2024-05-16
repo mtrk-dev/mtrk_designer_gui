@@ -2513,7 +2513,7 @@ function load_loops_configuration() {
             <div class="col-2">
                 <div class="input-group input-number-blocks">
                     <span class="input-group-text">x</span>
-                    <input type="number" class="form-control loops-input" data-block=${root} value=1 placeholder=1>
+                    <input name="loop-input" type="number" class="form-control loops-input" data-block=${root} value=1 placeholder=1>
                 </div>
             </div>
         </div>`;
@@ -2664,6 +2664,7 @@ function generate_block_duration() {
 function maximize_plot_area() {
     $("#leftSidebar").hide();
     $("#rightSidebar").hide();
+    $("#body-container").removeClass("container-lg").addClass("container-fluid");
     $("#plot-col").removeClass("col-lg-8").addClass("col-lg-11");
     let update = {
         "height": window.innerHeight/5,
@@ -2680,6 +2681,7 @@ function minimize_plot_area() {
     $("#leftSidebar").show();
     $("#rightSidebar").show();
     $("#plot-col").removeClass("col-lg-11").addClass("col-lg-8");
+    $("#body-container").removeClass("container-fluid").addClass("container-lg");
     let update = {
         "height": window.innerHeight/5,
         "width": rf_chart.offsetWidth,

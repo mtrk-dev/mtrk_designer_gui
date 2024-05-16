@@ -102,6 +102,10 @@
     overflow-y: auto;
 }
 
+#body-container {
+    padding-left: 0px;
+}
+
 #block-select {
     width: 90%;
     margin-top: 5%;
