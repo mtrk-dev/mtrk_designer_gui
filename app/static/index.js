@@ -1035,6 +1035,10 @@ $(document).ready(function() {
     $("#delete_event_btn").click(function () {
         selected_event_btn.remove();
         $('#eventsModal').modal('toggle');
+        // save event data.
+        let block_name = $('#block-select').val();
+        let events_col_inner_html = $("#events-col")[0].innerHTML;
+        block_to_events_html[block_name] = events_col_inner_html;
     });
 });
 
@@ -2666,6 +2670,7 @@ function maximize_plot_area() {
     $("#rightSidebar").hide();
     $("#body-container").removeClass("container-lg").addClass("container-fluid");
     $("#plot-col").removeClass("col-lg-8").addClass("col-lg-11");
+    $("#events-col").removeClass("col-auto").addClass("col-lg-1");
     let update = {
         "height": window.innerHeight/5,
         "width": rf_chart.offsetWidth,
@@ -2681,6 +2686,7 @@ function minimize_plot_area() {
     $("#leftSidebar").show();
     $("#rightSidebar").show();
     $("#plot-col").removeClass("col-lg-11").addClass("col-lg-8");
+    $("#events-col").removeClass("col-lg-1").addClass("col-auto");
     $("#body-container").removeClass("container-fluid").addClass("container-lg");
     let update = {
         "height": window.innerHeight/5,
