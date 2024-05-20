@@ -209,17 +209,17 @@
 
 /* block duration slider styling */
 #sliderSection span.irs-bar,  #sliderSection span.irs-from, #sliderSection span.irs-to, #sliderSection span.irs-handle>i:first-child{
-    background-color: #612a67d1;
+    background-color: #6d757d;
 }
 
 #sliderSection span.irs-to:before, #sliderSection span.irs-from:before {
-    border-top-color: #612a67d1;
+    border-top-color: #6d757d;
 }
 
 #sliderSection .irs-handle.state_hover>i:first-child, #sliderSection .irs--flat .irs-handle:hover>i:first-child {
-    background-color: #401644;
+    background-color: #dfd8e0;
 }
 
 #sliderSection .irs-line {
-    background-color: #6a757d;
+    background-color: #6a757d36;
 }

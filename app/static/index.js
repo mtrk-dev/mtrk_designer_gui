@@ -682,10 +682,12 @@ $(document).ready(function() {
         });
         recalculate_mouse_to_plot_conversion_variables();
         // Update slider to new values
-        let slider = $("#blockDurationSlider").data("ionRangeSlider");
+        let cur_max = slider.result.max;
+        if (block_range[1] > cur_max) { cur_max = block_range[1]; }
         slider.update({
             from: block_range[0],
-            to: block_range[1]
+            to: block_range[1],
+            max: cur_max,
         });
     });
 
@@ -1144,8 +1146,16 @@ $("#blockDurationSlider").ionRangeSlider({
         });
         recalculate_mouse_to_plot_conversion_variables();
         $("#blockDurationInput").val(data.to);
+
+        // update the slider max value if the user has selected max value
+        if (data.to == data.max) {
+            slider.update({
+                max: data.max + 50
+            })
+        }
     }
 });
+var slider = $("#blockDurationSlider").data("ionRangeSlider");
 
 // Initialize drag images
 let rf_drag_image = new Image();
