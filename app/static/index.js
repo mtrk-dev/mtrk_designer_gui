@@ -2401,6 +2401,12 @@ function duplicate_box(plot, trace_number, target_plot) {
     boxObjCopy.axis = axis_id_to_axis_name[target_plot.id];
     boxObjCopy.name = boxObj.name + "_copy";
     plot_to_box_objects[block_name][target_plot.id].push(boxObjCopy);
+
+    // If plot and target plot are the same, we move the duplicate box a little.
+    if (plot.id == target_plot.id) {
+        boxObjCopy.start_time = parseFloat(boxObjCopy.start_time + 0.2);
+        change_box_start_time(target_plot, target_plot.data.length-1, boxObjCopy.start_time);
+    }
 }
 
 function update_array_manager_chart(y_data) {
