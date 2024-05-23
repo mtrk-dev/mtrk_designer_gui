@@ -210,11 +210,11 @@
 }
 
 /* block duration slider styling */
-#sliderSection span.irs-bar,  #sliderSection span.irs-from, #sliderSection span.irs-to, #sliderSection span.irs-handle>i:first-child{
+#sliderSection span.irs-bar,  #sliderSection span.irs-from, #sliderSection span.irs-to, #sliderSection span.irs-single, #sliderSection span.irs-handle>i:first-child{
     background-color: #6d757d;
 }
 
-#sliderSection span.irs-to:before, #sliderSection span.irs-from:before {
+#sliderSection span.irs-to:before, #sliderSection span.irs-from:before, #sliderSection span.irs-single:before {
     border-top-color: #6d757d;
 }
 
