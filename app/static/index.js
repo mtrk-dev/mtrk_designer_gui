@@ -13,7 +13,7 @@ for (let i=0; i < rf_array.length; i++) {
 }
 const step_size = 100;
 
-const block_colors = ["#cf7856", "#978eff", "#5343ff", "#ff7f50", "#ff0065", "#77b6df", "#457480", "#ba029c", "#31e658", "#9be5cc", "#facade", "#fab1ed", "#deface", "#c0ffee", "#beaded", "#a3b899", "#ffaa51", "#216c5c"]
+const block_colors = ["#cf7856", "#978eff", "#5343ff", "#ff0065", "#77b6df", "#457480", "#ba029c", "#31e658", "#ff7f50", "#9be5cc", "#facade", "#fab1ed", "#deface", "#c0ffee", "#beaded", "#a3b899", "#ffaa51", "#216c5c"]
 var block_color_counter = 0;
 
 var block_range = [0, 10];
@@ -578,7 +578,11 @@ $(document).ready(function() {
             let block_name = $('#block-select').val();
             boxObj = plot_to_box_objects[block_name][plot.id][selected_trace_number-1];
             if (boxObj.block != null) {
-                load_block_modal_values(plot, selected_trace_number)
+                if (controlIsPressed) {
+                    select_block(boxObj.block);
+                    return;
+                }
+                load_block_modal_values(plot, selected_trace_number);
                 $('#blockModal').modal('toggle');
                 return;
             }
@@ -2180,8 +2184,12 @@ function select_box(trace_number, plot) {
         };
         boxObj.isSelected = true;
     } else {
+        let color = "rgb(129, 133, 137)";
+        if (boxObj.block != null) {
+            color = block_colors[boxObj.block];
+        }
         shapes[shape_number]["line"] =  {
-            color: 'rgb(129, 133, 137)',
+            color: color,
             width: 1
           };
           boxObj.isSelected = false;
@@ -2193,6 +2201,20 @@ function select_box(trace_number, plot) {
     Plotly.relayout(plot, update);
 }
 
+function select_block(block_number) {
+    let block_name = $('#block-select').val();
+    for (var key in plot_to_box_objects_template) {
+        plot_to_box_objects[block_name][key].forEach(function (boxObj, index) {
+            if (boxObj.block == block_number) {
+                let trace_number = index + 1
+                let plot_id = axis_name_to_axis_id[boxObj.axis];
+                let plot = document.getElementById(plot_id);
+                select_box(trace_number, plot);
+            }
+        });
+    }
+}
+
 function update_trace(trace_number, plot) {
     let update = {
         'line.color': block_colors[block_color_counter],
@@ -2202,7 +2224,7 @@ function update_trace(trace_number, plot) {
 }
 
 function add_block_with_selected_boxes() {
-    let selected_boxes = [];
+    let selected_boxes_count = 0;
     let start_time = Number.MAX_VALUE;
     let end_time = Number.MIN_VALUE;
 
@@ -2219,15 +2241,16 @@ function add_block_with_selected_boxes() {
     });
 
     let cur_block_name = $('#block-select').val();
-    const seen_plots = new Set();
     for (var key in plot_to_box_objects[cur_block_name]) {
         let boxes = JSON.parse(JSON.stringify(plot_to_box_objects[cur_block_name][key]));
         let deletionOffset = 0;
         boxes.forEach(function (boxObj, index) {
             if (boxObj.isSelected) {
                 index = index - deletionOffset;
-                boxObj.block = block_color_counter;
-                selected_boxes.push(boxObj);
+                if (boxObj.block == null)  {
+                    boxObj.block = block_color_counter;
+                }
+                selected_boxes_count += 1;
 
                 // We unselect the box now by calling the function again and update it.
                 // Here, index of the object in the array plus 1 will give us the trace number.
@@ -2239,7 +2262,8 @@ function add_block_with_selected_boxes() {
                 // We push the objects to the plot to box objects map
                 objCopy = Object.assign(Object.create(Object.getPrototypeOf(boxObj)), boxObj);
                 objCopy.isSelected = false;
-                objCopy.block = null;
+                // If the box is not a part of any block, we set the block to null.
+                if (boxObj.block == block_color_counter) objCopy.block = null;
                 plot_to_box_objects[block_name][plot.id].push(objCopy);
 
                 // Adding the data of block to the global blocks object.
@@ -2265,7 +2289,7 @@ function add_block_with_selected_boxes() {
             }
         });
     }
-    if (!selected_boxes.length) {
+    if (selected_boxes_count < 1) {
         fire_alert("no boxes selected!");
         return false;
     }
@@ -2273,7 +2297,7 @@ function add_block_with_selected_boxes() {
     blockObj = new Block(block_name, start_time);
     block_number_to_block_object[block_color_counter] = blockObj;
 
-    add_dummy_block_boxes(seen_plots, start_time, end_time);
+    add_dummy_block_boxes(start_time, end_time);
 
     block_color_counter += 1;
     if (block_color_counter >= block_colors.length) block_color_counter = 0;
@@ -2298,71 +2322,69 @@ function move_block_boxes(block_number, starting_point) {
     blockObj.start_time = starting_point;
 }
 
-function add_dummy_block_boxes(seen_plots, starting_point, ending_point) {
+function add_dummy_block_boxes(starting_point, ending_point) {
     for (var key in plot_to_box_objects["Main"]) {
-        if(!seen_plots.has(key)) {
-            let target = document.getElementById(key);
-            let x_data = [];
-            let y_data = [];
-            starting_point = parseFloat(starting_point);
-            ending_point = parseFloat(ending_point);
-            for (let i=starting_point; i<=ending_point; i+=(1/step_size)) {
-                x_data.push(i);
-                y_data.push(0);
-            }
-            let data = {};
-            data["y"] = y_data;
-            data["x"] = x_data;
-            data["line"] = {"color" : block_colors[block_color_counter]};
-            data["hovertemplate"] = '<b>Block ' + (block_color_counter + 1) + '</b><extra></extra>';
-            data["mode"] = "lines";
-            Plotly.addTraces(target, data);
-
-            var shape = JSON.parse(JSON.stringify(shape_template));
-            let block_color = block_colors[block_color_counter];
-            shape["x0"] = starting_point;
-            shape["x1"] = ending_point;
-            if (target.id == "rf_chart" || target.id == "adc_chart") shape["y1"] = default_shape_height;
-            else { shape["y1"] = shape_height; }
-            shape["line"] =  {
-                color: block_color+"FF",
-                width: 1,
-            };
-            shape["fillcolor"] = block_color + "2F";
-            let added_shapes=[];
-            if ("shapes" in target.layout) { added_shapes = target.layout.shapes;}
-            added_shapes.push(shape);
-
-            var line_shape = JSON.parse(JSON.stringify(line_shape_template));
-            line_shape["x0"] = starting_point+anchor_time;
-            line_shape["x1"] = starting_point+anchor_time;
-            added_shapes.push(line_shape);
-
-            var annotation = JSON.parse(JSON.stringify(annotation_template));
-            let middle_point = (starting_point+ending_point)/2;
-            annotation["x"] = middle_point;
-            annotation["text"] = "Block_"+(block_color_counter+1) + " (x1)";
-            if (target.id != "rf_chart" && target.id != "adc_chart") {
-                if (shape_height > default_shape_height) annotation["y"] = shape_height + 0.5;
-            }
-            let added_annotations=[];
-            if ("annotations" in target.layout) { added_annotations = target.layout.annotations;}
-            added_annotations.push(annotation);
-
-            var update = {
-                shapes: added_shapes,
-                annotations: added_annotations
-                };
-            Plotly.relayout(target, update);
-
-            boxObj = new Box("Block", starting_point, axis_id_to_axis_name[target.id], y_data);
-            let block_name = $('#block-select').val();
-            if (!(block_name in plot_to_box_objects)) {
-                plot_to_box_objects[block_name] = JSON.parse(JSON.stringify(plot_to_box_objects_template));
-            }
-            boxObj.block = block_color_counter;
-            plot_to_box_objects[block_name][target.id].push(boxObj);
+        let target = document.getElementById(key);
+        let x_data = [];
+        let y_data = [];
+        starting_point = parseFloat(starting_point);
+        ending_point = parseFloat(ending_point);
+        for (let i=starting_point; i<=ending_point; i+=(1/step_size)) {
+            x_data.push(i);
+            y_data.push(0);
         }
+        let data = {};
+        data["y"] = y_data;
+        data["x"] = x_data;
+        data["line"] = {"color" : block_colors[block_color_counter]};
+        data["hovertemplate"] = '<b>Block ' + (block_color_counter + 1) + '</b><extra></extra>';
+        data["mode"] = "lines";
+        Plotly.addTraces(target, data);
+
+        var shape = JSON.parse(JSON.stringify(shape_template));
+        let block_color = block_colors[block_color_counter];
+        shape["x0"] = starting_point;
+        shape["x1"] = ending_point;
+        if (target.id == "rf_chart" || target.id == "adc_chart") shape["y1"] = default_shape_height;
+        else { shape["y1"] = shape_height; }
+        shape["line"] =  {
+            color: block_color+"FF",
+            width: 1,
+        };
+        shape["fillcolor"] = block_color + "2F";
+        let added_shapes=[];
+        if ("shapes" in target.layout) { added_shapes = target.layout.shapes;}
+        added_shapes.push(shape);
+
+        var line_shape = JSON.parse(JSON.stringify(line_shape_template));
+        line_shape["x0"] = starting_point+anchor_time;
+        line_shape["x1"] = starting_point+anchor_time;
+        added_shapes.push(line_shape);
+
+        var annotation = JSON.parse(JSON.stringify(annotation_template));
+        let middle_point = (starting_point+ending_point)/2;
+        annotation["x"] = middle_point;
+        annotation["text"] = "Block_"+(block_color_counter+1) + " (x1)";
+        if (target.id != "rf_chart" && target.id != "adc_chart") {
+            if (shape_height > default_shape_height) annotation["y"] = shape_height + 0.5;
+        }
+        let added_annotations=[];
+        if ("annotations" in target.layout) { added_annotations = target.layout.annotations;}
+        added_annotations.push(annotation);
+
+        var update = {
+            shapes: added_shapes,
+            annotations: added_annotations
+            };
+        Plotly.relayout(target, update);
+
+        boxObj = new Box("Block", starting_point, axis_id_to_axis_name[target.id], y_data);
+        let block_name = $('#block-select').val();
+        if (!(block_name in plot_to_box_objects)) {
+            plot_to_box_objects[block_name] = JSON.parse(JSON.stringify(plot_to_box_objects_template));
+        }
+        boxObj.block = block_color_counter;
+        plot_to_box_objects[block_name][target.id].push(boxObj);
     }
 }
 
