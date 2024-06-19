@@ -37,7 +37,6 @@
 #generate-sdl-btn {
     margin-bottom: 1%;
     position: absolute;
-    background: none;
     font-size: 20px;
     bottom: 0
 }
@@ -46,7 +45,6 @@
     margin-bottom: 1%;
     position: absolute;
     bottom: 0;
-    background: transparent;
 }
 
 #reset-btn, #undo-btn, #redo-btn, #save-plot-btn {
@@ -140,10 +138,13 @@
 
 #events-col {
     background: #0e0f10;
+    border-right: 1px solid #34373b;
 }
 
 #plot-col {
     padding-right: 0px;
+    padding-left: 0px;
+    border-left: 1px solid #34373b;
 }
 
 #object-btns-group {
@@ -180,6 +181,7 @@
     padding: 5px;
     border: 1px solid gray;
     border-radius: 0.2rem;
+    background: transparent;
 }
 
 #flexSwitchCheckChecked {
@@ -224,4 +226,10 @@
 
 #sliderSection .irs-line {
     background-color: #6a757d36;
+}
+
+/* Update light class */
+.btn-light {
+    background: #fff;
+    border: 1px solid #dfe2e6;
 }
