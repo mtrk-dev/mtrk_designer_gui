@@ -233,3 +233,12 @@
     background: #fff;
     border: 1px solid #dfe2e6;
 }
+
+.navbar-brand {
+    font-size: 24px;
+}
+
+#brandingText {
+    padding-left: 2px;
+    letter-spacing: 1px;
+}
