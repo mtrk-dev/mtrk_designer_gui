@@ -16,8 +16,6 @@ const step_size = 100;
 const block_colors = ["#cf7856", "#978eff", "#5343ff", "#ff0065", "#77b6df", "#457480", "#ba029c", "#31e658", "#ff7f50", "#9be5cc", "#facade", "#fab1ed", "#deface", "#c0ffee", "#beaded", "#a3b899", "#ffaa51", "#216c5c"]
 var block_color_counter = 0;
 
-var block_range = [0, 10];
-
 plot_to_box_objects_template = {
     'rf_chart': [],
     'slice_chart': [],
@@ -36,6 +34,46 @@ var block_to_loops = {}
 
 // To maintain the inner html of events for each block.
 var block_to_events_html = {}
+
+// To maintain the duration of each block.
+var block_to_duration = {"Main": 10}
+
+// Block duration range slider configuration
+$("#blockDurationSlider").ionRangeSlider({
+    type: "double",
+    skin: "flat",
+    grid: true,
+    min: 0,
+    max: 30,
+    from: 0,
+    to: 10,
+    step: 1,
+    hide_min_max: true,
+    hide_from_to: false,
+    drag_interval: true,
+    min_interval: 1,
+    // postfix: "ms",
+    onFinish: function (data) {
+        // relayout the plot with new range selection.
+        $(".dropzone").each(function () {
+            let plot = this;
+            let update = {
+                "xaxis.range": [data.from, data.to]
+            };
+            Plotly.relayout(plot, update);
+        });
+        recalculate_mouse_to_plot_conversion_variables();
+
+        // update the slider max value if the user has selected max value
+        let selected_block = $("#block-select").val();
+        if (data.to == data.max && selected_block == "Main") {
+            slider.update({
+                max: data.max + 50
+            })
+        }
+    }
+});
+var slider = $("#blockDurationSlider").data("ionRangeSlider");
 
 const event_type_to_icon_str = {
     "calc": "fa fa-calculator",
@@ -187,7 +225,7 @@ const layout = {
         },
         "gridcolor": "rgba(255,255,255,0.05)",
         "zerolinecolor": "rgba(255,255,255,0.1)",
-        range: block_range,
+        range: [0, block_to_duration["Main"]],
         fixedrange: true,
     },
     yaxis: {
@@ -330,7 +368,7 @@ array_chart_layout = {
         "zerolinecolor": "rgba(255,255,255,0.05)",
         showticklabels: false,
         fixedrange: true,
-        range: block_range,
+        range: [0, block_to_duration["Main"]],
     },
     yaxis: {
         "gridcolor": "rgba(255,255,255,0.05)",
@@ -433,8 +471,9 @@ $(document).ready(function() {
             return;
         }
 
-        if (starting_point < block_range[0] || starting_point > block_range[1]) {
-            fire_alert("Invalid drop location");
+        let block_duration = block_to_duration[$('#block-select').val()];
+        if (starting_point < 0 || starting_point > block_duration) {
+            fire_alert("Drop allowed between 0 and block duration");
             return;
         }
 
@@ -527,10 +566,11 @@ $(document).ready(function() {
                             var y1_val = ed[key];
                         }
                     }
-                    if (starting_point < block_range[0]) {
-                        starting_point = block_range[0];
-                    } else if (starting_point > block_range[1]) {
-                        starting_point = block_range[1] - 1;
+                    block_duration = block_to_duration[$('#block-select').val()];
+                    if (starting_point < 0) {
+                        starting_point = 0;
+                    } else if (starting_point > block_duration) {
+                        starting_point = block_duration - 1;
                     }
 
                     // If the y0 value is not zero after moving for a shape, we want to move the shape to zero.
@@ -652,6 +692,7 @@ $(document).ready(function() {
         delete blocks[blockObj.name];
         delete block_number_to_block_object[block_number];
         delete block_to_loops[blockObj.name];
+        delete block_to_duration[blockObj.name];
         delete blockObj;
 
         // deleting block UI in current block window.
@@ -675,23 +716,11 @@ $(document).ready(function() {
     });
 
     $("#block-time-btn").click(function () {
-        block_range[1] = parseInt($("#blockDurationInput").val());
-        $(".dropzone").each(function () {
-            var plot = this;
-            // Change the range and relayout plot.
-            let update = {
-                "xaxis.range": block_range
-                };
-            Plotly.relayout(plot, update);
-        });
-        recalculate_mouse_to_plot_conversion_variables();
-        // Update slider to new values
-        let cur_max = slider.result.max;
-        if (block_range[1] > cur_max) { cur_max = block_range[1]; }
+        let block_duration = parseInt($("#blockDurationInput").val());
+        block_to_duration[$('#block-select').val()] = block_duration;
+        // Update slider to new max
         slider.update({
-            from: block_range[0],
-            to: block_range[1],
-            max: cur_max,
+            max: block_duration,
         });
     });
 
@@ -760,7 +789,6 @@ $(document).ready(function() {
         let configurations = save_configurations();
         let structure = generate_blocks_nesting_structure();
         let serialized_events = serialize_events_data();
-        let block_to_duration = generate_block_duration();
         send_data(block_to_sdl_objects, configurations, structure, serialized_events, block_to_duration);
     });
 
@@ -1122,44 +1150,6 @@ $(document).on("click", "#plot-size-btn", function () {
         $("#plot-size-icon").removeClass("fa-compress").addClass("fa-expand");
     }
 });
-
-// Block duration range slider configuration
-$("#blockDurationSlider").ionRangeSlider({
-    type: "double",
-    skin: "flat",
-    grid: true,
-    min: 0,
-    max: 30,
-    from: 0,
-    to: 10,
-    step: 1,
-    hide_min_max: true,
-    hide_from_to: false,
-    drag_interval: true,
-    min_interval: 5,
-    // postfix: "ms",
-    onFinish: function (data) {
-        block_range = [data.from, data.to];
-        // relayout the plot with new range selection.
-        $(".dropzone").each(function () {
-            let plot = this;
-            let update = {
-                "xaxis.range": block_range
-            };
-            Plotly.relayout(plot, update);
-        });
-        recalculate_mouse_to_plot_conversion_variables();
-        $("#blockDurationInput").val(data.to);
-
-        // update the slider max value if the user has selected max value
-        if (data.to == data.max) {
-            slider.update({
-                max: data.max + 50
-            })
-        }
-    }
-});
-var slider = $("#blockDurationSlider").data("ionRangeSlider");
 
 // Initialize drag images
 let rf_drag_image = new Image();
@@ -1728,6 +1718,13 @@ function reload_data(data) {
     let block_name = data["selected_block"];
     let plots_data = data["plots_data"][block_name];
     let configurations = data["configurations"];
+    block_to_duration = data["block_to_duration"];
+    $("#blockDurationInput").val(block_to_duration[block_name]);
+    slider.update({
+        from: 0,
+        to: block_to_duration[block_name],
+        max: block_to_duration[block_name]
+    });
     load_configurations(configurations);
     $(".dropzone").each(function () {
         var plot = this;
@@ -1735,7 +1732,7 @@ function reload_data(data) {
         let layout = plot_data[1];
         layout["height"] = window.innerHeight/5;
         layout["width"] =  rf_chart.offsetWidth;
-        layout["xaxis"]["range"] = block_range;
+        layout["xaxis"]["range"] = [0, block_to_duration[block_name]];
         Plotly.react(plot, plot_data[0], layout);
     });
     blocks = data["plots_data"];
@@ -1772,7 +1769,8 @@ function generate_current_data_state() {
         "configurations": configurations,
         "block_to_loops": block_to_loops,
         "array_name_to_array": array_name_to_array,
-        "block_to_events_html": block_to_events_html
+        "block_to_events_html": block_to_events_html,
+        "block_to_duration": block_to_duration
     }
     return current_state_data;
 }
@@ -2302,6 +2300,7 @@ function add_block_with_selected_boxes() {
     blocks[block_name] = block_data;
     blockObj = new Block(block_name, start_time);
     block_number_to_block_object[block_color_counter] = blockObj;
+    block_to_duration[block_name] = Math.ceil(end_time);
 
     add_dummy_block_boxes(start_time, end_time);
 
@@ -2477,7 +2476,7 @@ function load_block_data(block_name) {
         if (plot.id == "rf_chart") {
             layout["title"] = {
                 text: block_name,
-                font: {
+                font: { 
                     family: 'Courier New, monospace',
                     size: 18,
                     color: 'rgba(255,255,255,0.9)'
@@ -2489,8 +2488,15 @@ function load_block_data(block_name) {
         // changing the height to handle the case where plot dimension has been changed after block creation.
         layout["height"] = window.innerHeight/5;
         layout["width"] =  rf_chart.offsetWidth;
-        layout["xaxis"]["range"] = block_range;
+        layout["xaxis"]["range"] = [0, block_to_duration[block_name]];
+        $("#blockDurationInput").val(block_to_duration[block_name]);
+        slider.update({
+            from: 0,
+            to: block_to_duration[block_name],
+            max: block_to_duration[block_name]
+        });
         Plotly.react(plot, plot_data[0], layout);
+        recalculate_mouse_to_plot_conversion_variables();
     });
     // For the cases when different theme was selected during block creation.
     // This ensures the plot color matches the selected theme.
@@ -2698,15 +2704,6 @@ function serialize_events_data() {
     let block_name = $('#block-select').val();
     load_events_data(block_name);
     return events_data;
-}
-
-function generate_block_duration() {
-    // TODO: add individual durations to each block.
-    let block_to_duration = {}
-    for (let block in blocks) {
-        block_to_duration[block] = block_range[1];
-    }
-    return block_to_duration;
 }
 
 function maximize_plot_area() {
