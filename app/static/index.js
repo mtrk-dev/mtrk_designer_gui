@@ -2892,3 +2892,438 @@ class Block {
         this.start_time = start_time;
     }
 }
+
+// write a function that takes the following json structure and transform it into the structure
+// that is used in the code. Basically, populate these global variables with the data provided.
+// plot_to_box_objects, block_number_to_block_object, blocks, block_to_loops, block_to_events_html, block_to_duration, array_name_to_array
+let data_sdl =
+    {
+        "file": {
+            "format": "mtrk-SDL",
+            "version": 1,
+            "measurement": "abc",
+            "system": "Skyra-XQ"
+        },
+        "settings": {
+            "readout_os": 2
+        },
+        "infos": {
+            "description": "Spin echo 2d sequence",
+            "slices": 1,
+            "fov": 300,
+            "pelines": 128,
+            "seqstring": "se2d",
+            "reconstruction": "%SiemensIceProgs%\\IceProgram2D"
+        },
+        "instructions": {
+            "main": {
+                "print_counter": "on",
+                "print_message": "Main loop",
+                "steps": [{
+                    "action": "loop",
+                    "counter": 0,
+                    "range": "128",
+                    "steps": [{
+                        "action": "run_block",
+                        "block": "Block_1"
+                    }]
+                }]
+            },
+            "Block_1": {
+                "print_counter": "on",
+                "print_message": "Running main kernel",
+                "steps": [{
+                    "action": "rf",
+                    "object": "rf_excitation",
+                    "time": 100,
+                    "added_phase": {
+                        "type": "float",
+                        "float": "0"
+                    }
+                },
+                {
+                    "action": "rf",
+                    "object": "rf_refocusing",
+                    "time": 35100,
+                    "added_phase": {
+                        "type": "float",
+                        "float": "0"
+                    }
+                },
+                {
+                    "action": "grad",
+                    "axis": "slice",
+                    "object": "grad_slice_select",
+                    "time": 0
+                },
+                {
+                    "action": "grad",
+                    "axis": "slice",
+                    "object": "grad_slice_select_refocus",
+                    "time": 35000
+                },
+                {
+                    "action": "grad",
+                    "axis": "slice",
+                    "object": "grad_crusher",
+                    "time": 34400
+                },
+                {
+                    "action": "grad",
+                    "axis": "slice",
+                    "object": "grad_crusher",
+                    "time": 37760
+                },
+                {
+                    "action": "grad",
+                    "axis": "slice",
+                    "object": "grad_slice_refocus",
+                    "time": 2760
+                },
+                {
+                    "action": "grad",
+                    "axis": "slice",
+                    "object": "grad_slice_refocus",
+                    "time": 73330
+                },
+                {
+                    "action": "grad",
+                    "axis": "phase",
+                    "object": "grad_crusher",
+                    "time": 34400
+                },
+                {
+                    "action": "grad",
+                    "axis": "phase",
+                    "object": "grad_crusher",
+                    "time": 37760
+                },
+                {
+                    "action": "grad",
+                    "axis": "phase",
+                    "object": "grad_phase_encode",
+                    "time": 2760,
+                    "amplitude": {
+                        "type": "equation",
+                        "equation": "phaseencoding"
+                    }
+                },
+                {
+                    "action": "grad",
+                    "axis": "phase",
+                    "object": "grad_phase_encode",
+                    "time": 73330,
+                    "amplitude": {
+                        "type": "equation",
+                        "equation": "phaseencoding"
+                    }
+                },
+                {
+                    "action": "grad",
+                    "axis": "read",
+                    "object": "grad_crusher",
+                    "time": 34400
+                },
+                {
+                    "action": "grad",
+                    "axis": "read",
+                    "object": "grad_crusher",
+                    "time": 37760
+                },
+                {
+                    "action": "grad",
+                    "axis": "read",
+                    "object": "grad_read_dephase",
+                    "time": 2760
+                },
+                {
+                    "action": "grad",
+                    "axis": "read",
+                    "object": "grad_read_readout",
+                    "time": 69430
+                },
+                {
+                    "action": "adc",
+                    "object": "adc_readout",
+                    "time": 69460,
+                    "frequency": "0",
+                    "phase": "0",
+                    "added_phase": {
+                        "type": "float",
+                        "float": "0"
+                    },
+                    "mdh": {}
+                },
+                {
+                    "action": "init",
+                    "gradients": "logical"
+                },
+                {
+                    "action": "sync",
+                    "object": "ttl",
+                    "time": 0
+                },
+                {
+                    "action": "mark",
+                    "time": 2000000.0
+                },
+                {
+                    "action": "submit"
+                }]
+            }
+        },
+        "objects": {
+            "rf_excitation": {
+                "type": "rf",
+                "duration": 2560,
+                "array": "rf_pulse",
+                "initial_phase": 0,
+                "thickness": 5,
+                "flipangle": 90,
+                "purpose": "excitation"
+            },
+            "rf_refocusing": {
+                "type": "rf",
+                "duration": 2560,
+                "array": "rf_pulse",
+                "initial_phase": 0,
+                "thickness": 5,
+                "flipangle": 180,
+                "purpose": "refocusing"
+            },
+            "grad_slice_select": {
+                "type": "grad",
+                "duration": 2760,
+                "array": "grad_100_2560_100",
+                "tail": 0,
+                "amplitude": 4.95
+            },
+            "grad_slice_select_refocus": {
+                "type": "grad",
+                "duration": 2760,
+                "array": "grad_100_2560_100",
+                "tail": 0,
+                "amplitude": 4.95
+            },
+            "grad_crusher": {
+                "type": "grad",
+                "duration": 520,
+                "array": "grad_220_80_220",
+                "tail": 0,
+                "amplitude": 21.96
+            },
+            "grad_slice_refocus": {
+                "type": "grad",
+                "duration": 520,
+                "array": "grad_220_80_220",
+                "tail": 0,
+                "amplitude": -21.95
+            },
+            "grad_phase_encode": {
+                "type": "grad",
+                "duration": 450,
+                "array": "grad_220_10_220",
+                "tail": 0,
+                "amplitude": 1.0
+            },
+            "grad_read_dephase": {
+                "type": "grad",
+                "duration": 450,
+                "array": "grad_220_10_220",
+                "tail": 0,
+                "amplitude": -21.96
+            },
+            "grad_read_readout": {
+                "type": "grad",
+                "duration": 3900,
+                "array": "grad_30_3840_30",
+                "tail": 0,
+                "amplitude": -2.61
+            },
+            "adc_readout": {
+                "type": "adc",
+                "duration": 3840,
+                "samples": 128,
+                "dwelltime": 30
+            },
+            "ttl": {
+                "type": "sync",
+                "duration": 10,
+                "event": "osc0"
+            }
+        },
+        "arrays": {
+            "rf_pulse": {
+                "encoding": "text",
+                "type": "float",
+                "size": 128,
+                "data": [3.13304e-05, 0.000275274, 0.000741752, 0.00140054, 0.00221321, 0.0031333, 0.00410657, 0.00507138, 0.00595912, 0.00669486, 0.00719792, 0.00738272, 0.00715954, 0.0064355, 0.00511552, 0.00310332, 0.00030259, 0.00338198, 0.00804349, 0.0137717, 0.0206519, 0.0287638, 0.0381802, 0.0489663, 0.0611784, 0.0748629, 0.0900558, 0.106781, 0.125052, 0.144867, 0.166213, 0.189063, 0.213376, 0.239097, 0.266157, 0.294475, 0.323954, 0.354486, 0.385951, 0.418216, 0.451138, 0.484565, 0.518335, 0.552279, 0.586221, 0.619982, 0.653377, 0.686221, 0.718326, 0.749508, 0.779582, 0.80837, 0.835698, 0.861398, 0.885311, 0.90729, 0.927195, 0.9449, 0.960293, 0.973275, 0.983763, 0.991689, 0.997001, 0.999666, 0.999666, 0.997001, 0.991689, 0.983763, 0.973275, 0.960293, 0.9449, 0.927195, 0.90729, 0.885311, 0.861398, 0.835698, 0.80837, 0.779582, 0.749508, 0.718326, 0.686221, 0.653377, 0.619982, 0.586221, 0.552279, 0.518335, 0.484565, 0.451138, 0.418216, 0.385951, 0.354486, 0.323954, 0.294475, 0.266157, 0.239097, 0.213376, 0.189063, 0.166213, 0.144867, 0.125052, 0.106781, 0.0900558, 0.0748629, 0.0611784, 0.0489663, 0.0381802, 0.0287638, 0.0206519, 0.0137717, 0.00804349, 0.00338198, 0.00030259, 0.00310332, 0.00511552, 0.0064355, 0.00715954, 0.00738272, 0.00719792, 0.00669486, 0.00595912, 0.00507138, 0.00410657, 0.0031333, 0.00221321, 0.00140054, 0.000741752, 0.000275274, 3.13304e-05]
+            },
+            "grad_100_2560_100": {
+                "encoding": "text",
+                "type": "float",
+                "size": 276,
+                "data": [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1, 0.0]
+            },
+            "grad_220_80_220": {
+                "encoding": "text",
+                "type": "float",
+                "size": 52,
+                "data": [0.0, 0.0455, 0.0909, 0.1364, 0.1818, 0.2273, 0.2727, 0.3182, 0.3636, 0.4091, 0.4545, 0.5, 0.5455, 0.5909, 0.6364, 0.6818, 0.7273, 0.7727, 0.8182, 0.8636, 0.9091, 0.9545, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.9545, 0.9091, 0.8636, 0.8182, 0.7727, 0.7273, 0.6818, 0.6364, 0.5909, 0.5455, 0.5, 0.4545, 0.4091, 0.3636, 0.3182, 0.2727, 0.2273, 0.1818, 0.1364, 0.0909, 0.0455, 0.0]
+            },
+            "grad_220_10_220": {
+                "encoding": "text",
+                "type": "float",
+                "size": 45,
+                "data": [0.0, 0.0455, 0.0909, 0.1364, 0.1818, 0.2273, 0.2727, 0.3182, 0.3636, 0.4091, 0.4545, 0.5, 0.5455, 0.5909, 0.6364, 0.6818, 0.7273, 0.7727, 0.8182, 0.8636, 0.9091, 0.9545, 1.0, 0.9545, 0.9091, 0.8636, 0.8182, 0.7727, 0.7273, 0.6818, 0.6364, 0.5909, 0.5455, 0.5, 0.4545, 0.4091, 0.3636, 0.3182, 0.2727, 0.2273, 0.1818, 0.1364, 0.0909, 0.0455, 0.0]
+            },
+            "grad_30_3840_30": {
+                "encoding": "text",
+                "type": "float",
+                "size": 390,
+                "data": [0.0, 0.3333, 0.6667, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.6667, 0.3333, 0.0]
+            }
+        },
+        "equations": {
+            "phaseencoding": {
+                "equation": "0.3378125*(ctr(0)-64.5)"
+            }
+        }
+}
+function populate_global_variables_with_sdl_data(data_sdl) {
+    let objects = data_sdl.objects;
+    let arrays = data_sdl.arrays;
+    let instructions = data_sdl.instructions;
+    let equations = data_sdl.equations;
+    let file = data_sdl.file;
+    let settings = data_sdl.settings;
+    let info = data_sdl.infos;
+
+    let array_name_to_array_copy = {};
+    for (let array_name in arrays) {
+        array_name_to_array_copy[array_name] = arrays[array_name].data;
+    }
+
+    let block_number_to_block_object_copy = {};
+    // loop through instructions and keep the key as block number and create block object using values.
+    let block_number = 0;
+    for (let block_name in instructions) {
+        if (block_name == "main") continue;
+        let block_data = instructions[block_name];
+        // TODO: figure out a way to get the start time of the block (DFS?).
+        block_number_to_block_object_copy[block_number] = new Block(block_name, 0);
+        block_number_to_block_object_copy[block_number].message = block_data.print_message;
+        block_number_to_block_object_copy[block_number].print_counter = block_data.print_counter == "on" ? true : false;
+        block_number += 1;
+    }
+    // update the block color counter as we have added blocks.
+    block_color_counter = block_number;
+
+
+    let plot_to_box_objects_copy = {};
+    let blocks_copy = {};
+    // loop through the instructions and check all the steps using depth first search. Get the timing and object name from the step, 
+    // add the corresponding object to the plot_to_box_objects.
+    for (let block_name in instructions) {
+        let block_data = instructions[block_name];
+        // debugging: keeping it consistent with front end code.
+        if (block_name == "main") block_name = "Main";
+        plot_to_box_objects_copy[block_name] = JSON.parse(JSON.stringify(plot_to_box_objects_template));
+        let steps = block_data.steps;
+        for (let step of steps) {
+            if (!(step.action == "rf" || step.action == "grad" || step.action == "adc")) continue;
+            let object_name = step.object;
+            let object = objects[object_name];
+            let array = [];
+            if (object.type != "adc") array = arrays[object.array];
+            let axis = "rf";
+            if ("axis" in step) {
+                axis = step.axis;
+            } else if (object.type == "adc") {
+                axis = "adc";
+            }
+            let plot_id = axis_name_to_axis_id[axis];
+            add_box_to_plot_ui(plot_id, array.data, parseFloat(step.time)/1000, object.type);
+            let box = new Box(object.type, parseFloat(step.time)/1000, axis, array.data);
+            box.name = object_name;
+            if (object.type == "grad") {
+                box.amplitude = object.amplitude;
+            } else if (object.type == "rf") {
+                box.rf_duration = parseFloat(object.duration)/1000;
+                box.init_phase = object.initial_phase;
+                box.thickness = object.thickness;
+                box.flip_angle = object.flipangle;
+                box.purpose = object.purpose;
+                box.rf_added_phase_type = step.added_phase.type;
+                box.rf_added_phase_float = step.added_phase.float;
+            } else if (object.type == "adc") {
+                box.frequency = step.frequency;
+                box.phase = step.phase;
+                box.adc_added_phase_type = step.added_phase.type;
+                box.adc_added_phase_float = step.added_phase.float;
+                box.samples = object.samples;
+                box.dwell_time = parseFloat(object.dwelltime)/1000;
+            }
+            // Hard coding all the boxes to main currently.
+            plot_to_box_objects_copy["Main"][plot_id].push(box);
+        }
+    }
+    console.log(plot_to_box_objects_copy);
+    plot_to_box_objects = plot_to_box_objects_copy;
+    scale_boxes_amplitude();
+}
+populate_global_variables_with_sdl_data(data_sdl);
+
+// Replicating the functionality of drop.
+function add_box_to_plot_ui(plot_name, array, starting_point, box_type) {
+    let plot = document.getElementById(plot_name);
+    if (box_type == "adc") {
+        array = axis_id_to_default_array[plot.id];
+        console.log(plot.id);
+        console.log(array);
+        console.log(starting_point);
+    }
+    let multiplier = 1;
+    if (plot.id == "rf_chart") {
+        multiplier = 2;
+    }
+    let x_data = []
+    for (let i=0; i<array.length; i+=1) {
+        x_data.push(starting_point + multiplier*(i/step_size));
+    }
+    let data = {};
+    data["y"] = array;
+    data["x"] = x_data;
+    data["line"] = {"color" : axis_id_to_color[plot.id]};
+    data["hovertemplate"] = '<b>' +  box_type + '</b><br> %{y:.2f}<extra></extra>';
+    Plotly.addTraces(plot, data);
+
+    // Update the trace by adding a box around it.
+    var shape = JSON.parse(JSON.stringify(shape_template));
+    shape["x0"] = starting_point;
+    shape["x1"] = starting_point + multiplier*(array.length/step_size);
+    if (plot.id == "rf_chart" || plot.id == "adc_chart") shape["y1"] = default_shape_height;
+    else { shape["y1"] = shape_height; }
+    let added_shapes=[];
+    if ("shapes" in plot.layout) { added_shapes = plot.layout.shapes;}
+    added_shapes.push(shape);
+
+    // add a line shape to show anchor point.
+    var line_shape = JSON.parse(JSON.stringify(line_shape_template));
+    line_shape["x0"] = starting_point+anchor_time;
+    line_shape["x1"] = starting_point+anchor_time;
+    added_shapes.push(line_shape);
+
+    // add a dummy annotation
+    var annotation = JSON.parse(JSON.stringify(annotation_template));
+    annotation["x"] = starting_point+2.5;
+    let added_annotations=[];
+    if ("annotations" in plot.layout) { added_annotations = plot.layout.annotations;}
+    added_annotations.push(annotation);
+
+    var update = {
+        shapes: added_shapes,
+        annotations: added_annotations
+        };
+    Plotly.relayout(plot, update);
+}
