@@ -3199,9 +3199,10 @@ function populate_global_variables_with_sdl_data(data_sdl) {
     let settings = data_sdl.settings;
     let info = data_sdl.infos;
 
-    let array_name_to_array_copy = {};
+    // let array_name_to_array_copy = {};
     for (let array_name in arrays) {
-        array_name_to_array_copy[array_name] = arrays[array_name].data;
+        // array_name_to_array_copy[array_name] = arrays[array_name].data;
+        array_name_to_array[array_name] = arrays[array_name].data;
     }
 
     let block_number_to_block_object_copy = {};
@@ -3234,7 +3235,7 @@ function populate_global_variables_with_sdl_data(data_sdl) {
             if (!(step.action == "rf" || step.action == "grad" || step.action == "adc")) continue;
             let object_name = step.object;
             let object = objects[object_name];
-            let array = [];
+            let array = adc_readout_array;
             if (object.type != "adc") array = arrays[object.array];
             let axis = "rf";
             if ("axis" in step) {
@@ -3243,9 +3244,11 @@ function populate_global_variables_with_sdl_data(data_sdl) {
                 axis = "adc";
             }
             let plot_id = axis_name_to_axis_id[axis];
-            add_box_to_plot_ui(plot_id, array.data, parseFloat(step.time)/1000, object.type);
+            let plot = document.getElementById(plot_id);
+            add_box_to_plot_ui(plot, array.data, parseFloat(step.time)/1000, object.type);
             let box = new Box(object.type, parseFloat(step.time)/1000, axis, array.data);
             box.name = object_name;
+            box.array_info.name = object.array;
             if (object.type == "grad") {
                 box.amplitude = object.amplitude;
             } else if (object.type == "rf") {
@@ -3257,6 +3260,7 @@ function populate_global_variables_with_sdl_data(data_sdl) {
                 box.rf_added_phase_type = step.added_phase.type;
                 box.rf_added_phase_float = step.added_phase.float;
             } else if (object.type == "adc") {
+                box.adc_duration = parseFloat(object.duration)/1000;
                 box.frequency = step.frequency;
                 box.phase = step.phase;
                 box.adc_added_phase_type = step.added_phase.type;
@@ -3266,22 +3270,25 @@ function populate_global_variables_with_sdl_data(data_sdl) {
             }
             // Hard coding all the boxes to main currently.
             plot_to_box_objects_copy["Main"][plot_id].push(box);
+
+            // Updating the trace amplitude or duration based on the  newly box added.
+            // plot.data.length-1 relfects the last added trace to the plot.
+            if (object.type == "grad") {
+                update_trace_amplitude(plot, plot.data.length-1, box.array_info.array, box.amplitude);
+            } else if (object.type == "adc") {
+                update_adc_trace_duration(plot, plot.data.length-1, parseFloat(box.start_time), parseFloat(box.adc_duration));
+            }
         }
     }
-    console.log(plot_to_box_objects_copy);
     plot_to_box_objects = plot_to_box_objects_copy;
     scale_boxes_amplitude();
 }
 populate_global_variables_with_sdl_data(data_sdl);
 
 // Replicating the functionality of drop.
-function add_box_to_plot_ui(plot_name, array, starting_point, box_type) {
-    let plot = document.getElementById(plot_name);
+function add_box_to_plot_ui(plot, array, starting_point, box_type) {
     if (box_type == "adc") {
         array = axis_id_to_default_array[plot.id];
-        console.log(plot.id);
-        console.log(array);
-        console.log(starting_point);
     }
     let multiplier = 1;
     if (plot.id == "rf_chart") {
