@@ -550,7 +550,7 @@ $(document).ready(function() {
                     console.log("Moved!");
                     // Here, the offset of 1 is because there is one default trace present in the plot to show empty plots.
                     // and division by 2 is because we have 2 shapes per trace. One for box and other for anchor position.
-                    let shape_number = parseInt(Object.keys(ed)[0][7]);
+                    let shape_number = parseInt(Object.keys(ed)[0].split("[")[1].split("]")[0]);
                     let trace_number = (shape_number/2)+1;
                     for (var key in ed) {
                         if (key.endsWith(".x0")) {
