@@ -47,6 +47,15 @@
     bottom: 0;
 }
 
+#version-text {
+    margin-bottom: 1%;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    margin-right: 1%;
+    font-size: smaller;
+}
+
 #reset-btn, #undo-btn, #redo-btn, #save-plot-btn {
     background: transparent;
     font-size: 14px;
