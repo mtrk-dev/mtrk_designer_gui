@@ -2108,12 +2108,19 @@ function update_theme(toTheme) {
             $(this).addClass("btn-light");
         });
         $("body").css('background', "#f8fafc");
+        $("body").css("--slider-bar","#7d51a0");
+        $("body").css("--slider-handle","#7d51a0");
+        $("body").css("--slider-bar-hover","#4e0858");
         toggle_plot_color(true);
         $("#events-col").css({'background': "#ffffff", 'border-right': "1px solid #dfe2e6"});
         $("#plot-col").css({'background': "#ffffff", 'border-left': "1px solid #dfe2e6"});
         $("#object-btns-group button").css('border-color', '#dfe2e6');
         $(".checkpoint-icon").css({'background': "#ffffff", 'border': "1px solid #dfe2e6"});
         $("#reset-btn, #undo-btn, #redo-btn, #save-plot-btn").css('background', "#ffffff");
+        $("#mtrk-logo").hide();
+        $("#mtrk-logo-dark").show();
+        $("#mtrk-logo").removeClass("d-inline-block");
+        $("#mtrk-logo-dark").addClass("d-inline-block");
     }
     else {
         document.documentElement.setAttribute('data-bs-theme','dark');
@@ -2127,12 +2134,19 @@ function update_theme(toTheme) {
             $(this).addClass("btn-secondary");
         });
         $("body").css('background', "var(--bs-body-bg)");
+        $("body").css("--slider-bar","#6d757d");
+        $("body").css("--slider-handle","#6d757d");
+        $("body").css("--slider-bar-hover","#dfd8e0");
         toggle_plot_color(false);
         $("#events-col").css({'background': "#0e0f10", "border-right": "1px solid #34373b"});
         $("#plot-col").css({'background': "var(--bs-body-bg)", "border-left": "1px solid #34373b"});
         $("#object-btns-group button").css('border-color', '#ffffff1f');
         $(".checkpoint-icon").css({'background': "transparent", 'border': "1px solid gray"});
         $("#reset-btn, #undo-btn, #redo-btn, #save-plot-btn").css('background', "transparent");
+        $("#mtrk-logo").show();
+        $("#mtrk-logo-dark").hide();
+        $("#mtrk-logo-dark").removeClass("d-inline-block");
+        $("#mtrk-logo").addClass("d-inline-block");
     }
 }
 
