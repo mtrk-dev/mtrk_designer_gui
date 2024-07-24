@@ -3190,14 +3190,24 @@ let data_sdl =
             }
         }
 }
+var objects = null;
+var arrays = null;
+var instructions = null;
+var equations = null;
+var file = null;
+var settings = null;
+var info = null;
+var plot_to_box_objects_copy = {};
+var blocks_copy = {};
+var visited_blocks = {};
 function populate_global_variables_with_sdl_data(data_sdl) {
-    let objects = data_sdl.objects;
-    let arrays = data_sdl.arrays;
-    let instructions = data_sdl.instructions;
-    let equations = data_sdl.equations;
-    let file = data_sdl.file;
-    let settings = data_sdl.settings;
-    let info = data_sdl.infos;
+    objects = data_sdl.objects;
+    arrays = data_sdl.arrays;
+    instructions = data_sdl.instructions;
+    equations = data_sdl.equations;
+    file = data_sdl.file;
+    settings = data_sdl.settings;
+    info = data_sdl.infos;
 
     // let array_name_to_array_copy = {};
     for (let array_name in arrays) {
@@ -3220,70 +3230,86 @@ function populate_global_variables_with_sdl_data(data_sdl) {
     // update the block color counter as we have added blocks.
     block_color_counter = block_number;
 
-
-    let plot_to_box_objects_copy = {};
-    let blocks_copy = {};
-    // loop through the instructions and check all the steps using depth first search. Get the timing and object name from the step, 
-    // add the corresponding object to the plot_to_box_objects.
     for (let block_name in instructions) {
-        let block_data = instructions[block_name];
-        // debugging: keeping it consistent with front end code.
-        if (block_name == "main") block_name = "Main";
-        plot_to_box_objects_copy[block_name] = JSON.parse(JSON.stringify(plot_to_box_objects_template));
-        let steps = block_data.steps;
-        for (let step of steps) {
-            if (!(step.action == "rf" || step.action == "grad" || step.action == "adc")) continue;
-            let object_name = step.object;
-            let object = objects[object_name];
-            let array = adc_readout_array;
-            if (object.type != "adc") array = arrays[object.array];
-            let axis = "rf";
-            if ("axis" in step) {
-                axis = step.axis;
-            } else if (object.type == "adc") {
-                axis = "adc";
-            }
-            let plot_id = axis_name_to_axis_id[axis];
-            let plot = document.getElementById(plot_id);
-            add_box_to_plot_ui(plot, array.data, parseFloat(step.time)/1000, object.type);
-            let box = new Box(object.type, parseFloat(step.time)/1000, axis, array.data);
-            box.name = object_name;
-            box.array_info.name = object.array;
-            if (object.type == "grad") {
-                box.amplitude = object.amplitude;
-            } else if (object.type == "rf") {
-                box.rf_duration = parseFloat(object.duration)/1000;
-                box.init_phase = object.initial_phase;
-                box.thickness = object.thickness;
-                box.flip_angle = object.flipangle;
-                box.purpose = object.purpose;
-                box.rf_added_phase_type = step.added_phase.type;
-                box.rf_added_phase_float = step.added_phase.float;
-            } else if (object.type == "adc") {
-                box.adc_duration = parseFloat(object.duration)/1000;
-                box.frequency = step.frequency;
-                box.phase = step.phase;
-                box.adc_added_phase_type = step.added_phase.type;
-                box.adc_added_phase_float = step.added_phase.float;
-                box.samples = object.samples;
-                box.dwell_time = parseFloat(object.dwelltime)/1000;
-            }
-            // Hard coding all the boxes to main currently.
-            plot_to_box_objects_copy["Main"][plot_id].push(box);
-
-            // Updating the trace amplitude or duration based on the  newly box added.
-            // plot.data.length-1 relfects the last added trace to the plot.
-            if (object.type == "grad") {
-                update_trace_amplitude(plot, plot.data.length-1, box.array_info.array, box.amplitude);
-            } else if (object.type == "adc") {
-                update_adc_trace_duration(plot, plot.data.length-1, parseFloat(box.start_time), parseFloat(box.adc_duration));
-            }
-        }
+        dfs_visit_block(block_name, instructions, visited_blocks);
+        visited_blocks[block_name] = true;
     }
+
     plot_to_box_objects = plot_to_box_objects_copy;
     scale_boxes_amplitude();
 }
 populate_global_variables_with_sdl_data(data_sdl);
+
+function dfs_visit_block(block_name, instructions, visited_blocks) {
+    if (block_name in visited_blocks) return;
+    plot_to_box_objects_copy["Main"] = JSON.parse(JSON.stringify(plot_to_box_objects_template));
+    visited_blocks[block_name] = true;
+    let block_data = instructions[block_name];
+    let steps = block_data.steps;
+    for (let step of steps) {
+        if (step.action == "run_block") {
+            dfs_visit_block(step.block, instructions, visited_blocks);
+        } else if (step.action == "loop") {
+            steps.push.apply(steps, step.steps);
+        } else if (step.action == "rf" || step.action == "grad" || step.action == "adc") {
+            add_step(step, block_name);
+        }
+    }
+}
+
+function add_block_option(block_text) {
+    let o = new Option(block_text, block_text);
+    $(o).html(block_text);
+    $("#block-select").append(o);
+}
+
+function add_step(step, block_name) {
+    let object_name = step.object;
+    let object = objects[object_name];
+    let array = adc_readout_array;
+    if (object.type != "adc") array = arrays[object.array];
+    let axis = "rf";
+    if ("axis" in step) {
+        axis = step.axis;
+    } else if (object.type == "adc") {
+        axis = "adc";
+    }
+    let plot_id = axis_name_to_axis_id[axis];
+    let plot = document.getElementById(plot_id);
+    add_box_to_plot_ui(plot, array.data, parseFloat(step.time)/1000, object.type);
+    let box = new Box(object.type, parseFloat(step.time)/1000, axis, array.data);
+    box.name = object_name;
+    box.array_info.name = object.array;
+    if (object.type == "grad") {
+        box.amplitude = object.amplitude;
+    } else if (object.type == "rf") {
+        box.rf_duration = parseFloat(object.duration)/1000;
+        box.init_phase = object.initial_phase;
+        box.thickness = object.thickness;
+        box.flip_angle = object.flipangle;
+        box.purpose = object.purpose;
+        box.rf_added_phase_type = step.added_phase.type;
+        box.rf_added_phase_float = step.added_phase.float;
+    } else if (object.type == "adc") {
+        box.adc_duration = parseFloat(object.duration)/1000;
+        box.frequency = step.frequency;
+        box.phase = step.phase;
+        box.adc_added_phase_type = step.added_phase.type;
+        box.adc_added_phase_float = step.added_phase.float;
+        box.samples = object.samples;
+        box.dwell_time = parseFloat(object.dwelltime)/1000;
+    }
+    // Hard coding all the boxes to main currently.
+    plot_to_box_objects_copy["Main"][plot_id].push(box);
+
+    // Updating the trace amplitude or duration based on the  newly box added.
+    // plot.data.length-1 relfects the last added trace to the plot.
+    if (object.type == "grad") {
+        update_trace_amplitude(plot, plot.data.length-1, box.array_info.array, box.amplitude);
+    } else if (object.type == "adc") {
+        update_adc_trace_duration(plot, plot.data.length-1, parseFloat(box.start_time), parseFloat(box.adc_duration));
+    }
+}
 
 // Replicating the functionality of drop.
 function add_box_to_plot_ui(plot, array, starting_point, box_type) {
