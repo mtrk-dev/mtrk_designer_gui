@@ -26,6 +26,9 @@ plot_to_box_objects_template = {
 var plot_to_box_objects = {}
 var block_number_to_block_object = {}
 
+// To maintain the block the name for Main block
+const main_block_str = "Main";
+
 // blocks will maintain plot data for all the blocks.
 var blocks = {}
 
@@ -36,7 +39,7 @@ var block_to_loops = {}
 var block_to_events_html = {}
 
 // To maintain the duration of each block.
-var block_to_duration = {"Main": 10}
+var block_to_duration = {[main_block_str]: 10}
 
 // Block duration range slider configuration
 $("#blockDurationSlider").ionRangeSlider({
@@ -66,7 +69,7 @@ $("#blockDurationSlider").ionRangeSlider({
 
         // update the slider max value if the user has selected max value
         let selected_block = $("#block-select").val();
-        if (data.to == data.max && selected_block == "Main") {
+        if (data.to == data.max && selected_block == main_block_str) {
             slider.update({
                 max: data.max + 50
             })
@@ -225,7 +228,7 @@ const layout = {
         },
         "gridcolor": "rgba(255,255,255,0.05)",
         "zerolinecolor": "rgba(255,255,255,0.1)",
-        range: [0, block_to_duration["Main"]],
+        range: [0, block_to_duration[main_block_str]],
         fixedrange: true,
     },
     yaxis: {
@@ -265,7 +268,7 @@ phase_layout["xaxis"]["title"] = "";
 readout_layout["xaxis"]["title"] = "";
 
 rf_layout["title"] = {
-    text:'Main',
+    text:main_block_str,
     font: {
         family: 'Courier New, monospace',
         size: 18,
@@ -368,7 +371,7 @@ array_chart_layout = {
         "zerolinecolor": "rgba(255,255,255,0.05)",
         showticklabels: false,
         fixedrange: true,
-        range: [0, block_to_duration["Main"]],
+        range: [0, block_to_duration[main_block_str]],
     },
     yaxis: {
         "gridcolor": "rgba(255,255,255,0.05)",
@@ -2344,7 +2347,7 @@ function move_block_boxes(block_number, starting_point) {
 }
 
 function add_dummy_block_boxes(starting_point, ending_point) {
-    for (var key in plot_to_box_objects["Main"]) {
+    for (var key in plot_to_box_objects[main_block_str]) {
         let target = document.getElementById(key);
         let x_data = [];
         let y_data = [];
@@ -2600,7 +2603,7 @@ function load_loops_configuration() {
         });
     }
     let parentDiv = document.getElementById("loopsInputGroup");
-    dfs("Main", parentDiv, 0);
+    dfs(main_block_str, parentDiv, 0);
 
     $(".block-loop-item").click(function() {
         $(this).toggleClass("active");
@@ -2639,7 +2642,7 @@ function generate_blocks_nesting_structure() {
 function reload_loops_count() {
     $.each($('.loops-input'), function(index, input) {
         let block = input.dataset.block;
-        if (block == "Main") input.disabled = true;
+        if (block == main_block_str) input.disabled = true;
         if (block in block_to_loops) {
             let loops = block_to_loops[block];
             input.value = loops;
@@ -2916,7 +2919,7 @@ let data_sdl =
             "reconstruction": "%SiemensIceProgs%\\IceProgram2D"
         },
         "instructions": {
-            "main": {
+            "Main": {
                 "print_counter": "on",
                 "print_message": "Main loop",
                 "steps": [{
@@ -3219,7 +3222,7 @@ function populate_global_variables_with_sdl_data(data_sdl) {
     // loop through instructions and keep the key as block number and create block object using values.
     let block_number = 0;
     for (let block_name in instructions) {
-        if (block_name == "main") continue;
+        if (block_name == main_block_str) continue;
         let block_data = instructions[block_name];
         // TODO: figure out a way to get the start time of the block (DFS?).
         block_number_to_block_object_copy[block_number] = new Block(block_name, 0);
@@ -3231,7 +3234,7 @@ function populate_global_variables_with_sdl_data(data_sdl) {
     block_color_counter = block_number;
 
     for (let block_name in instructions) {
-        dfs_visit_block(block_name, instructions, visited_blocks);
+        dfs_visit_block(block_name, instructions, visited_blocks, null);
         visited_blocks[block_name] = true;
     }
 
@@ -3239,22 +3242,40 @@ function populate_global_variables_with_sdl_data(data_sdl) {
     scale_boxes_amplitude();
 }
 populate_global_variables_with_sdl_data(data_sdl);
+load_block_data(main_block_str);
 
-function dfs_visit_block(block_name, instructions, visited_blocks) {
+function dfs_visit_block(block_name, instructions, visited_blocks, prev_block) {
     if (block_name in visited_blocks) return;
-    plot_to_box_objects_copy["Main"] = JSON.parse(JSON.stringify(plot_to_box_objects_template));
+    if (block_name != main_block_str) add_block_option(block_name);
+    plot_to_box_objects_copy[block_name] = JSON.parse(JSON.stringify(plot_to_box_objects_template));
+
+    let block_data_temp = {}
+    $(".dropzone").each(function () {
+        let plot = this;
+        let layout_copy = JSON.parse(JSON.stringify(plot.layout));
+        layout_copy["shapes"] = [];
+        layout_copy["annotations"] = [];
+        block_data_temp[plot.id] = [[plot.data[0]], layout_copy];
+    });
+
     visited_blocks[block_name] = true;
     let block_data = instructions[block_name];
     let steps = block_data.steps;
+    let max_time = block_to_duration[main_block_str];
     for (let step of steps) {
         if (step.action == "run_block") {
-            dfs_visit_block(step.block, instructions, visited_blocks);
+            dfs_visit_block(step.block, instructions, visited_blocks, block_name);
         } else if (step.action == "loop") {
             steps.push.apply(steps, step.steps);
         } else if (step.action == "rf" || step.action == "grad" || step.action == "adc") {
-            add_step(step, block_name);
+            add_step(step, block_name, block_data_temp);
+            max_time = Math.max(max_time, parseInt(step.time/1000));
         }
     }
+    blocks[block_name] = block_data_temp;
+    // TODO: assign block duration according to end time. Doing max_start time plus buffer for now.
+    block_to_duration[block_name] = max_time + 10;
+    block_data_temp = {};
 }
 
 function add_block_option(block_text) {
@@ -3263,7 +3284,7 @@ function add_block_option(block_text) {
     $("#block-select").append(o);
 }
 
-function add_step(step, block_name) {
+function add_step(step, block_name, block_data_temp) {
     let object_name = step.object;
     let object = objects[object_name];
     let array = adc_readout_array;
@@ -3300,7 +3321,7 @@ function add_step(step, block_name) {
         box.dwell_time = parseFloat(object.dwelltime)/1000;
     }
     // Hard coding all the boxes to main currently.
-    plot_to_box_objects_copy["Main"][plot_id].push(box);
+    plot_to_box_objects_copy[block_name][plot_id].push(box);
 
     // Updating the trace amplitude or duration based on the  newly box added.
     // plot.data.length-1 relfects the last added trace to the plot.
@@ -3309,6 +3330,20 @@ function add_step(step, block_name) {
     } else if (object.type == "adc") {
         update_adc_trace_duration(plot, plot.data.length-1, parseFloat(box.start_time), parseFloat(box.adc_duration));
     }
+
+    // Update temp block data to be sent back
+    let trace_number = plot.data.length-1;
+    let shape_number = plot.layout.shapes.length-2;
+    let line_shape_number = shape_number + 1;
+    let annotation_number = plot.layout.annotations.length-1;
+    let data = plot.data[trace_number];
+    let shape = plot.layout.shapes[shape_number];
+    let line_shape = plot.layout.shapes[line_shape_number];
+    let annotation = plot.layout.annotations[annotation_number];
+    block_data_temp[plot.id][0].push(JSON.parse(JSON.stringify(data)));
+    block_data_temp[plot.id][1]["shapes"].push(JSON.parse(JSON.stringify(shape)));
+    block_data_temp[plot.id][1]["shapes"].push(JSON.parse(JSON.stringify(line_shape)));
+    block_data_temp[plot.id][1]["annotations"].push(JSON.parse(JSON.stringify(annotation)));
 }
 
 // Replicating the functionality of drop.
