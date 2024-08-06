@@ -3201,8 +3201,8 @@ var file = null;
 var settings = null;
 var info = null;
 var plot_to_box_objects_copy = {};
-var blocks_copy = {};
 var visited_blocks = {};
+var dummy_blocks = {};
 function populate_global_variables_with_sdl_data(data_sdl) {
     objects = data_sdl.objects;
     arrays = data_sdl.arrays;
@@ -3212,26 +3212,24 @@ function populate_global_variables_with_sdl_data(data_sdl) {
     settings = data_sdl.settings;
     info = data_sdl.infos;
 
-    // let array_name_to_array_copy = {};
     for (let array_name in arrays) {
-        // array_name_to_array_copy[array_name] = arrays[array_name].data;
         array_name_to_array[array_name] = arrays[array_name].data;
     }
 
-    let block_number_to_block_object_copy = {};
-    // loop through instructions and keep the key as block number and create block object using values.
-    let block_number = 0;
-    for (let block_name in instructions) {
-        if (block_name == main_block_str) continue;
-        let block_data = instructions[block_name];
-        // TODO: figure out a way to get the start time of the block (DFS?).
-        block_number_to_block_object_copy[block_number] = new Block(block_name, 0);
-        block_number_to_block_object_copy[block_number].message = block_data.print_message;
-        block_number_to_block_object_copy[block_number].print_counter = block_data.print_counter == "on" ? true : false;
-        block_number += 1;
-    }
-    // update the block color counter as we have added blocks.
-    block_color_counter = block_number;
+    // let block_number_to_block_object_copy = {};
+    // // loop through instructions and keep the key as block number and create block object using values.
+    // let block_number = 0;
+    // for (let block_name in instructions) {
+    //     if (block_name == main_block_str) continue;
+    //     let block_data = instructions[block_name];
+    //     // TODO: figure out a way to get the start time of the block (DFS?).
+    //     block_number_to_block_object_copy[block_number] = new Block(block_name, 0);
+    //     block_number_to_block_object_copy[block_number].message = block_data.print_message;
+    //     block_number_to_block_object_copy[block_number].print_counter = block_data.print_counter == "on" ? true : false;
+    //     block_number += 1;
+    // }
+    // // update the block color counter as we have added blocks.
+    // block_color_counter = block_number;
 
     for (let block_name in instructions) {
         dfs_visit_block(block_name, instructions, visited_blocks, null);
@@ -3242,7 +3240,10 @@ function populate_global_variables_with_sdl_data(data_sdl) {
     scale_boxes_amplitude();
 }
 populate_global_variables_with_sdl_data(data_sdl);
+make_dummy_blocks();
 load_block_data(main_block_str);
+scale_boxes_amplitude();
+block_color_counter = Object.keys(visited_blocks).length;
 
 function dfs_visit_block(block_name, instructions, visited_blocks, prev_block) {
     if (block_name in visited_blocks) return;
@@ -3262,12 +3263,14 @@ function dfs_visit_block(block_name, instructions, visited_blocks, prev_block) {
     let block_data = instructions[block_name];
     let steps = block_data.steps;
     let max_time = block_to_duration[main_block_str];
+    let min_time = Number.MAX_SAFE_INTEGER;
     for (let step of steps) {
         if (step.action == "run_block") {
             dfs_visit_block(step.block, instructions, visited_blocks, block_name);
         } else if (step.action == "loop") {
             steps.push.apply(steps, step.steps);
         } else if (step.action == "rf" || step.action == "grad" || step.action == "adc") {
+            min_time = Math.min(min_time, parseInt(step.time/1000));
             add_step(step, block_name, block_data_temp);
             max_time = Math.max(max_time, parseInt(step.time/1000));
         }
@@ -3276,6 +3279,16 @@ function dfs_visit_block(block_name, instructions, visited_blocks, prev_block) {
     // TODO: assign block duration according to end time. Doing max_start time plus buffer for now.
     block_to_duration[block_name] = max_time + 10;
     block_data_temp = {};
+    if (min_time == Number.MAX_SAFE_INTEGER) min_time = 0;
+    blockObj = new Block(block_name, min_time);
+    block_number_to_block_object[block_color_counter] = blockObj;
+    if (prev_block != null) {
+        if (prev_block in dummy_blocks) {
+            dummy_blocks[prev_block].push([block_color_counter, block_name, min_time, max_time]);
+        }
+        else dummy_blocks[prev_block] = [[block_color_counter, block_name, min_time, max_time]];
+    }
+    block_color_counter += 1;
 }
 
 function add_block_option(block_text) {
@@ -3394,4 +3407,17 @@ function add_box_to_plot_ui(plot, array, starting_point, box_type) {
         annotations: added_annotations
         };
     Plotly.relayout(plot, update);
+}
+
+function make_dummy_blocks() {
+    for (let block_name in dummy_blocks) {
+        $("#block-select").val(block_name);
+        load_block_data(block_name);
+        let info_ranges = dummy_blocks[block_name];
+        for (let info_range of info_ranges) {
+            block_color_counter = info_range[0];
+            add_dummy_block_boxes(parseInt(info_range[2]), parseInt(info_range[3]));
+            update_block_boxes_name(block_color_counter, info_range[1]);
+        }
+    }
 }
