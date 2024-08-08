@@ -3200,7 +3200,8 @@ var equations = null;
 var file = null;
 var settings = null;
 var info = null;
-var plot_to_box_objects_copy = {};
+var min_time = null;
+var max_time = null;
 var visited_blocks = {};
 var dummy_blocks = {};
 function populate_global_variables_with_sdl_data(data_sdl) {
@@ -3216,27 +3217,13 @@ function populate_global_variables_with_sdl_data(data_sdl) {
         array_name_to_array[array_name] = arrays[array_name].data;
     }
 
-    // let block_number_to_block_object_copy = {};
-    // // loop through instructions and keep the key as block number and create block object using values.
-    // let block_number = 0;
-    // for (let block_name in instructions) {
-    //     if (block_name == main_block_str) continue;
-    //     let block_data = instructions[block_name];
-    //     // TODO: figure out a way to get the start time of the block (DFS?).
-    //     block_number_to_block_object_copy[block_number] = new Block(block_name, 0);
-    //     block_number_to_block_object_copy[block_number].message = block_data.print_message;
-    //     block_number_to_block_object_copy[block_number].print_counter = block_data.print_counter == "on" ? true : false;
-    //     block_number += 1;
-    // }
-    // // update the block color counter as we have added blocks.
-    // block_color_counter = block_number;
-
     for (let block_name in instructions) {
+        min_time = Number.MAX_SAFE_INTEGER;
+        max_time = 0;
         dfs_visit_block(block_name, instructions, visited_blocks, null);
         visited_blocks[block_name] = true;
     }
 
-    plot_to_box_objects = plot_to_box_objects_copy;
     scale_boxes_amplitude();
 }
 populate_global_variables_with_sdl_data(data_sdl);
@@ -3248,7 +3235,7 @@ block_color_counter = Object.keys(visited_blocks).length;
 function dfs_visit_block(block_name, instructions, visited_blocks, prev_block) {
     if (block_name in visited_blocks) return;
     if (block_name != main_block_str) add_block_option(block_name);
-    plot_to_box_objects_copy[block_name] = JSON.parse(JSON.stringify(plot_to_box_objects_template));
+    plot_to_box_objects[block_name] = JSON.parse(JSON.stringify(plot_to_box_objects_template));
 
     let block_data_temp = {}
     $(".dropzone").each(function () {
@@ -3262,26 +3249,30 @@ function dfs_visit_block(block_name, instructions, visited_blocks, prev_block) {
     visited_blocks[block_name] = true;
     let block_data = instructions[block_name];
     let steps = block_data.steps;
-    let max_time = block_to_duration[main_block_str];
-    let min_time = Number.MAX_SAFE_INTEGER;
+    let range = "1";
     for (let step of steps) {
         if (step.action == "run_block") {
             dfs_visit_block(step.block, instructions, visited_blocks, block_name);
         } else if (step.action == "loop") {
+            range = step.range;
             steps.push.apply(steps, step.steps);
         } else if (step.action == "rf" || step.action == "grad" || step.action == "adc") {
             min_time = Math.min(min_time, parseInt(step.time/1000));
+            let object_name = step.object;
+            let step_duration = parseFloat(objects[object_name].duration/1000);
+            max_time = Math.max(max_time, Math.ceil(step.time/1000+step_duration));
             add_step(step, block_name, block_data_temp);
-            max_time = Math.max(max_time, parseInt(step.time/1000));
         }
     }
     blocks[block_name] = block_data_temp;
-    // TODO: assign block duration according to end time. Doing max_start time plus buffer for now.
-    block_to_duration[block_name] = max_time + 10;
+    block_to_duration[block_name] = max_time;
     block_data_temp = {};
-    if (min_time == Number.MAX_SAFE_INTEGER) min_time = 0;
     blockObj = new Block(block_name, min_time);
+    blockObj.message = instructions[block_name].print_message;
+    blockObj.print_counter = instructions[block_name].print_counter == "on" ? true : false;
     block_number_to_block_object[block_color_counter] = blockObj;
+    block_to_loops[block_name] = range;
+
     if (prev_block != null) {
         if (prev_block in dummy_blocks) {
             dummy_blocks[prev_block].push([block_color_counter, block_name, min_time, max_time]);
@@ -3333,8 +3324,7 @@ function add_step(step, block_name, block_data_temp) {
         box.samples = object.samples;
         box.dwell_time = parseFloat(object.dwelltime)/1000;
     }
-    // Hard coding all the boxes to main currently.
-    plot_to_box_objects_copy[block_name][plot_id].push(box);
+    plot_to_box_objects[block_name][plot_id].push(box);
 
     // Updating the trace amplitude or duration based on the  newly box added.
     // plot.data.length-1 relfects the last added trace to the plot.
