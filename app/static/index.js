@@ -1109,6 +1109,7 @@ $(document).on("click", "#add-event-btn", function(){
     $("#inputSyncObject").val('');
     $("#inputSyncEventParam").val('');
     $("#delete_event_btn").hide();
+    $('#event-action-select').attr("disabled", false);
     $('#eventsModal').modal('toggle');
     selected_event_btn = null;
 });
@@ -1121,6 +1122,7 @@ $(document).on("click", ".event-btn", function () {
     let event_type = clicked_event_data["eventType"];
     $("#event-action-select").val(event_type);
     $('#event-action-select').change();
+    $('#event-action-select').attr("disabled", true);
     $("#eventsModalLabel").text("Configure Event");
     $("#delete_event_btn").show();
 
