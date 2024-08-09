@@ -3262,6 +3262,8 @@ function dfs_visit_block(block_name, instructions, visited_blocks, prev_block) {
             let step_duration = parseFloat(objects[object_name].duration/1000);
             max_time = Math.max(max_time, Math.ceil(step.time/1000+step_duration));
             add_step(step, block_name, block_data_temp);
+        } else if (step.action == "init" || step.action == "sync" || step.action == "calc") {
+            add_event_from_sdl_data(step, block_name);
         }
     }
     blocks[block_name] = block_data_temp;
@@ -3410,4 +3412,30 @@ function make_dummy_blocks() {
             update_block_boxes_name(block_color_counter, info_range[1]);
         }
     }
+}
+
+function add_event_from_sdl_data(step, block_name) {
+    let event_data = {};
+    let event_action = step.action;
+    event_data["event-type"] = event_action;
+
+    if (event_action == "calc") {
+        // TODO: use the info from the step to populate the event_data for calc event.
+        event_data["input-calc-action-type"] = $("#inputCalcActionType").val();
+        event_data["input-calc-float"] = $("#inputCalcFloat").val();
+        event_data["input-calc-increment"] = $("#inputCalcIncrement").val();
+    } else if (event_action == "init") {
+        event_data["input-init-action-gradients"] = step.gradients;
+    } else if (event_action == "sync") {
+        let object = objects[step.object];
+        let time = (step.time == 0) ? "0" : toString(step.time);
+        event_data["input-sync-time"] = time;
+        event_data["input-sync-object"] = step.object;
+        event_data["input-sync-duration"] = object.duration;
+        event_data["input-sync-event-param"] = object.event;
+    }
+
+    add_new_event(event_data);
+    let events_col_inner_html = $("#events-col")[0].innerHTML;
+    block_to_events_html[block_name] = events_col_inner_html;
 }
