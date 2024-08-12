@@ -47,6 +47,13 @@
     bottom: 0
 }
 
+#upload-sdl-btn {
+    margin-bottom: 1%;
+    position: absolute;
+    font-size: 20px;
+    bottom: 50px;
+}
+
 #keyboard-shortcuts {
     margin-bottom: 1%;
     position: absolute;
