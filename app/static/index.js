@@ -403,7 +403,8 @@ window.onresize = function() {
 };
 
 // Note: can keep a local copy of this in the future if it causes problems.
-const default_data_state = JSON.parse(JSON.stringify(generate_current_data_state()));
+let data_state = generate_current_data_state()
+const default_data_state = JSON.stringify(data_state);
 
 let data = JSON.parse(localStorage.getItem("data"));
 if (data) {
@@ -1093,15 +1094,17 @@ $(document).ready(function() {
                 text = text.replace(/main/g, main_block_str);
                 let data_sdl = JSON.parse(text);
                 save_data();
-                reload_data(default_data_state);
+                reload_data(JSON.parse(default_data_state));
                 populate_global_variables_with_sdl_data(data_sdl);
                 make_dummy_blocks();
                 load_block_data(main_block_str);
                 scale_boxes_amplitude();
                 block_color_counter = Object.keys(visited_blocks).length;
-            } catch ({ name, message }) {
+            } catch (e) {
                 fire_alert("Could not load SDL file");
-                console.log(name, message);
+                console.log(e);
+                undo_data();
+                redo_stack = [];
             }
         };
     }
@@ -2948,6 +2951,8 @@ function populate_global_variables_with_sdl_data(data_sdl) {
     file = data_sdl.file;
     settings = data_sdl.settings;
     info = data_sdl.infos;
+    visited_blocks = {};
+    dummy_blocks = {};
     for (let array_name in arrays) {
         array_name_to_array[array_name] = arrays[array_name].data;
     }
