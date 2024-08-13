@@ -2548,16 +2548,16 @@ function load_block_data(block_name) {
         Plotly.react(plot, plot_data[0], layout);
         recalculate_mouse_to_plot_conversion_variables();
     });
+    // Load events data for the block.
+    load_events_data(block_name);
     // For the cases when different theme was selected during block creation.
     // This ensures the plot color matches the selected theme.
     if (document.documentElement.getAttribute('data-bs-theme') == 'dark') {
-        toggle_plot_color(false);
+        update_theme("dark");
     }
     else {
-        toggle_plot_color(true);
+        update_theme("light");
     }
-    // Load events data for the block.
-    load_events_data(block_name);
 }
 
 function load_events_data(block_name) {
@@ -2704,9 +2704,11 @@ function add_new_event(event_data) {
     let event_icon_str = event_type_to_icon_str[event_type];
 
     let data_attributes_str = create_data_attributes_string(event_data);
+    let selected_theme = document.documentElement.getAttribute('data-bs-theme');
+    let btn_class = selected_theme == "dark" ? "btn-secondary" : "btn-light";
 
     let event_btn_str = `<a
-        class="btn btn-sm btn-secondary event-btn"
+        class="btn btn-sm ${btn_class} event-btn"
         role="button" data-bs-toggle="tooltip" data-bs-placement="bottom"
         title="${event_type} event" ${data_attributes_str}>
             <i class="${event_icon_str}"></i>
@@ -2926,7 +2928,6 @@ class Block {
         this.start_time = start_time;
     }
 }
-
 
 var objects = null;
 var arrays = null;
