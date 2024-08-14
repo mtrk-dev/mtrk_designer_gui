@@ -1090,6 +1090,8 @@ $(document).ready(function() {
     sdlFileInput.oninput = () => {
         $("#sdl-load-spinner").show();
         $("#sdl-upload-icon").hide();
+        $('#plot-col').addClass('blurred');
+        $('#events-col').addClass('blurred');
         let selectedFile = sdlFileInput.files[0];
         let reader = new FileReader();
         reader.readAsText(selectedFile, "UTF-8");
@@ -1113,6 +1115,8 @@ $(document).ready(function() {
             } finally {
                 $("#sdl-load-spinner").hide();
                 $("#sdl-upload-icon").show();
+                $('#plot-col').removeClass('blurred');
+                 $('#events-col').removeClass('blurred');
             }
         };
     }
