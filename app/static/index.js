@@ -1,3 +1,43 @@
+// Hide the spinner by default
+$("#sdl-load-spinner").hide();
+
+// Block duration range slider configuration
+$("#blockDurationSlider").ionRangeSlider({
+    type: "double",
+    skin: "flat",
+    grid: true,
+    min: 0,
+    max: 30,
+    from: 0,
+    to: 10,
+    step: 1,
+    hide_min_max: true,
+    hide_from_to: false,
+    drag_interval: true,
+    min_interval: 1,
+    // postfix: "ms",
+    onFinish: function (data) {
+        // relayout the plot with new range selection.
+        $(".dropzone").each(function () {
+            let plot = this;
+            let update = {
+                "xaxis.range": [data.from, data.to]
+            };
+            Plotly.relayout(plot, update);
+        });
+        recalculate_mouse_to_plot_conversion_variables();
+
+        // update the slider max value if the user has selected max value
+        let selected_block = $("#block-select").val();
+        if (data.to == data.max && selected_block == main_block_str) {
+            slider.update({
+                max: data.max + 50
+            })
+        }
+    }
+});
+var slider = $("#blockDurationSlider").data("ionRangeSlider");
+
 const dummy_data = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1, 0.0]
 const rf_array = [3.13304e-005,3.14159,0.000275274,3.14159,0.000741752,3.14159,0.00140054,3.14159,0.00221321,3.14159,0.0031333,3.14159,0.00410657,3.14159,0.00507138,3.14159,0.00595912,3.14159,0.00669486,3.14159,0.00719792,3.14159,0.00738272,3.14159,0.00715954,3.14159,0.0064355,3.14159,0.00511552,3.14159,0.00310332,3.14159,0.00030259,3.14159,0.00338198,0,0.00804349,0,0.0137717,0,0.0206519,0,0.0287638,0,0.0381802,0,0.0489663,0,0.0611784,0,0.0748629,0,0.0900558,0,0.106781,0,0.125052,0,0.144867,0,0.166213,0,0.189063,0,0.213376,0,0.239097,0,0.266157,0,0.294475,0,0.323954,0,0.354486,0,0.385951,0,0.418216,0,0.451138,0,0.484565,0,0.518335,0,0.552279,0,0.586221,0,0.619982,0,0.653377,0,0.686221,0,0.718326,0,0.749508,0,0.779582,0,0.80837,0,0.835698,0,0.861398,0,0.885311,0,0.90729,0,0.927195,0,0.9449,0,0.960293,0,0.973275,0,0.983763,0,0.991689,0,0.997001,0,0.999666,0,0.999666,0,0.997001,0,0.991689,0,0.983763,0,0.973275,0,0.960293,0,0.9449,0,0.927195,0,0.90729,0,0.885311,0,0.861398,0,0.835698,0,0.80837,0,0.779582,0,0.749508,0,0.718326,0,0.686221,0,0.653377,0,0.619982,0,0.586221,0,0.552279,0,0.518335,0,0.484565,0,0.451138,0,0.418216,0,0.385951,0,0.354486,0,0.323954,0,0.294475,0,0.266157,0,0.239097,0,0.213376,0,0.189063,0,0.166213,0,0.144867,0,0.125052,0,0.106781,0,0.0900558,0,0.0748629,0,0.0611784,0,0.0489663,0,0.0381802,0,0.0287638,0,0.0206519,0,0.0137717,0,0.00804349,0,0.00338198,0,0.00030259,3.14159,0.00310332,3.14159,0.00511552,3.14159,0.0064355,3.14159,0.00715954,3.14159,0.00738272,3.14159,0.00719792,3.14159,0.00669486,3.14159,0.00595912,3.14159,0.00507138,3.14159,0.00410657,3.14159,0.0031333,3.14159,0.00221321,3.14159,0.00140054,3.14159,0.000741752,3.14159,0.000275274,3.14159,3.13304e-005,3.14159]
 const grad_slice_select_array = [0.0, 0.0455, 0.0909, 0.1364, 0.1818, 0.2273, 0.2727, 0.3182, 0.3636, 0.4091, 0.4545, 0.5, 0.5455, 0.5909, 0.6364, 0.6818, 0.7273, 0.7727, 0.8182, 0.8636, 0.9091, 0.9545, 1.0, 1.0, 0.9545, 0.9091, 0.8636, 0.8182, 0.7727, 0.7273, 0.6818, 0.6364, 0.5909, 0.5455, 0.5, 0.4545, 0.4091, 0.3636, 0.3182, 0.2727, 0.2273, 0.1818, 0.1364, 0.0909, 0.0455, 0.0]
@@ -40,43 +80,6 @@ var block_to_events_html = {}
 
 // To maintain the duration of each block.
 var block_to_duration = {[main_block_str]: 10}
-
-// Block duration range slider configuration
-$("#blockDurationSlider").ionRangeSlider({
-    type: "double",
-    skin: "flat",
-    grid: true,
-    min: 0,
-    max: 30,
-    from: 0,
-    to: 10,
-    step: 1,
-    hide_min_max: true,
-    hide_from_to: false,
-    drag_interval: true,
-    min_interval: 1,
-    // postfix: "ms",
-    onFinish: function (data) {
-        // relayout the plot with new range selection.
-        $(".dropzone").each(function () {
-            let plot = this;
-            let update = {
-                "xaxis.range": [data.from, data.to]
-            };
-            Plotly.relayout(plot, update);
-        });
-        recalculate_mouse_to_plot_conversion_variables();
-
-        // update the slider max value if the user has selected max value
-        let selected_block = $("#block-select").val();
-        if (data.to == data.max && selected_block == main_block_str) {
-            slider.update({
-                max: data.max + 50
-            })
-        }
-    }
-});
-var slider = $("#blockDurationSlider").data("ionRangeSlider");
 
 const event_type_to_icon_str = {
     "calc": "fa fa-calculator",
@@ -1085,6 +1088,8 @@ $(document).ready(function() {
     // Handle sdl file uploading.
     const sdlFileInput = document.getElementById('sdlFileInput');
     sdlFileInput.oninput = () => {
+        $("#sdl-load-spinner").show();
+        $("#sdl-upload-icon").hide();
         let selectedFile = sdlFileInput.files[0];
         let reader = new FileReader();
         reader.readAsText(selectedFile, "UTF-8");
@@ -1105,6 +1110,9 @@ $(document).ready(function() {
                 console.log(e);
                 undo_data();
                 redo_stack = [];
+            } finally {
+                $("#sdl-load-spinner").hide();
+                $("#sdl-upload-icon").show();
             }
         };
     }

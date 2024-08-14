@@ -543,7 +543,8 @@
                   </div>
                 </div>
                 <button id="upload-sdl-btn" class="btn btn-secondary" type="submit" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Upload SDL File">
-                  <i class="fa fa-cloud-upload" aria-hidden="true"></i>
+                  <span id="sdl-load-spinner" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                  <i id="sdl-upload-icon" class="fa fa-cloud-upload" aria-hidden="true"></i>
                 </button>
                 <input class="form-control form-control-sm" type="file" id="sdlFileInput" accept=".mtrk" hidden>
                 <button id="generate-sdl-btn" class="btn btn-secondary" type="submit" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Generate SDL File">
