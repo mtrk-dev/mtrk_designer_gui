@@ -2966,7 +2966,17 @@ function populate_global_variables_with_sdl_data(data_sdl) {
     visited_blocks = {};
     dummy_blocks = {};
     for (let array_name in arrays) {
-        array_name_to_array[array_name] = arrays[array_name].data;
+        let array_data = arrays[array_name].data;
+        if (array_name.includes("rf") && arrays[array_name].type == "complex_float") {
+            let new_array_data = [];
+            for (let i=0; i<array_data.length; i+=2) {
+                new_array_data.push(array_data[i]);
+            }
+            array_name_to_array[array_name] = new_array_data;
+            arrays[array_name].data = new_array_data;
+        } else {
+            array_name_to_array[array_name] = array_data;
+        }
     }
     for (let block_name in instructions) {
         min_time = Number.MAX_SAFE_INTEGER;
