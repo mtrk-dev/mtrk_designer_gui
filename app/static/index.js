@@ -2944,6 +2944,7 @@ class Block {
     }
 }
 
+// SDL load related functions - start
 var objects = null;
 var arrays = null;
 var instructions = null;
@@ -2984,7 +2985,6 @@ function populate_global_variables_with_sdl_data(data_sdl) {
         dfs_visit_block(block_name, instructions, visited_blocks, null);
         visited_blocks[block_name] = true;
     }
-    scale_boxes_amplitude();
 }
 
 function dfs_visit_block(block_name, instructions, visited_blocks, prev_block) {
@@ -3063,7 +3063,14 @@ function add_step(step, block_name, block_data_temp) {
     box.name = object_name;
     box.array_info.name = object.array;
     if (object.type == "grad") {
-        box.amplitude = object.amplitude;
+        if ("amplitude" in step && step.amplitude.type == "equation") {
+            box.variable_amplitude = true;
+            let equation_name = step.amplitude.equation;
+            box.equation_info.name = equation_name;
+            box.equation_info.expression = equations[equation_name].equation;
+        } else {
+            box.amplitude = object.amplitude;
+        }
     } else if (object.type == "rf") {
         box.rf_duration = parseFloat(object.duration)/1000;
         box.init_phase = object.initial_phase;
@@ -3086,7 +3093,11 @@ function add_step(step, block_name, block_data_temp) {
     // Updating the trace amplitude or duration based on the  newly box added.
     // plot.data.length-1 relfects the last added trace to the plot.
     if (object.type == "grad") {
-        update_trace_amplitude(plot, plot.data.length-1, box.array_info.array, box.amplitude);
+        if (box.variable_amplitude) {
+            change_trace_type(plot, plot.data.length-1, box.array_info.name, true);
+        } else {
+            update_trace_amplitude(plot, plot.data.length-1, box.array_info.array, box.amplitude);
+        }
     } else if (object.type == "adc") {
         update_adc_trace_duration(plot, plot.data.length-1, parseFloat(box.start_time), parseFloat(box.adc_duration));
     }
@@ -3194,3 +3205,4 @@ function add_event_from_sdl_data(step, block_name) {
     let events_col_inner_html = $("#events-col")[0].innerHTML;
     block_to_events_html[block_name] = events_col_inner_html;
 }
+// SDL load related functions - end
