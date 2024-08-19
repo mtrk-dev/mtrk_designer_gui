@@ -1088,13 +1088,17 @@ $(document).ready(function() {
     // Handle sdl file uploading.
     const sdlFileInput = document.getElementById('sdlFileInput');
     sdlFileInput.oninput = () => {
-        $("#sdl-load-spinner").show();
-        $("#sdl-upload-icon").hide();
-        $('#plot-col').addClass('blurred');
-        $('#events-col').addClass('blurred');
         let selectedFile = sdlFileInput.files[0];
         let reader = new FileReader();
-        reader.readAsText(selectedFile, "UTF-8");
+        try {
+            reader.readAsText(selectedFile, "UTF-8");
+            $("#sdl-load-spinner").show();
+            $("#sdl-upload-icon").hide();
+            $('#plot-col').addClass('blurred');
+            $('#events-col').addClass('blurred');
+        } catch {
+            return;
+        }
         reader.onload = function(e) {
             try {
                 let text = reader.result;
@@ -1116,7 +1120,7 @@ $(document).ready(function() {
                 $("#sdl-load-spinner").hide();
                 $("#sdl-upload-icon").show();
                 $('#plot-col').removeClass('blurred');
-                 $('#events-col').removeClass('blurred');
+                $('#events-col').removeClass('blurred');
             }
         };
     }
