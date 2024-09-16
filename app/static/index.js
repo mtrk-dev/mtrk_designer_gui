@@ -2892,3 +2892,11 @@ class Block {
         this.start_time = start_time;
     }
 }
+
+window.addEventListener('load', function() {
+    var loader = document.getElementById('loader');
+    loader.style.opacity = '0'; // Fade out loader
+    setTimeout(function() {
+        loader.style.display = 'none'; // Hide loader
+    }, 500); // Wait for fade-out effect to complete
+});
