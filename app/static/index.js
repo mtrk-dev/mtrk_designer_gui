@@ -3015,6 +3015,12 @@ function dfs_visit_block(block_name, instructions, visited_blocks, prev_block) {
         } else if (step.action == "loop") {
             range = step.range;
             steps.push.apply(steps, step.steps);
+            // TODO: verify if the loop count will always be valid like this.
+            if ("block" in step.steps[0]) {
+                repeating_block_name = step.steps[0].block;
+                block_to_loops[repeating_block_name] = range;
+            }
+
         } else if (step.action == "rf" || step.action == "grad" || step.action == "adc") {
             min_time = Math.min(min_time, parseInt(step.time/1000));
             let object_name = step.object;
@@ -3032,7 +3038,6 @@ function dfs_visit_block(block_name, instructions, visited_blocks, prev_block) {
     blockObj.message = instructions[block_name].print_message;
     blockObj.print_counter = instructions[block_name].print_counter == "on" ? true : false;
     block_number_to_block_object[block_color_counter] = blockObj;
-    block_to_loops[block_name] = range;
 
     if (prev_block != null) {
         if (prev_block in dummy_blocks) {
