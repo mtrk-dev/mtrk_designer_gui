@@ -2958,6 +2958,7 @@ var settings = null;
 var info = null;
 var min_time = null;
 var max_time = null;
+var mark_time = null;
 var visited_blocks = {};
 var dummy_blocks = {};
 function populate_global_variables_with_sdl_data(data_sdl) {
@@ -2974,10 +2975,16 @@ function populate_global_variables_with_sdl_data(data_sdl) {
         let array_data = arrays[array_name].data;
         if (array_name.includes("rf") && arrays[array_name].type == "complex_float") {
             let new_array_data = [];
-            for (let i=0; i<array_data.length; i+=2) {
-                new_array_data.push(array_data[i]);
+            let new_phase_data = [];
+            for (let i=0; i < array_data.length; i++) {
+                if (i % 2 == 0) {
+                    new_array_data.push(array_data[i]);
+                } else {
+                    new_phase_data.push(array_data[i]);
+                }
             }
             array_name_to_array[array_name] = new_array_data;
+            array_name_to_array[array_name + "_phase"] = new_phase_data;
             arrays[array_name].data = new_array_data;
         } else {
             array_name_to_array[array_name] = array_data;
@@ -3029,6 +3036,8 @@ function dfs_visit_block(block_name, instructions, visited_blocks, prev_block) {
             add_step(step, block_name, block_data_temp);
         } else if (step.action == "init" || step.action == "sync" || step.action == "calc") {
             add_event_from_sdl_data(step, block_name);
+        } else if (step.action == "mark") {
+            mark_time = Math.ceil(step.time/1000);
         }
     }
     blocks[block_name] = block_data_temp;
@@ -3088,6 +3097,9 @@ function add_step(step, block_name, block_data_temp) {
         box.purpose = object.purpose;
         box.rf_added_phase_type = step.added_phase.type;
         box.rf_added_phase_float = step.added_phase.float;
+        let phase_array_name = object.array + "_phase";
+        box.phase_array_info.name = phase_array_name;
+        box.phase_array_info.array = array_name_to_array[phase_array_name].data;
     } else if (object.type == "adc") {
         box.adc_duration = parseFloat(object.duration)/1000;
         box.frequency = step.frequency;
