@@ -2969,6 +2969,12 @@ function populate_global_variables_with_sdl_data(data_sdl) {
     file = data_sdl.file;
     settings = data_sdl.settings;
     info = data_sdl.infos;
+    let config_data = {
+        "file": file,
+        "settings": settings,
+        "info": info
+    }
+    load_configurations(config_data);
     visited_blocks = {};
     dummy_blocks = {};
     for (let array_name in arrays) {
