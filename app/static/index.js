@@ -259,7 +259,7 @@ var phase_layout = JSON.parse(JSON.stringify(layout));
 var readout_layout = JSON.parse(JSON.stringify(layout));
 var adc_layout = JSON.parse(JSON.stringify(layout));
 
-rf_layout["yaxis"]["title"] = "RF (V)";
+rf_layout["yaxis"]["title"] = "RF";
 slice_layout["yaxis"]["title"] = "Slice (mT/m)";
 phase_layout["yaxis"]["title"] = "Phase (mT/m)";
 readout_layout["yaxis"]["title"] = "Readout (mT/m)";
