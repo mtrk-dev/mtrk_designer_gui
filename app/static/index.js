@@ -2557,12 +2557,13 @@ function load_block_data(block_name) {
         // changing the height to handle the case where plot dimension has been changed after block creation.
         layout["height"] = window.innerHeight/5;
         layout["width"] =  rf_chart.offsetWidth;
-        layout["xaxis"]["range"] = [0, block_to_duration[block_name]];
         $("#blockDurationInput").val(block_to_duration[block_name]);
+        let zoom_range = calculate_block_range(block_name);
+        layout["xaxis"]["range"] = zoom_range;
         slider.update({
             from: 0,
-            to: block_to_duration[block_name],
-            max: block_to_duration[block_name]
+            to: zoom_range[1],
+            max: zoom_range[1],
         });
         Plotly.react(plot, plot_data[0], layout);
         recalculate_mouse_to_plot_conversion_variables();
@@ -2577,6 +2578,21 @@ function load_block_data(block_name) {
     else {
         update_theme("light");
     }
+}
+
+function calculate_block_range(block_name) {
+    let start_time = Number.MAX_VALUE;
+    let end_time = 0;
+
+    for (var key in blocks[block_name]) {
+        let layout = blocks[block_name][key][1];
+        layout.shapes.forEach(function (shape) {
+            start_time = Math.min(start_time, Math.floor(shape["x0"]));
+            end_time = Math.max(end_time, Math.ceil(shape["x1"]));
+        });
+    }
+
+    return [start_time, end_time];
 }
 
 function load_events_data(block_name) {
@@ -3056,6 +3072,10 @@ function dfs_visit_block(block_name, instructions, visited_blocks, prev_block) {
     }
     blocks[block_name] = block_data_temp;
     block_to_duration[block_name] = max_time;
+    if (mark_time != null) {
+        block_to_duration[block_name] = mark_time;
+    }
+
     block_data_temp = {};
     blockObj = new Block(block_name, min_time);
     blockObj.message = instructions[block_name].print_message;
