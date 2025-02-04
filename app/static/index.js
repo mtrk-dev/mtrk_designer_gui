@@ -726,11 +726,11 @@ $(document).ready(function() {
     });
 
     $("#block-time-btn").click(function () {
-        let block_duration = parseInt($("#blockDurationInput").val());
+        let block_duration = parseFloat($("#blockDurationInput").val());
         block_to_duration[$('#block-select').val()] = block_duration;
         // Update slider to new max
         slider.update({
-            max: block_duration,
+            max: Math.ceil(block_duration),
         });
     });
 
@@ -1777,8 +1777,8 @@ function reload_data(data) {
     $("#blockDurationInput").val(block_to_duration[block_name]);
     slider.update({
         from: 0,
-        to: block_to_duration[block_name],
-        max: block_to_duration[block_name]
+        to: Math.ceil(block_to_duration[block_name]),
+        max: Math.ceil(block_to_duration[block_name])
     });
     load_configurations(configurations);
     $(".dropzone").each(function () {
@@ -1787,7 +1787,7 @@ function reload_data(data) {
         let layout = plot_data[1];
         layout["height"] = window.innerHeight/5;
         layout["width"] =  rf_chart.offsetWidth;
-        layout["xaxis"]["range"] = [0, block_to_duration[block_name]];
+        layout["xaxis"]["range"] = [0, Math.ceil(block_to_duration[block_name])];
         Plotly.react(plot, plot_data[0], layout);
     });
     blocks = data["plots_data"];
@@ -2369,7 +2369,7 @@ function add_block_with_selected_boxes() {
     blocks[block_name] = block_data;
     blockObj = new Block(block_name, start_time);
     block_number_to_block_object[block_color_counter] = blockObj;
-    block_to_duration[block_name] = Math.ceil(end_time);
+    block_to_duration[block_name] = parseFloat(end_time);
 
     add_dummy_block_boxes(start_time, end_time);
 
@@ -3059,15 +3059,15 @@ function dfs_visit_block(block_name, instructions, visited_blocks, prev_block) {
             }
 
         } else if (step.action == "rf" || step.action == "grad" || step.action == "adc") {
-            min_time = Math.min(min_time, parseInt(step.time/1000));
+            min_time = Math.min(min_time, parseFloat(step.time/1000));
             let object_name = step.object;
             let step_duration = parseFloat(objects[object_name].duration/1000);
-            max_time = Math.max(max_time, Math.ceil(step.time/1000+step_duration));
+            max_time = Math.max(max_time, parseFloat(step.time/1000+step_duration));
             add_step(step, block_name, block_data_temp);
         } else if (step.action == "init" || step.action == "sync" || step.action == "calc") {
             add_event_from_sdl_data(step, block_name);
         } else if (step.action == "mark") {
-            mark_time = Math.ceil(step.time/1000);
+            mark_time = parseFloat(step.time/1000);
         }
     }
     blocks[block_name] = block_data_temp;
