@@ -1898,8 +1898,7 @@ function change_box_start_time(plot, trace_number, starting_point) {
     // Here, shape_number + 1, will give the line shape number, as we are always creating line shape after box shape.
     move_box_shape(plot, shape_number, starting_point)
     move_vertical_line_shape(plot, shape_number+1, starting_point);
-    let ending_point = starting_point + (x_data.length/step_size);
-    let middle_point = (starting_point+ending_point)/2;
+    let middle_point = x_data[Math.floor(x_data.length/2)];
     move_annotation(plot, trace_number-1, middle_point);
 }
 
@@ -2403,8 +2402,12 @@ function add_dummy_block_boxes(starting_point, ending_point) {
         let y_data = [];
         starting_point = parseFloat(starting_point);
         ending_point = parseFloat(ending_point);
-        for (let i=starting_point; i<=ending_point; i+=(1/step_size)) {
+        for (let i=starting_point; i<=ending_point; i+=1) {
             x_data.push(i);
+            y_data.push(0);
+        }
+        if (ending_point % 1 != 0) {
+            x_data.push(ending_point);
             y_data.push(0);
         }
         let data = {};
@@ -3223,13 +3226,17 @@ function add_box_to_plot_ui(plot, array, starting_point, box_type) {
 }
 
 function make_dummy_blocks() {
+    // TODO: use dfs to get accurate end time for the blocks.
     for (let block_name in dummy_blocks) {
         $("#block-select").val(block_name);
         load_block_data(block_name);
         let info_ranges = dummy_blocks[block_name];
         for (let info_range of info_ranges) {
             block_color_counter = info_range[0];
-            add_dummy_block_boxes(parseInt(info_range[2]), parseInt(info_range[3]));
+            let loops = parseInt(block_to_loops[info_range[1]]);
+            let end_time_loops = parseInt(info_range[3]);
+            if (loops) end_time_loops = end_time_loops * loops;
+            add_dummy_block_boxes(parseInt(info_range[2]), end_time_loops);
             update_block_boxes_name(block_color_counter, info_range[1]);
         }
     }
