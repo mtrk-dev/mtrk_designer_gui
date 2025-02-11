@@ -1774,7 +1774,7 @@ function reload_data(data) {
     let plots_data = data["plots_data"][block_name];
     let configurations = data["configurations"];
     block_to_duration = data["block_to_duration"];
-    $("#blockDurationInput").val(block_to_duration[block_name]);
+    $("#blockDurationInput").val(block_to_duration[block_name].toFixed(2));
     slider.update({
         from: 0,
         to: Math.ceil(block_to_duration[block_name]),
@@ -2560,7 +2560,7 @@ function load_block_data(block_name) {
         // changing the height to handle the case where plot dimension has been changed after block creation.
         layout["height"] = window.innerHeight/5;
         layout["width"] =  rf_chart.offsetWidth;
-        $("#blockDurationInput").val(block_to_duration[block_name]);
+        $("#blockDurationInput").val(block_to_duration[block_name].toFixed(2));
         let zoom_range = calculate_block_range(block_name);
         layout["xaxis"]["range"] = zoom_range;
         slider.update({
@@ -3048,14 +3048,15 @@ function dfs_visit_block(block_name, instructions, visited_blocks, prev_block, m
     let steps = block_data.steps;
     let range = "1";
     let inner_block_time = null;
-    for (let step of steps) {
+    for (let i=0; i < steps.length; i++) {
+        let step = steps[i];
         if (step.action == "run_block") {
             inner_block_time = null;
             inner_block_time = dfs_visit_block(step.block, instructions, visited_blocks, block_name, Number.MAX_SAFE_INTEGER, 0);
             if (!(step.block in block_to_loops)) block_to_loops[step.block] = 1;
         } else if (step.action == "loop") {
             range = step.range;
-            steps.push.apply(steps, step.steps);
+            steps.splice(i + 1, 0, ...step.steps);
             // TODO: verify if the loop count will always be valid like this.
             if ("block" in step.steps[0]) {
                 repeating_block_name = step.steps[0].block;
