@@ -3024,14 +3024,12 @@ function populate_global_variables_with_sdl_data(data_sdl) {
         }
     }
     for (let block_name in instructions) {
-        min_time = Number.MAX_SAFE_INTEGER;
-        max_time = 0;
-        dfs_visit_block(block_name, instructions, visited_blocks, null);
+        dfs_visit_block(block_name, instructions, visited_blocks, null, Number.MAX_SAFE_INTEGER, 0);
         visited_blocks[block_name] = true;
     }
 }
 
-function dfs_visit_block(block_name, instructions, visited_blocks, prev_block) {
+function dfs_visit_block(block_name, instructions, visited_blocks, prev_block, min_time, max_time) {
     if (block_name in visited_blocks) return;
     if (block_name != main_block_str) add_block_option(block_name);
     plot_to_box_objects[block_name] = JSON.parse(JSON.stringify(plot_to_box_objects_template));
@@ -3049,9 +3047,12 @@ function dfs_visit_block(block_name, instructions, visited_blocks, prev_block) {
     let block_data = instructions[block_name];
     let steps = block_data.steps;
     let range = "1";
+    let inner_block_time = null;
     for (let step of steps) {
         if (step.action == "run_block") {
-            dfs_visit_block(step.block, instructions, visited_blocks, block_name);
+            inner_block_time = null;
+            inner_block_time = dfs_visit_block(step.block, instructions, visited_blocks, block_name, Number.MAX_SAFE_INTEGER, 0);
+            if (!(step.block in block_to_loops)) block_to_loops[step.block] = 1;
         } else if (step.action == "loop") {
             range = step.range;
             steps.push.apply(steps, step.steps);
@@ -3073,6 +3074,11 @@ function dfs_visit_block(block_name, instructions, visited_blocks, prev_block) {
             mark_time = parseFloat(step.time/1000);
         }
     }
+
+    if (inner_block_time) {
+        min_time = Math.min(min_time, inner_block_time[0]);
+        max_time = Math.max(max_time, inner_block_time[1]);
+    }
     blocks[block_name] = block_data_temp;
     block_to_duration[block_name] = max_time;
     if (mark_time != null) {
@@ -3086,12 +3092,15 @@ function dfs_visit_block(block_name, instructions, visited_blocks, prev_block) {
     block_number_to_block_object[block_color_counter] = blockObj;
 
     if (prev_block != null) {
+        // max_time = max_time * parseInt(range);
         if (prev_block in dummy_blocks) {
             dummy_blocks[prev_block].push([block_color_counter, block_name, min_time, max_time]);
         }
         else dummy_blocks[prev_block] = [[block_color_counter, block_name, min_time, max_time]];
     }
     block_color_counter += 1;
+
+    return [min_time, max_time];
 }
 
 function add_block_option(block_text) {
@@ -3235,7 +3244,7 @@ function make_dummy_blocks() {
             block_color_counter = info_range[0];
             let loops = parseInt(block_to_loops[info_range[1]]);
             let end_time_loops = parseInt(info_range[3]);
-            if (loops) end_time_loops = end_time_loops * loops;
+            // if (loops) end_time_loops = end_time_loops * loops;
             add_dummy_block_boxes(parseInt(info_range[2]), end_time_loops);
             update_block_boxes_name(block_color_counter, info_range[1]);
         }
