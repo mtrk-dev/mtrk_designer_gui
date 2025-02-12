@@ -1,3 +1,7 @@
+![mtrk](/app/static/mtrk_icon.ico)
+
+![GitHub](https://img.shields.io/github/license/mtrk-dev/mtrk_designer_gui?color=%233273dc)&nbsp;
+
 # MTRK Designer GUI -  Pulse Sequence Designer
 
 MTRK Designer GUI is a powerful web-based drag-and-drop MRI pulse sequence creation tool that allows you to intuitively create pulse sequences for magnetic resonance imaging (MRI) experiments.
