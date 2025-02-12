@@ -1,6 +1,6 @@
 ![mtrk](/app/static/mtrk_icon.ico)
 
-![GitHub](https://img.shields.io/github/license/mtrk-dev/mtrk_designer_gui?color=%233273dc)&nbsp;
+![GitHub](https://img.shields.io/github/license/mtrk-dev/mtrk_designer_gui?color=%23c3ab8b)
 
 # MTRK Designer GUI -  Pulse Sequence Designer
 
