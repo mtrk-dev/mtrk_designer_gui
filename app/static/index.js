@@ -2368,7 +2368,7 @@ function add_block_with_selected_boxes() {
     blocks[block_name] = block_data;
     blockObj = new Block(block_name, start_time);
     block_number_to_block_object[block_color_counter] = blockObj;
-    block_to_duration[block_name] = parseFloat(end_time);
+    block_to_duration[block_name] = parseFloat(end_time) - parseFloat(start_time);
 
     add_dummy_block_boxes(start_time, end_time);
 
@@ -3081,11 +3081,13 @@ function dfs_visit_block(block_name, instructions, visited_blocks, prev_block, m
         max_time = Math.max(max_time, inner_block_time[1]);
     }
     blocks[block_name] = block_data_temp;
-    block_to_duration[block_name] = max_time;
     if (mark_time != null) {
-        block_to_duration[block_name] = mark_time;
+        max_time = mark_time;
     }
-
+    if (block_name == main_block_str) {
+        min_time = 0;
+    }
+    block_to_duration[block_name] = max_time - min_time;
     block_data_temp = {};
     blockObj = new Block(block_name, min_time);
     blockObj.message = instructions[block_name].print_message;
@@ -3236,7 +3238,6 @@ function add_box_to_plot_ui(plot, array, starting_point, box_type) {
 }
 
 function make_dummy_blocks() {
-    // TODO: use dfs to get accurate end time for the blocks.
     for (let block_name in dummy_blocks) {
         $("#block-select").val(block_name);
         load_block_data(block_name);
