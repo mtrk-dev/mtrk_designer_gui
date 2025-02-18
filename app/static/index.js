@@ -2985,7 +2985,6 @@ var settings = null;
 var info = null;
 var min_time = null;
 var max_time = null;
-var mark_time = null;
 var visited_blocks = {};
 var dummy_blocks = {};
 function populate_global_variables_with_sdl_data(data_sdl) {
@@ -3048,11 +3047,14 @@ function dfs_visit_block(block_name, instructions, visited_blocks, prev_block, m
     let steps = block_data.steps;
     let range = "1";
     let inner_block_time = null;
+    let mark_time = null;
     for (let i=0; i < steps.length; i++) {
         let step = steps[i];
         if (step.action == "run_block") {
             inner_block_time = null;
             inner_block_time = dfs_visit_block(step.block, instructions, visited_blocks, block_name, Number.MAX_SAFE_INTEGER, 0);
+            min_time = Math.min(min_time, inner_block_time[0]);
+            max_time = Math.max(max_time, inner_block_time[1]);
             if (!(step.block in block_to_loops)) block_to_loops[step.block] = 1;
         } else if (step.action == "loop") {
             range = step.range;
@@ -3083,6 +3085,7 @@ function dfs_visit_block(block_name, instructions, visited_blocks, prev_block, m
     blocks[block_name] = block_data_temp;
     if (mark_time != null) {
         max_time = mark_time;
+        mark_time = null;
     }
     if (block_name == main_block_str) {
         min_time = 0;
