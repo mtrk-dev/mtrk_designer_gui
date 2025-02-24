@@ -2985,6 +2985,7 @@ var settings = null;
 var info = null;
 var min_time = null;
 var max_time = null;
+var offset_time = 0;
 var visited_blocks = {};
 var dummy_blocks = {};
 function populate_global_variables_with_sdl_data(data_sdl) {
@@ -3066,10 +3067,10 @@ function dfs_visit_block(block_name, instructions, visited_blocks, prev_block, m
             }
 
         } else if (step.action == "rf" || step.action == "grad" || step.action == "adc") {
-            min_time = Math.min(min_time, parseFloat(step.time/1000));
+            min_time = Math.min(min_time, offset_time + parseFloat(step.time/1000));
             let object_name = step.object;
             let step_duration = parseFloat(objects[object_name].duration/1000);
-            max_time = Math.max(max_time, parseFloat(step.time/1000+step_duration));
+            max_time = Math.max(max_time, offset_time + parseFloat(step.time/1000+step_duration));
             add_step(step, block_name, block_data_temp);
         } else if (step.action == "init" || step.action == "sync" || step.action == "calc") {
             add_event_from_sdl_data(step, block_name);
@@ -3084,12 +3085,13 @@ function dfs_visit_block(block_name, instructions, visited_blocks, prev_block, m
     }
     blocks[block_name] = block_data_temp;
     if (mark_time != null) {
-        max_time = mark_time;
+        max_time = offset_time + mark_time;
         mark_time = null;
     }
     if (block_name == main_block_str) {
         min_time = 0;
     }
+    offset_time = max_time;
     block_to_duration[block_name] = max_time - min_time;
     block_data_temp = {};
     blockObj = new Block(block_name, min_time);
