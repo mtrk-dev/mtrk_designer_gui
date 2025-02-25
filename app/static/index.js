@@ -996,8 +996,15 @@ $(document).ready(function() {
         $.each($('.loops-input'), function(index, input) {
             let block = input.dataset.block;
             let loops = input.value;
+            let old_loops = block_to_loops[block];
             block_to_loops[block] = loops;
+            if (!old_loops) old_loops = 1;
+            if (loops != old_loops) {
+                reflect_block_loops(block, loops);
+            }
         });
+        // Need to save data here as the annotation update would use the blocks structure.
+        save_data();
         update_annotations_loops_count();
         $('#loopsModal').modal('toggle');
     });
@@ -1902,6 +1909,43 @@ function change_box_start_time(plot, trace_number, starting_point) {
     move_annotation(plot, trace_number-1, middle_point);
 }
 
+function change_block_box_end_time(plot, trace_number, loops_duration) {
+    let x = plot.data[trace_number]["x"];
+    let y = plot.data[trace_number]["y"];
+    let line = plot.data[trace_number]["line"];
+    let hovertemplate = plot.data[trace_number]["hovertemplate"];
+    let shape_number = (trace_number-1)*2;
+
+    // Draw a trace with updated end point.
+    let x_data = [];
+    let y_data = [];
+    let starting_point = x[0];
+    let ending_point = starting_point + parseFloat(loops_duration);
+    // TODO: sample the data according to size.
+    for (let i=starting_point; i<=ending_point; i+=1) {
+        x_data.push(i);
+        y_data.push(0);
+    }
+    if (ending_point % 1 != 0) {
+        x_data.push(ending_point);
+        y_data.push(0);
+    }
+    let data = {};
+    data["y"] = y_data;
+    data["x"] = x_data;
+    data["line"] = line;
+    data["hovertemplate"] = hovertemplate;
+    data["mode"] = "lines";
+
+    // delete the old trace and add updated one.
+    Plotly.deleteTraces(plot, trace_number);
+    Plotly.addTraces(plot, data, trace_number);
+
+    update_box_shape(plot, shape_number, starting_point, ending_point);
+    let middle_point = starting_point + parseFloat(loops_duration)/2;
+    move_annotation(plot, trace_number-1, middle_point);
+}
+
 function change_box_array(plot, trace_number, starting_point, new_array) {
     let y = new_array;
     let line = plot.data[trace_number]["line"];
@@ -2598,6 +2642,25 @@ function calculate_block_range(block_name) {
     return [start_time, end_time];
 }
 
+function reflect_block_loops(target_block, loops) {
+    let block_duration = block_to_duration[target_block];
+    let loops_duration = parseFloat(block_duration) * parseFloat(loops);
+    let cur_block_name = $('#block-select').val();
+    for (var key in plot_to_box_objects_template) {
+        plot_to_box_objects[cur_block_name][key].forEach(function (boxObj, index) {
+            if (boxObj.block != null) {
+                blockObj = block_number_to_block_object[boxObj.block];
+                if (blockObj.name == target_block) {
+                    let trace_number = index + 1;
+                    let plot_id = axis_name_to_axis_id[boxObj.axis];
+                    let plot = document.getElementById(plot_id);
+                    change_block_box_end_time(plot, trace_number, loops_duration);
+                }
+            }
+        });
+    }
+}
+
 function load_events_data(block_name) {
     if (block_name in block_to_events_html && block_to_events_html[block_name]) {
         $("#events-col")[0].innerHTML = block_to_events_html[block_name];
@@ -2655,7 +2718,7 @@ function load_loops_configuration() {
             <div class="col-2">
                 <div class="input-group input-number-blocks">
                     <span class="input-group-text">x</span>
-                    <input name="loop-input" type="number" class="form-control loops-input" data-block=${root} value=1 placeholder=1>
+                    <input name="loop-input" type="number" class="form-control loops-input" data-block=${root} value=1 placeholder=1 min=1>
                 </div>
             </div>
         </div>`;
