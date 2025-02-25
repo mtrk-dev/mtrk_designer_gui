@@ -1921,12 +1921,12 @@ function change_block_box_end_time(plot, trace_number, loops_duration) {
     let y_data = [];
     let starting_point = x[0];
     let ending_point = starting_point + parseFloat(loops_duration);
-    // TODO: sample the data according to size.
-    for (let i=starting_point; i<=ending_point; i+=1) {
+    let increment = get_increment_size_for_dummy_blocks(parseInt(ending_point - starting_point));
+    for (let i=starting_point; i<=ending_point; i+=increment) {
         x_data.push(i);
         y_data.push(0);
     }
-    if (ending_point % 1 != 0) {
+    if (ending_point % increment != 0) {
         x_data.push(ending_point);
         y_data.push(0);
     }
@@ -2446,11 +2446,12 @@ function add_dummy_block_boxes(starting_point, ending_point) {
         let y_data = [];
         starting_point = parseFloat(starting_point);
         ending_point = parseFloat(ending_point);
-        for (let i=starting_point; i<=ending_point; i+=1) {
+        let increment = get_increment_size_for_dummy_blocks(parseInt(ending_point - starting_point));
+        for (let i=starting_point; i<=ending_point; i+=increment) {
             x_data.push(i);
             y_data.push(0);
         }
-        if (ending_point % 1 != 0) {
+        if (ending_point % increment != 0) {
             x_data.push(ending_point);
             y_data.push(0);
         }
@@ -2507,6 +2508,23 @@ function add_dummy_block_boxes(starting_point, ending_point) {
         boxObj.block = block_color_counter;
         plot_to_box_objects[block_name][target.id].push(boxObj);
     }
+}
+
+function get_increment_size_for_dummy_blocks(block_duration) {
+    let increment = 0.01;
+    if (block_duration >= 10 && block_duration < 50) {
+        increment = 0.1;
+    }
+    else if (block_duration >= 50 && block_duration < 1000) {
+        increment = 1;
+    }
+    else if (block_duration >= 1000 && block_duration < 5000) {
+        increment = 5;
+    }
+    else if (block_duration >= 5000) {
+        increment = 10;
+    }
+    return increment;
 }
 
 function duplicate_box(plot, trace_number, target_plot) {
