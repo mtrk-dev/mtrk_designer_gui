@@ -1000,7 +1000,7 @@ $(document).ready(function() {
             block_to_loops[block] = loops;
             if (!old_loops) old_loops = 1;
             if (loops != old_loops) {
-                reflect_block_loops(block, loops);
+                reflect_block_loops(block, loops, old_loops);
             }
         });
         // Need to save data here as the annotation update would use the blocks structure.
@@ -2660,10 +2660,14 @@ function calculate_block_range(block_name) {
     return [start_time, end_time];
 }
 
-function reflect_block_loops(target_block, loops) {
+function reflect_block_loops(target_block, loops, old_loops) {
     let block_duration = block_to_duration[target_block];
     let loops_duration = parseFloat(block_duration) * parseFloat(loops);
+    let old_loops_duration = parseFloat(block_duration) * parseFloat(old_loops);
+    let target_block_start = null;
     let cur_block_name = $('#block-select').val();
+
+    // Update the end time of the target block.
     for (var key in plot_to_box_objects_template) {
         plot_to_box_objects[cur_block_name][key].forEach(function (boxObj, index) {
             if (boxObj.block != null) {
@@ -2673,6 +2677,24 @@ function reflect_block_loops(target_block, loops) {
                     let plot_id = axis_name_to_axis_id[boxObj.axis];
                     let plot = document.getElementById(plot_id);
                     change_block_box_end_time(plot, trace_number, loops_duration);
+                    target_block_start = blockObj.start_time;
+                }
+            }
+        });
+    }
+    // Update the relative position of the other boxes/blocks.
+    for (var key in plot_to_box_objects_template) {
+        plot_to_box_objects[cur_block_name][key].forEach(function (boxObj, index) {
+            if (target_block_start != null && boxObj.start_time > target_block_start) {
+                let trace_number = index + 1;
+                let plot_id = axis_name_to_axis_id[boxObj.axis];
+                let plot = document.getElementById(plot_id);
+                let shifted_start_time = parseFloat(boxObj.start_time) - parseFloat(old_loops_duration - loops_duration);
+                change_box_start_time(plot, trace_number, shifted_start_time);
+                boxObj.start_time = shifted_start_time;
+                if (boxObj.block != null) {
+                    blockObj = block_number_to_block_object[boxObj.block];
+                    blockObj.start_time = shifted_start_time;
                 }
             }
         });
