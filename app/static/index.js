@@ -1674,6 +1674,10 @@ function save_block_modal_values(plot, trace_number) {
         delete block_to_events_html[cur_block_name];
         block_to_events_html[input_block_name] = block_events_inner_html;
 
+        let block_duration = block_to_duration[cur_block_name];
+        delete block_to_duration[cur_block_name];
+        block_to_duration[input_block_name] = block_duration;
+
         load_block_select_options();
         $('#block-select').val(block_name);
         update_block_boxes_name(boxObj.block, input_block_name);
