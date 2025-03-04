@@ -3211,6 +3211,10 @@ function dfs_visit_block(block_name, instructions, visited_blocks, prev_block, m
         block_data_temp[plot.id] = [[plot.data[0]], layout_copy];
     });
 
+    $("#calc-events")[0].innerHTML = "";
+    $("#init-events")[0].innerHTML = "";
+    $("#sync-events")[0].innerHTML = "";
+
     visited_blocks[block_name] = true;
     let block_data = instructions[block_name];
     let steps = block_data.steps;
