@@ -993,6 +993,7 @@ $(document).ready(function() {
     });
 
     $("#loops_save_changes_btn").click(function() {
+        let base_block = $('#block-select').val();
         $.each($('.loops-input'), function(index, input) {
             let block = input.dataset.block;
             let loops = input.value;
@@ -1000,7 +1001,35 @@ $(document).ready(function() {
             block_to_loops[block] = loops;
             if (!old_loops) old_loops = 1;
             if (loops != old_loops) {
-                reflect_block_loops(block, loops, old_loops);
+                // This will store the blocks that need to be shifted in the UI after the loops are reflected.
+                let block_name_to_shift_val = {};
+
+                // Do a DFS on the structure to reach the block
+                // calculate the shift needed for each parent block's UI simultaneously.
+                let structure = generate_blocks_nesting_structure();
+                function dfs_shift_value(block_name, parent_block) {
+                    if (block_name == block) {
+                        let shift_value =  reflect_block_loops(block, loops, old_loops, parent_block);
+                        return shift_value;
+                    }
+                    if (!(block_name in structure)) {
+                        return 0;
+                    }
+                    for (let child of structure[block_name]) {
+                        let child_shift_value = dfs_shift_value(child, block_name);
+                        if (child_shift_value != 0) {
+                            let shift_value = parseFloat(block_to_loops[block_name]) * parseFloat(child_shift_value);
+                            block_name_to_shift_val[block_name] = [shift_value, parent_block];
+                            return shift_value;
+                        }
+                    }
+                    return 0;
+                }
+                dfs_shift_value(main_block_str, null);
+                propagate_loop_change(block_name_to_shift_val);
+                save_block_data($('#block-select').val());
+                $("#block-select").val(base_block);
+                load_block_data(base_block);
             }
         });
         // Need to save data here as the annotation update would use the blocks structure.
@@ -1913,7 +1942,7 @@ function change_box_start_time(plot, trace_number, starting_point) {
     move_annotation(plot, trace_number-1, middle_point);
 }
 
-function change_block_box_end_time(plot, trace_number, loops_duration) {
+function change_block_box_end_time(plot, trace_number, ending_point) {
     let x = plot.data[trace_number]["x"];
     let y = plot.data[trace_number]["y"];
     let line = plot.data[trace_number]["line"];
@@ -1924,7 +1953,6 @@ function change_block_box_end_time(plot, trace_number, loops_duration) {
     let x_data = [];
     let y_data = [];
     let starting_point = x[0];
-    let ending_point = starting_point + parseFloat(loops_duration);
     let increment = get_increment_size_for_dummy_blocks(parseInt(ending_point - starting_point));
     for (let i=starting_point; i<=ending_point; i+=increment) {
         x_data.push(i);
@@ -1946,7 +1974,7 @@ function change_block_box_end_time(plot, trace_number, loops_duration) {
     Plotly.addTraces(plot, data, trace_number);
 
     update_box_shape(plot, shape_number, starting_point, ending_point);
-    let middle_point = starting_point + parseFloat(loops_duration)/2;
+    let middle_point = starting_point + (ending_point-starting_point)/2;
     move_annotation(plot, trace_number-1, middle_point);
 }
 
@@ -2664,23 +2692,27 @@ function calculate_block_range(block_name) {
     return [start_time, end_time];
 }
 
-function reflect_block_loops(target_block, loops, old_loops) {
+function reflect_block_loops(target_block, loops, old_loops, parent_block) {
     let block_duration = block_to_duration[target_block];
     let loops_duration = parseFloat(block_duration) * parseFloat(loops);
     let old_loops_duration = parseFloat(block_duration) * parseFloat(old_loops);
     let target_block_start = null;
     let cur_block_name = $('#block-select').val();
+    save_block_data(cur_block_name);
+    $("#block-select").val(parent_block);
+    load_block_data(parent_block);
 
     // Update the end time of the target block.
     for (var key in plot_to_box_objects_template) {
-        plot_to_box_objects[cur_block_name][key].forEach(function (boxObj, index) {
+        plot_to_box_objects[parent_block][key].forEach(function (boxObj, index) {
             if (boxObj.block != null) {
                 blockObj = block_number_to_block_object[boxObj.block];
                 if (blockObj.name == target_block) {
                     let trace_number = index + 1;
                     let plot_id = axis_name_to_axis_id[boxObj.axis];
                     let plot = document.getElementById(plot_id);
-                    change_block_box_end_time(plot, trace_number, loops_duration);
+                    let shifted_end_time = parseFloat(boxObj.start_time) + parseFloat(loops_duration);
+                    change_block_box_end_time(plot, trace_number, shifted_end_time);
                     target_block_start = blockObj.start_time;
                 }
             }
@@ -2688,7 +2720,7 @@ function reflect_block_loops(target_block, loops, old_loops) {
     }
     // Update the relative position of the other boxes/blocks.
     for (var key in plot_to_box_objects_template) {
-        plot_to_box_objects[cur_block_name][key].forEach(function (boxObj, index) {
+        plot_to_box_objects[parent_block][key].forEach(function (boxObj, index) {
             if (target_block_start != null && boxObj.start_time > target_block_start) {
                 let trace_number = index + 1;
                 let plot_id = axis_name_to_axis_id[boxObj.axis];
@@ -2702,6 +2734,35 @@ function reflect_block_loops(target_block, loops, old_loops) {
                 }
             }
         });
+    }
+    return parseFloat(old_loops_duration - loops_duration);
+}
+
+function propagate_loop_change(block_name_to_shift_val) {
+    for (let cur_block in block_name_to_shift_val) {
+        if (cur_block == main_block_str) continue;
+
+        let [shift_val, parent_block] = block_name_to_shift_val[cur_block];
+        save_block_data($('#block-select').val());
+        $("#block-select").val(parent_block);
+        load_block_data(parent_block);
+
+        for (var key in plot_to_box_objects_template) {
+            plot_to_box_objects[parent_block][key].forEach(function (boxObj, index) {
+                if (boxObj.block != null) {
+                    blockObj = block_number_to_block_object[boxObj.block];
+                    if (blockObj.name == cur_block) {
+                        let trace_number = index + 1;
+                        let plot_id = axis_name_to_axis_id[boxObj.axis];
+                        let plot = document.getElementById(plot_id);
+                        let x_data = plot.data[trace_number]["x"];
+                        let cur_end_time = x_data[x_data.length-1];
+                        let shifted_end_time = parseFloat(cur_end_time) - parseFloat(shift_val);
+                        change_block_box_end_time(plot, trace_number, shifted_end_time);
+                    }
+                }
+            });
+        }
     }
 }
 
@@ -3170,7 +3231,9 @@ function dfs_visit_block(block_name, instructions, visited_blocks, prev_block, m
             // TODO: verify if the loop count will always be valid like this.
             if ("block" in step.steps[0]) {
                 repeating_block_name = step.steps[0].block;
-                block_to_loops[repeating_block_name] = range;
+                // TODO: reflect block loops dynamically from here.
+                // block_to_loops[repeating_block_name] = range;
+                block_to_loops[repeating_block_name] = 1;
             }
 
         } else if (step.action == "rf" || step.action == "grad" || step.action == "adc") {
