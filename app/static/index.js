@@ -3261,6 +3261,9 @@ function dfs_visit_block(block_name, instructions, visited_blocks, prev_block, m
     if (block_name == main_block_str) {
         min_time = 0;
     }
+    if (min_time == Number.MAX_SAFE_INTEGER) {
+        min_time = offset_time;
+    }
     offset_time = max_time;
     block_to_duration[block_name] = max_time - min_time;
     block_data_temp = {};
