@@ -2696,6 +2696,7 @@ function reflect_block_loops(target_block, loops, old_loops, parent_block) {
     let block_duration = block_to_duration[target_block];
     let loops_duration = parseFloat(block_duration) * parseFloat(loops);
     let old_loops_duration = parseFloat(block_duration) * parseFloat(old_loops);
+    let shift_val = parseFloat(old_loops_duration - loops_duration);
     let target_block_start = null;
     let cur_block_name = $('#block-select').val();
     save_block_data(cur_block_name);
@@ -2725,7 +2726,7 @@ function reflect_block_loops(target_block, loops, old_loops, parent_block) {
                 let trace_number = index + 1;
                 let plot_id = axis_name_to_axis_id[boxObj.axis];
                 let plot = document.getElementById(plot_id);
-                let shifted_start_time = parseFloat(boxObj.start_time) - parseFloat(old_loops_duration - loops_duration);
+                let shifted_start_time = parseFloat(boxObj.start_time) - shift_val;
                 change_box_start_time(plot, trace_number, shifted_start_time);
                 boxObj.start_time = shifted_start_time;
                 if (boxObj.block != null) {
@@ -2735,7 +2736,8 @@ function reflect_block_loops(target_block, loops, old_loops, parent_block) {
             }
         });
     }
-    return parseFloat(old_loops_duration - loops_duration);
+    block_to_duration[parent_block] = parseFloat(block_to_duration[parent_block]) - parseFloat(shift_val);
+    return shift_val;
 }
 
 function propagate_loop_change(block_name_to_shift_val) {
@@ -2763,6 +2765,8 @@ function propagate_loop_change(block_name_to_shift_val) {
                 }
             });
         }
+
+        block_to_duration[parent_block] = parseFloat(block_to_duration[parent_block]) - parseFloat(shift_val);
     }
 }
 
