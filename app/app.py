@@ -29,7 +29,7 @@ def process():
         block_boxes = block_to_box_objects[block_name]
         block_boxes = sorted(block_boxes, key=lambda x: int(float(x['start_time'])*1000))
         for box_object in block_boxes:
-            box_object["start_time"] = int(float(box_object['start_time'])*1000)
+            box_object["start_time"] = int(round(float(box_object['start_time'])*1000))
 
     configurations = data['configurations']
     block_structure = data['block_structure']
