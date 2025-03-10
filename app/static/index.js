@@ -759,6 +759,24 @@ $(document).ready(function() {
         }
     });
 
+    $('#inputMdh').on('input', function() {
+        let element = $(this);
+        // Resize the textarea according to the text size
+        element.css('height', 'auto');
+        element.css('height', element.prop('scrollHeight') + 'px');
+
+        // Prettify if the JSON is valid, else signal invalid JSON.
+        let text = element.val();
+        try {
+            let json = JSON.parse(text);
+            let prettyText = JSON.stringify(json, null, 4);
+            element.removeClass('is-invalid').addClass('is-valid');
+            element.val(prettyText);
+        } catch (e) {
+            element.removeClass('is-valid').addClass('is-invalid');
+        }
+    });
+
     $("#reset-btn").click(function(){
         Swal.fire({
             icon: "warning",
@@ -1539,6 +1557,9 @@ function load_modal_values(plot, trace_number) {
         $('#inputAdcAddedPhase').val(boxObj.adc_added_phase_float);
         $('#inputAdcSamples').val(boxObj.samples);
         $('#inputAdcDwellTime').val(boxObj.dwell_time);
+        $('#inputMdh').val(boxObj.mdh);
+        $("#inputMdh").removeClass('is-invalid');
+        $("#inputMdh").removeClass('is-valid');
     }
 }
 
@@ -1665,6 +1686,7 @@ function save_modal_values(plot, trace_number) {
         boxObj.adc_added_phase_float = $('#inputAdcAddedPhase').val();
         boxObj.samples = $('#inputAdcSamples').val();
         boxObj.dwell_time = $('#inputAdcDwellTime').val();
+        boxObj.mdh = $('#inputMdh').val();
     }
     return true;
 }
@@ -3094,6 +3116,7 @@ class Box {
     phase = null;
     samples = null;
     dwell_time = null;
+    mdh = null;
     array_info = {
         name: "Default Array",
         array: []
@@ -3131,6 +3154,7 @@ class Box {
             this.adc_added_phase_float = 0;
             this.samples = 128;
             this.dwell_time = 30;
+            this.mdh = "{}";
         }
     }
 }
@@ -3343,6 +3367,7 @@ function add_step(step, block_name, block_data_temp) {
         box.adc_added_phase_float = step.added_phase.float;
         box.samples = object.samples;
         box.dwell_time = parseFloat(object.dwelltime)/1000;
+        box.mdh = JSON.stringify(step.mdh, null, 4);
     }
     plot_to_box_objects[block_name][plot_id].push(box);
 
