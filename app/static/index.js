@@ -3358,7 +3358,7 @@ function add_step(step, block_name, block_data_temp) {
         box.rf_added_phase_float = step.added_phase.float;
         let phase_array_name = object.array + "_phase";
         box.phase_array_info.name = phase_array_name;
-        box.phase_array_info.array = array_name_to_array[phase_array_name].data;
+        box.phase_array_info.array = array_name_to_array[phase_array_name];
     } else if (object.type == "adc") {
         box.adc_duration = parseFloat(object.duration)/1000;
         box.frequency = step.frequency;
