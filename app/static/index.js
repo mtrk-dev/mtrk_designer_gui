@@ -1019,35 +1019,7 @@ $(document).ready(function() {
             block_to_loops[block] = loops;
             if (!old_loops) old_loops = 1;
             if (loops != old_loops) {
-                // This will store the blocks that need to be shifted in the UI after the loops are reflected.
-                let block_name_to_shift_val = {};
-
-                // Do a DFS on the structure to reach the block
-                // calculate the shift needed for each parent block's UI simultaneously.
-                let structure = generate_blocks_nesting_structure();
-                function dfs_shift_value(block_name, parent_block) {
-                    if (block_name == block) {
-                        let shift_value =  reflect_block_loops(block, loops, old_loops, parent_block);
-                        return shift_value;
-                    }
-                    if (!(block_name in structure)) {
-                        return 0;
-                    }
-                    for (let child of structure[block_name]) {
-                        let child_shift_value = dfs_shift_value(child, block_name);
-                        if (child_shift_value != 0) {
-                            let shift_value = parseFloat(block_to_loops[block_name]) * parseFloat(child_shift_value);
-                            block_name_to_shift_val[block_name] = [shift_value, parent_block];
-                            return shift_value;
-                        }
-                    }
-                    return 0;
-                }
-                dfs_shift_value(main_block_str, null);
-                propagate_loop_change(block_name_to_shift_val);
-                save_block_data($('#block-select').val());
-                $("#block-select").val(base_block);
-                load_block_data(base_block);
+                reflect_block_loops_change(block, loops, old_loops, base_block);
             }
         });
         // Need to save data here as the annotation update would use the blocks structure.
@@ -2714,63 +2686,53 @@ function calculate_block_range(block_name) {
     return [start_time, end_time];
 }
 
-function reflect_block_loops(target_block, loops, old_loops, parent_block) {
-    let block_duration = block_to_duration[target_block];
-    let loops_duration = parseFloat(block_duration) * parseFloat(loops);
-    let old_loops_duration = parseFloat(block_duration) * parseFloat(old_loops);
-    let shift_val = parseFloat(old_loops_duration - loops_duration);
-    let target_block_start = null;
-    let cur_block_name = $('#block-select').val();
-    save_block_data(cur_block_name);
-    $("#block-select").val(parent_block);
-    load_block_data(parent_block);
+function reflect_block_loops_change(block, loops, old_loops, base_block) {
+    // This will store the blocks that need to be shifted in the UI after the loops are reflected.
+    let block_name_to_shift_val = {};
 
-    // Update the end time of the target block.
-    for (var key in plot_to_box_objects_template) {
-        plot_to_box_objects[parent_block][key].forEach(function (boxObj, index) {
-            if (boxObj.block != null) {
-                blockObj = block_number_to_block_object[boxObj.block];
-                if (blockObj.name == target_block) {
-                    let trace_number = index + 1;
-                    let plot_id = axis_name_to_axis_id[boxObj.axis];
-                    let plot = document.getElementById(plot_id);
-                    let shifted_end_time = parseFloat(boxObj.start_time) + parseFloat(loops_duration);
-                    change_block_box_end_time(plot, trace_number, shifted_end_time);
-                    target_block_start = blockObj.start_time;
-                }
+    // Do a DFS on the structure to reach the block
+    // calculate the shift needed for each parent block's UI simultaneously.
+    let structure = generate_blocks_nesting_structure();
+    function dfs_shift_value(block_name, parent_block) {
+        if (block_name == block) {
+            let block_duration = block_to_duration[block_name];
+            let loops_duration = parseFloat(block_duration) * parseFloat(loops);
+            let old_loops_duration = parseFloat(block_duration) * parseFloat(old_loops);
+            let shift_value = parseFloat(old_loops_duration - loops_duration);
+            block_name_to_shift_val[block_name] = [shift_value, parent_block];
+            return shift_value;
+        }
+        if (!(block_name in structure)) {
+            return 0;
+        }
+        for (let child of structure[block_name]) {
+            let child_shift_value = dfs_shift_value(child, block_name);
+            if (child_shift_value != 0) {
+                let shift_value = parseFloat(block_to_loops[block_name]) * parseFloat(child_shift_value);
+                block_name_to_shift_val[block_name] = [shift_value, parent_block];
+                return shift_value;
             }
-        });
+        }
+        return 0;
     }
-    // Update the relative position of the other boxes/blocks.
-    for (var key in plot_to_box_objects_template) {
-        plot_to_box_objects[parent_block][key].forEach(function (boxObj, index) {
-            if (target_block_start != null && boxObj.start_time > target_block_start) {
-                let trace_number = index + 1;
-                let plot_id = axis_name_to_axis_id[boxObj.axis];
-                let plot = document.getElementById(plot_id);
-                let shifted_start_time = parseFloat(boxObj.start_time) - shift_val;
-                change_box_start_time(plot, trace_number, shifted_start_time);
-                boxObj.start_time = shifted_start_time;
-                if (boxObj.block != null) {
-                    blockObj = block_number_to_block_object[boxObj.block];
-                    blockObj.start_time = shifted_start_time;
-                }
-            }
-        });
-    }
-    block_to_duration[parent_block] = parseFloat(block_to_duration[parent_block]) - parseFloat(shift_val);
-    return shift_val;
+    dfs_shift_value(main_block_str, null);
+    propagate_loop_change_ui(block_name_to_shift_val);
+    save_block_data($('#block-select').val());
+    $("#block-select").val(base_block);
+    load_block_data(base_block);
 }
 
-function propagate_loop_change(block_name_to_shift_val) {
+function propagate_loop_change_ui(block_name_to_shift_val) {
     for (let cur_block in block_name_to_shift_val) {
         if (cur_block == main_block_str) continue;
 
+        let relative_shift_start = null;
         let [shift_val, parent_block] = block_name_to_shift_val[cur_block];
         save_block_data($('#block-select').val());
         $("#block-select").val(parent_block);
         load_block_data(parent_block);
 
+        // Update the end time of the block with shift value.
         for (var key in plot_to_box_objects_template) {
             plot_to_box_objects[parent_block][key].forEach(function (boxObj, index) {
                 if (boxObj.block != null) {
@@ -2783,6 +2745,25 @@ function propagate_loop_change(block_name_to_shift_val) {
                         let cur_end_time = x_data[x_data.length-1];
                         let shifted_end_time = parseFloat(cur_end_time) - parseFloat(shift_val);
                         change_block_box_end_time(plot, trace_number, shifted_end_time);
+                        relative_shift_start = blockObj.start_time;
+                    }
+                }
+            });
+        }
+
+        // Update the relative position of the other boxes/blocks.
+        for (var key in plot_to_box_objects_template) {
+            plot_to_box_objects[parent_block][key].forEach(function (boxObj, index) {
+                if (relative_shift_start != null && boxObj.start_time > relative_shift_start) {
+                    let trace_number = index + 1;
+                    let plot_id = axis_name_to_axis_id[boxObj.axis];
+                    let plot = document.getElementById(plot_id);
+                    let shifted_start_time = parseFloat(boxObj.start_time) - shift_val;
+                    change_box_start_time(plot, trace_number, shifted_start_time);
+                    boxObj.start_time = shifted_start_time;
+                    if (boxObj.block != null) {
+                        blockObj = block_number_to_block_object[boxObj.block];
+                        blockObj.start_time = shifted_start_time;
                     }
                 }
             });
