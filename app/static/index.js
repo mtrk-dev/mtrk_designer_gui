@@ -725,6 +725,23 @@ $(document).ready(function() {
         $('#blockModal').modal('toggle');
     });
 
+    $("#block_enter_btn").on( "click", function() {
+        let plot = selected_plot;
+        let cur_block = $('#block-select').val();
+        let trace_number = selected_trace_number;
+
+        boxObj = plot_to_box_objects[cur_block][plot.id][trace_number-1];
+        blockObj = block_number_to_block_object[boxObj.block];
+        let new_block = blockObj.name;
+
+        save_block_data(cur_block);
+        load_block_data(new_block);
+        $('#block-select').val(new_block);
+        scale_boxes_amplitude();
+        $('#blockModal').modal('toggle');
+    });
+
+
     $("#block-time-btn").click(function () {
         let block_duration = parseFloat($("#blockDurationInput").val());
         block_to_duration[$('#block-select').val()] = block_duration;

@@ -145,6 +145,14 @@
     margin-left: 75%;
 }
 
+#block_enter_btn {
+    background: none;
+    border: none;
+    font-size: 20px;
+    margin-right: 25%;
+    padding: 0px;
+}
+
 #nestingCol {
     display: block;
 }
