@@ -1136,6 +1136,7 @@ $(document).ready(function() {
                 make_dummy_blocks();
                 load_block_data(main_block_str);
                 scale_boxes_amplitude();
+                reflect_loops_from_sdl();
                 block_color_counter = Object.keys(visited_blocks).length;
             } catch (e) {
                 fire_alert("Could not load SDL file");
@@ -3244,9 +3245,7 @@ function dfs_visit_block(block_name, instructions, visited_blocks, prev_block, m
             // TODO: verify if the loop count will always be valid like this.
             if ("block" in step.steps[0]) {
                 repeating_block_name = step.steps[0].block;
-                // TODO: reflect block loops dynamically from here.
-                // block_to_loops[repeating_block_name] = range;
-                block_to_loops[repeating_block_name] = 1;
+                block_to_loops[repeating_block_name] = range;
             }
 
         } else if (step.action == "rf" || step.action == "grad" || step.action == "adc") {
@@ -3438,7 +3437,6 @@ function make_dummy_blocks() {
             block_color_counter = info_range[0];
             let loops = parseInt(block_to_loops[info_range[1]]);
             let end_time_loops = parseInt(info_range[3]);
-            // if (loops) end_time_loops = end_time_loops * loops;
             add_dummy_block_boxes(parseInt(info_range[2]), end_time_loops);
             update_block_boxes_name(block_color_counter, info_range[1]);
         }
@@ -3469,5 +3467,12 @@ function add_event_from_sdl_data(step, block_name) {
     add_new_event(event_data);
     let events_col_inner_html = $("#events-col")[0].innerHTML;
     block_to_events_html[block_name] = events_col_inner_html;
+}
+
+function reflect_loops_from_sdl() {
+    for (let block_name in block_to_loops) {
+        let loops = block_to_loops[block_name];
+        if (loops != 1) reflect_block_loops_change(block_name, loops, 1, main_block_str);
+    }
 }
 // SDL load related functions - end
