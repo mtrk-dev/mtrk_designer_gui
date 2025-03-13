@@ -328,7 +328,7 @@ var annotation_template = {
     text: '',
     showarrow: false,
     font: {
-      family: 'Courier New, monospace',
+      family: 'monospace',
       size: 12,
       color: '#777'
     },
