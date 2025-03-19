@@ -75,6 +75,18 @@
     margin-top: 8%;
 }
 
+#checkpoint-collapse-btn {
+    background: none;
+    border: none;
+    padding-left: 2px;
+    font-size: 18px;
+}
+
+#checkpointCardBody {
+    padding: 0px;
+    border: none;
+}
+
 #add-event-btn {
     font-size: 14px;
     background: transparent;

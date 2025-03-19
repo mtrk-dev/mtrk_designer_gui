@@ -539,15 +539,24 @@
                 </div>
                 <hr>
                 <div class="checkpoint-control">
-                  <div class="mb-3">
-                    <label id="upload-checkpoint-label" for="formFileCheckpoint" class="form-label">
-                      <i class="fa fa-upload checkpoint-icon" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Upload Checkpoint"></i>
-                    </label>
-                    <i id="download-checkpoint-btn" class="fa fa-download checkpoint-icon" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Download Checkpoint"></i>
-                    <input class="form-control form-control-sm" type="file" id="formFileCheckpoint" accept="application/JSON" hidden>
-                  </div>
-                  <div id="checkpoint-alert" class="alert alert-danger" role="alert" style="display:none">
-                    Invalid Checkpoint file!
+                  <p class="d-inline-flex gap-1">
+                    <a id="checkpoint-collapse-btn" class="btn btn-secondary" data-bs-toggle="collapse" href="#checkpointCollapse" role="button" aria-expanded="false" aria-controls="checkpointCollapse" title="Expand Checkpoint Control">
+                      <i class="fa fa-eye-slash" aria-hidden="true"></i>
+                    </a>
+                  </p>
+                  <div class="collapse" id="checkpointCollapse">
+                    <div id="checkpointCardBody" class="card card-body">
+                      <div class="mb-3">
+                        <label id="upload-checkpoint-label" for="formFileCheckpoint" class="form-label">
+                          <i class="fa fa-upload checkpoint-icon" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Upload Checkpoint"></i>
+                        </label>
+                        <i id="download-checkpoint-btn" class="fa fa-download checkpoint-icon" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Download Checkpoint"></i>
+                        <input class="form-control form-control-sm" type="file" id="formFileCheckpoint" accept="application/JSON" hidden>
+                      </div>
+                      <div id="checkpoint-alert" class="alert alert-danger" role="alert" style="display:none">
+                        Invalid Checkpoint file!
+                      </div>
+                    </div>
                   </div>
                 </div>
                 <button id="upload-sdl-btn" class="btn btn-secondary" type="submit" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Upload SDL File">

@@ -939,6 +939,10 @@ $(document).ready(function() {
         recalculate_mouse_to_plot_conversion_variables();
     });
 
+    $('#checkpoint-collapse-btn').click(function(){
+        $(this).find('i').toggleClass('fa-eye-slash fa-eye');
+    });
+
     $('#loops-btn').click(function(){
         load_loops_configuration();
         $('#loopsModal').modal('toggle');
