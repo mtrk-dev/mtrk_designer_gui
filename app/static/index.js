@@ -93,6 +93,8 @@ var undo_stack = [];
 var redo_stack = [];
 const max_stack_length = 8;
 
+var viewer_url = "http://localhost:5500";
+
 const current_version = "1.6";
 
 // Dummy arrays dictionary for array selection.
@@ -3067,6 +3069,7 @@ function send_data(block_to_box_objects, configurations, block_structure, events
         }),
         success: function(response) {
             console.log(response);
+            verify_and_open_viewer(viewer_url, response);
             let response_blob = new Blob([response], { type: 'application/json' });
             let response_file = new File([response_blob], 'output_sdl_file.mtrk');
             download_file(response_file);
@@ -3091,6 +3094,21 @@ window.addEventListener('load', function() {
         loader.style.display = 'none'; // Hide loader
     }, 500); // Wait for fade-out effect to complete
 });
+
+async function verify_and_open_viewer(url, sdl_file) {
+    try {
+        let response = await fetch(url, { method: 'HEAD' });
+        if (response.ok) {
+            console.log(`The viewer URL ${url} is accessible. Opening in a new window.`);
+            let otherWindow = window.open(url);
+            setTimeout(() => { otherWindow.postMessage(sdl_file, url); }, 1000);
+        } else {
+            console.log(`The viewer URL ${url} returned status: ${response.status}. Not opening the URL.`);
+        }
+    } catch (error) {
+        console.log(`The URL ${url}  for viewer is not accessible. Error: ${error.message}. Not opening the URL.`);
+    }
+}
 
 class Box {
     type = "";
