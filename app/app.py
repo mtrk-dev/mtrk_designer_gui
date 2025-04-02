@@ -65,4 +65,4 @@ def open_browser():
 if __name__ == "__main__":
     # Uncomment this line if you want the webpage to open by default.
     # Timer(1, open_browser).start()
-    app.run(debug=True)
+    app.run(debug=True, port=5010)
