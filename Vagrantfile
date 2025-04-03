@@ -14,7 +14,7 @@ Vagrant.configure("2") do |config|
   # boxes at https://vagrantcloud.com/search.
   config.vm.box = "bento/ubuntu-22.04"
   config.vm.provision "docker"
-  config.vm.network "forwarded_port", guest: 5000, host: 5010, auto_correct: true, host_ip: "127.0.0.1"
+  config.vm.network "forwarded_port", guest: 5010, host: 5010, auto_correct: true, host_ip: "127.0.0.1"
   config.vm.network "forwarded_port", guest: 6010, host: 6010, auto_correct: true
 
   config.vm.provider "parallels" do |p, o|

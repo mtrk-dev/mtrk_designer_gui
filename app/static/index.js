@@ -93,7 +93,7 @@ var undo_stack = [];
 var redo_stack = [];
 const max_stack_length = 8;
 
-var viewer_url = "http://127.0.0.1:5500";
+var viewer_url = "http://127.0.0.1:6010";
 
 const current_version = "1.6";
 
