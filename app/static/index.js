@@ -3358,6 +3358,7 @@ function add_step(step, block_name, block_data_temp) {
     let box = new Box(object.type, parseFloat(step.time)/1000, axis, array.data);
     box.name = object_name;
     box.array_info.name = object.array;
+    let flip_multiplier = 1;
     if (object.type == "grad") {
         if ("amplitude" in step && step.amplitude.type == "equation") {
             box.variable_amplitude = true;
@@ -3366,6 +3367,10 @@ function add_step(step, block_name, block_data_temp) {
             box.equation_info.expression = equations[equation_name].equation;
         } else {
             box.amplitude = object.amplitude;
+            if ("amplitude" in step  && step.amplitude == "flip") {
+                box.flip_amplitude = true;
+                flip_multiplier = -1;
+            }
         }
     } else if (object.type == "rf") {
         box.rf_duration = parseFloat(object.duration)/1000;
@@ -3396,7 +3401,7 @@ function add_step(step, block_name, block_data_temp) {
         if (box.variable_amplitude) {
             change_trace_type(plot, plot.data.length-1, box.array_info.name, true);
         } else {
-            update_trace_amplitude(plot, plot.data.length-1, box.array_info.array, box.amplitude);
+            update_trace_amplitude(plot, plot.data.length-1, box.array_info.array, box.amplitude * flip_multiplier);
         }
     } else if (object.type == "adc") {
         update_adc_trace_duration(plot, plot.data.length-1, parseFloat(box.start_time), parseFloat(box.adc_duration));
