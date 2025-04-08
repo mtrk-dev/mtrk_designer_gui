@@ -1,6 +1,7 @@
 from flask import Flask
-from flask import render_template, request, send_file
+from flask import render_template, request, send_file, jsonify
 import json
+import traceback
 
 import os
 import sys
@@ -57,6 +58,15 @@ def process():
 
     if os.path.isfile("output.mtrk"):
        return send_file('output.mtrk')
+
+@app.errorhandler(Exception)
+def handle_exception(e):
+    response = {
+        "error": str(e),
+        "type": type(e).__name__,
+        "traceback": traceback.format_exc()
+    }
+    return jsonify(response), 500
 
 def open_browser():
     webbrowser.open_new("http://127.0.0.1:5000")
