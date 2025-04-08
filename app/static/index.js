@@ -3076,7 +3076,7 @@ function send_data(block_to_box_objects, configurations, block_structure, events
         },
         error: function(error) {
             let errorResponse = error.responseJSON;
-            console.log(errorResponse);
+            console.log(errorResponse.traceback);
             fire_alert('Internal Error: ' + errorResponse.error + ' (' + errorResponse.type + ')');
         }
     });
