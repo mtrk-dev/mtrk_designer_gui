@@ -108,13 +108,15 @@ var array_name_to_array = {
     "grad_100_2650_100": grad_100_2650_100,
     "grad_220_10_220": grad_220_10_220,
     "grad_220_80_220": grad_220_80_220,
-    "grad_30_3840_30": grad_30_3840_30
+    "grad_30_3840_30": grad_30_3840_30,
+    "grad_slice_select": grad_slice_select_array,
+    "adc_readout": adc_readout_array,
 }
 
 const object_to_array = {
-    "rf_excitation_btn" : rf_pulse_array,
-    "gradient_btn" : grad_slice_select_array,
-    "adc_readout_btn" : adc_readout_array,
+    "rf_excitation_btn" : "rf_pulse",
+    "gradient_btn" : "grad_slice_select",
+    "adc_readout_btn" : "adc_readout",
 
 }
 
@@ -149,11 +151,11 @@ const axis_name_to_axis_id = {
 }
 
 const axis_id_to_default_array = {
-    "rf_chart" : rf_pulse_array,
-    "slice_chart" : grad_slice_select_array,
-    "phase_chart" : grad_slice_select_array,
-    "readout_chart": grad_slice_select_array,
-    "adc_chart": adc_readout_array
+    "rf_chart" : "rf_pulse",
+    "slice_chart" : "grad_slice_select",
+    "phase_chart" : "grad_slice_select",
+    "readout_chart": "grad_slice_select",
+    "adc_chart": "adc_readout"
 }
 
 const plot_rf_data = {
@@ -469,7 +471,8 @@ $(document).ready(function() {
         let xInDataCoord = mx*event.x + cx;
         xInDataCoord = parseFloat(xInDataCoord.toFixed(4));
         
-        let dragged_array = object_to_array[dragged.id];
+        let dragged_array_name = object_to_array[dragged.id];
+        let dragged_array = array_name_to_array[dragged_array_name];
         let starting_point = xInDataCoord;
 
         if (dragged.id == "rf_excitation_btn" && target.id != "rf_chart") {
@@ -536,7 +539,7 @@ $(document).ready(function() {
         // We create a new Box object and store it.
         // [target.id][trace_number-1] : Box object
         // let trace_number = target.data.length - 1; // Trace number is simply the index of current added trace i.e last index.
-        boxObj = new Box(object_to_type[dragged.id], starting_point, axis_id_to_axis_name[target.id], dragged_array);
+        boxObj = new Box(object_to_type[dragged.id], starting_point, axis_id_to_axis_name[target.id], [dragged_array_name, dragged_array]);
         boxObj.name = boxObj.type + "_" + (target.data.length - 1);
         let block_name = $('#block-select').val();
         if (!(block_name in plot_to_box_objects)) {
@@ -1397,9 +1400,7 @@ function get_trace_dimensions(plot, trace_number) {
 }
 
 function change_trace_type(plot, trace_number, box_array_name, toVariable) {
-    let  y = [];
-    if (box_array_name == "Default Array") y = axis_id_to_default_array[plot.id];
-    else y = array_name_to_array[box_array_name];
+    let  y = array_name_to_array[box_array_name];
 
     let x = plot.data[trace_number]["x"];
     let line = plot.data[trace_number]["line"];
@@ -1596,9 +1597,7 @@ function save_modal_values(plot, trace_number) {
     let flip = $('#flipAmplitudeCheck').is(':checked');
     let array_changed_flag = false;
     if (selected_box_array_name != boxObj.array_info.name) {
-        let new_array = [];
-        if (selected_box_array_name == "Default Array") new_array = axis_id_to_default_array[plot.id]
-        else new_array = array_name_to_array[selected_box_array_name]
+        let new_array = array_name_to_array[selected_box_array_name];
         change_box_array(plot, trace_number, parseFloat(input_start_time), new_array);
         array_changed_flag = true;
     }
@@ -1622,9 +1621,7 @@ function save_modal_values(plot, trace_number) {
     // If the amplitude for a grad box has been changed/flipped we update and adjust the scale.
     if (boxObj.type == "grad" && (!$("#variableRadio").is(':checked'))) {
         let input_constant_amplitude = $('#inputConstantAmplitude').val();
-        let base_array = [];
-        if (selected_box_array_name == "Default Array") base_array = axis_id_to_default_array[plot.id]
-        else base_array = array_name_to_array[selected_box_array_name]
+        let base_array = array_name_to_array[selected_box_array_name];
         if (!(input_constant_amplitude == boxObj.amplitude && flip == boxObj.flip_amplitude) || array_changed_flag || trace_type_changed_flag) {
             if (flip) {
                 input_constant_amplitude *= -1;
@@ -1637,11 +1634,7 @@ function save_modal_values(plot, trace_number) {
     boxObj.start_time = parseFloat(input_start_time);
     boxObj.anchor_time = $('#inputAnchorTime').val();
     boxObj.array_info.name = selected_box_array_name;
-    if (selected_box_array_name == "Default Array") {
-        boxObj.array_info.array = axis_id_to_default_array[plot.id];
-    } else {
-        boxObj.array_info.array = array_name_to_array[selected_box_array_name];
-    }
+    boxObj.array_info.array = array_name_to_array[selected_box_array_name];
 
     if (boxObj.type == "rf") {
         boxObj.rf_added_phase_type = $('#inputRfAddedPhaseType').val();
@@ -2154,8 +2147,7 @@ function scale_variable_traces() {
                 let boxObjCopy = JSON.parse(JSON.stringify(plot_to_box_objects[block_name][plot.id][trace_number-1]));
                 let array_name = boxObjCopy.array_info.name;
 
-                if (array_name == "Default Array") y = axis_id_to_default_array[plot.id];
-                else y = array_name_to_array[array_name];
+                y = array_name_to_array[array_name];
 
                 y = y.map(val => val * max_amplitude);
 
@@ -2192,7 +2184,6 @@ function scale_variable_traces() {
 function load_parameters_array_dropdown() {
     let ul = document.getElementById("array-dropdown-menu");
     ul.innerHTML = '';
-    ul.innerHTML += '<li><a class="dropdown-item array-dropdown">Default Array</a></li>';
     for (const [key, value] of Object.entries(array_name_to_array)) {
         let li = document.createElement("li");
         li.appendChild(document.createTextNode(key));
@@ -2552,7 +2543,7 @@ function add_dummy_block_boxes(starting_point, ending_point) {
             };
         Plotly.relayout(target, update);
 
-        boxObj = new Box("Block", starting_point, axis_id_to_axis_name[target.id], y_data);
+        boxObj = new Box("Block", starting_point, axis_id_to_axis_name[target.id], ["dummy_block_array", y_data]);
         boxObj.name = "dummy_box_" + (target.data.length-1);
         let block_name = $('#block-select').val();
         if (!(block_name in plot_to_box_objects)) {
@@ -3143,11 +3134,11 @@ class Box {
     dwell_time = null;
     mdh = null;
     array_info = {
-        name: "Default Array",
+        name: "",
         array: []
     };
     phase_array_info = {
-        name: "Select Array",
+        name: "",
         array: []
     }
     equation_info = {
@@ -3155,11 +3146,12 @@ class Box {
         expression: ""
     }
 
-    constructor(type, start_time, axis, array) {
+    constructor(type, start_time, axis, array_info) {
         this.type = type;
         this.start_time = start_time;
         this.axis = axis;
-        this.array_info.array = array;
+        this.array_info.name = array_info[0];
+        this.array_info.array = array_info[1];
 
         // Add default values according to box type.
         if (type == "rf") {
@@ -3170,9 +3162,12 @@ class Box {
             this.purpose = "excitation";
             this.rf_added_phase_type = "float";
             this.rf_added_phase_float = 0;
+            this.phase_array_info.name = "rf_phase";
+            this.phase_array_info.array = array_name_to_array["rf_phase"];
         } else if (type == "grad") {
             this.amplitude = 1;
         } else if (type == "adc") {
+            this.adc_duration = 1;
             this.frequency = 0;
             this.phase = 0;
             this.adc_added_phase_type = "float";
@@ -3359,9 +3354,8 @@ function add_step(step, block_name, block_data_temp) {
     let plot_id = axis_name_to_axis_id[axis];
     let plot = document.getElementById(plot_id);
     add_box_to_plot_ui(plot, array.data, parseFloat(step.time)/1000, object.type);
-    let box = new Box(object.type, parseFloat(step.time)/1000, axis, array.data);
+    let box = new Box(object.type, parseFloat(step.time)/1000, axis, [object.array, array.data]);
     box.name = object_name;
-    box.array_info.name = object.array;
     let flip_multiplier = 1;
     if (object.type == "grad") {
         if ("amplitude" in step && step.amplitude.type == "equation") {
@@ -3429,7 +3423,7 @@ function add_step(step, block_name, block_data_temp) {
 // Replicating the functionality of drop.
 function add_box_to_plot_ui(plot, array, starting_point, box_type) {
     if (box_type == "adc") {
-        array = axis_id_to_default_array[plot.id];
+        array = array_name_to_array[axis_id_to_default_array[plot.id]];
     }
     let multiplier = 1;
     if (plot.id == "rf_chart") {
