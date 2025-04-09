@@ -537,6 +537,7 @@ $(document).ready(function() {
         // [target.id][trace_number-1] : Box object
         // let trace_number = target.data.length - 1; // Trace number is simply the index of current added trace i.e last index.
         boxObj = new Box(object_to_type[dragged.id], starting_point, axis_id_to_axis_name[target.id], dragged_array);
+        boxObj.name = boxObj.type + "_" + (target.data.length - 1);
         let block_name = $('#block-select').val();
         if (!(block_name in plot_to_box_objects)) {
             plot_to_box_objects[block_name] = JSON.parse(JSON.stringify(plot_to_box_objects_template));
@@ -820,7 +821,6 @@ $(document).ready(function() {
     });
 
     $("#generate-sdl-btn").click(function(){
-        // download_file(file);
         let block_to_sdl_objects = {};
         for (let block in plot_to_box_objects) {
             let sdl_objects = [];
@@ -828,6 +828,8 @@ $(document).ready(function() {
                 sdl_objects.push(...plot_to_box_objects[block][key]);
             }
             block_to_sdl_objects[block] = sdl_objects;
+            // add default loop value for missing blocks.
+            if (!(block in block_to_loops)) block_to_loops[block] = 1;
         }
         if (Object.keys(block_to_sdl_objects).length === 0) {
             fire_alert("Add boxes to generate SDL file.");
@@ -2551,6 +2553,7 @@ function add_dummy_block_boxes(starting_point, ending_point) {
         Plotly.relayout(target, update);
 
         boxObj = new Box("Block", starting_point, axis_id_to_axis_name[target.id], y_data);
+        boxObj.name = "dummy_box_" + (target.data.length-1);
         let block_name = $('#block-select').val();
         if (!(block_name in plot_to_box_objects)) {
             plot_to_box_objects[block_name] = JSON.parse(JSON.stringify(plot_to_box_objects_template));
