@@ -63,4 +63,11 @@ Vagrant.configure("2") do |config|
 
     sudo bash /opt/mtrk_designer_gui/install.sh
   SHELL
+
+  config.trigger.after :up do |trigger|
+    trigger.info = "Running host command after 'vagrant up'"
+    trigger.run = { inline: "vagrant port > port_info.txt" }
+    trigger.run_remote = {inline: "/opt/mtrk_designer_gui/venv/bin/python /vagrant/retrieve_port_mapping.py"}
+  end
+
 end
