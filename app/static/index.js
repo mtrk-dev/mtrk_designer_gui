@@ -3063,10 +3063,17 @@ function send_data(block_to_box_objects, configurations, block_structure, events
         }),
         success: function(response) {
             console.log(response);
-            // verify_and_open_viewer(viewer_url, response);
             let response_blob = new Blob([response], { type: 'application/json' });
             let response_file = new File([response_blob], 'output_sdl_file.mtrk');
             download_file(response_file);
+            $.ajax({
+                url: '/get_port_mapping',
+                method: 'GET',
+                success: function(data) {
+                    viewer_url = "http://127.0.0.1:" + data["6010"];
+                    verify_and_open_viewer(viewer_url, response);
+                }
+            });
         },
         error: function(error) {
             let errorResponse = error.responseJSON;

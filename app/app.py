@@ -59,6 +59,16 @@ def process():
     if os.path.isfile("output.mtrk"):
        return send_file('output.mtrk')
 
+@app.route('/get_port_mapping', methods=['GET'])
+def get_port_mapping():
+    port_mapping_file = '/opt/port_mappings.json'
+    if os.path.exists(port_mapping_file):
+        with open(port_mapping_file, 'r') as file:
+            port_mapping = json.load(file)
+        return jsonify(port_mapping)
+    else:
+        return jsonify({"error": "Port mapping file not found"}), 404
+
 @app.errorhandler(Exception)
 def handle_exception(e):
     response = {
