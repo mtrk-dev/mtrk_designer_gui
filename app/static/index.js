@@ -214,7 +214,7 @@ const layout = {
     showlegend: false,
       margin: {
         t: 20,
-        b: 20,
+        b: 25,
         r: 15,
         // l: 60
       },
@@ -222,13 +222,15 @@ const layout = {
         text: ""
     },
     xaxis: {
-        title: "time (ms)",
-        titlefont: {
-            family: 'Arial, sans-serif',
-            size: 12,
-            color: 'rgba(255,255,255,0.9)'
+        title: {
+            text: "time (ms)",
+            font: {
+                family: 'Arial, sans-serif',
+                size: 12,
+                color: 'rgba(255,255,255,0.9)'
+            }
         },
-        tickformat: "digits",
+        tickformat: "~",
         tickfont : {
             family: 'Arial, sans-serif',
             color : 'rgba(255,255,255,0.9)'
@@ -239,11 +241,13 @@ const layout = {
         fixedrange: true,
     },
     yaxis: {
-        title: "RF (V)",
-        titlefont: {
-            family: 'Arial, sans-serif',
-            size: 12,
-            color: 'rgba(255,255,255,0.9)'
+        title: {
+            text: "RF (V)",
+            font: {
+                family: 'Arial, sans-serif',
+                size: 12,
+                color: 'rgba(255,255,255,0.9)'
+            }
         },
         tickfont : {
             family: 'Arial, sans-serif',
@@ -254,7 +258,8 @@ const layout = {
         fixedrange: true,
         range: [-1.25, 1.75],
     },
-    dragmode: false
+    dragmode: false,
+    hovermode: "x"
 };
 
 var rf_layout = JSON.parse(JSON.stringify(layout));
@@ -263,16 +268,16 @@ var phase_layout = JSON.parse(JSON.stringify(layout));
 var readout_layout = JSON.parse(JSON.stringify(layout));
 var adc_layout = JSON.parse(JSON.stringify(layout));
 
-rf_layout["yaxis"]["title"] = "RF";
-slice_layout["yaxis"]["title"] = "Slice (mT/m)";
-phase_layout["yaxis"]["title"] = "Phase (mT/m)";
-readout_layout["yaxis"]["title"] = "Readout (mT/m)";
-adc_layout["yaxis"]["title"] = "ADC (on/off)";
+rf_layout["yaxis"]["title"]["text"] = "RF";
+slice_layout["yaxis"]["title"]["text"] = "Slice (mT/m)";
+phase_layout["yaxis"]["title"]["text"] = "Phase (mT/m)";
+readout_layout["yaxis"]["title"]["text"] = "Readout (mT/m)";
+adc_layout["yaxis"]["title"]["text"] = "ADC (on/off)";
 
-rf_layout["xaxis"]["title"] = "";
-slice_layout["xaxis"]["title"] = "";
-phase_layout["xaxis"]["title"] = "";
-readout_layout["xaxis"]["title"] = "";
+rf_layout["xaxis"]["title"]["text"] = "";
+slice_layout["xaxis"]["title"]["text"] = "";
+phase_layout["xaxis"]["title"]["text"] = "";
+readout_layout["xaxis"]["title"]["text"] = "";
 
 rf_layout["title"] = {
     text:main_block_str,
