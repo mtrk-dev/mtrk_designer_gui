@@ -2488,7 +2488,7 @@ function move_block_boxes(block_number, starting_point) {
 }
 
 function add_dummy_block_boxes(starting_point, ending_point) {
-    for (var key in plot_to_box_objects[main_block_str]) {
+    for (var key in plot_to_box_objects_template) {
         let target = document.getElementById(key);
         let x_data = [];
         let y_data = [];
@@ -2700,10 +2700,17 @@ function calculate_block_range(block_name) {
 
     for (var key in blocks[block_name]) {
         let layout = blocks[block_name][key][1];
+        if (!layout.shapes) continue;
         layout.shapes.forEach(function (shape) {
             start_time = Math.min(start_time, Math.floor(shape["x0"]));
             end_time = Math.max(end_time, Math.ceil(shape["x1"]));
         });
+    }
+
+    if (start_time == Number.MAX_VALUE || end_time == 0) {
+        // The block is probably empty, so just return a safe zoom range.
+        start_time = 0;
+        end_time = 10;
     }
 
     return [start_time, end_time];
@@ -3530,3 +3537,75 @@ function reflect_loops_from_sdl() {
     }
 }
 // SDL load related functions - end
+
+
+// Block checkpoint related functions - start
+function generate_block_checkpoint_state(block_name) {
+    let block_state = {};
+
+    block_state["block_name"] = block_name;
+    block_state["block_data"] = blocks[block_name];
+    block_state["block_duration"] = block_to_duration[block_name];
+    block_state["block_events_html"] = block_to_events_html[block_name];
+    block_state["plot_to_box_objects"] = plot_to_box_objects[block_name];
+    block_state["array_name_to_array"] = array_name_to_array;
+
+    let min_block_state = JSON.stringify(block_state);
+
+    let blob = new Blob([min_block_state], { type: 'application/json' });
+    let file_name = block_name + "_checkpoint.json";
+    let file = new File([blob], file_name);
+    download_file(file);
+
+    return block_state;
+}
+
+function load_block_checkpoint(block_state) {
+    let block_name = block_state["block_name"];
+    if (!(block_name in plot_to_box_objects)) {
+        plot_to_box_objects[block_name] = JSON.parse(JSON.stringify(plot_to_box_objects_template));
+    } else {
+        while (block_name in plot_to_box_objects) {
+            block_name = block_name + "_" + Math.random().toString(36).substring(2, 15);
+        }
+    }
+    blocks[block_name] = block_state["block_data"];
+    block_to_duration[block_name] = parseFloat(block_state["block_duration"]);
+    block_to_events_html[block_name] = block_state["block_events_html"];
+
+    // update the arrays only with the additional arrays that might be present in the block.
+    for (let key in block_state["array_name_to_array"]) {
+        if (!(key in array_name_to_array)) {
+            array_name_to_array[key] = block_state["array_name_to_array"][key];
+        }
+    }
+
+    // convert all the box objects to actual Box class objects for coherence.
+    for (let key in plot_to_box_objects_template) {
+        block_state["plot_to_box_objects"][key].forEach(function (Obj) {
+            let boxObj = new Box(Obj.type, Obj.start_time, Obj.axis, [Obj.array_info.name, Obj.array_info.array]);
+            Object.assign(boxObj, Obj);
+            plot_to_box_objects[block_name][key].push(boxObj);
+        });
+    }
+
+    let start_time = 0;
+    let end_time = start_time + block_to_duration[block_name];
+    blockObj = new Block(block_name, start_time);
+    block_number_to_block_object[block_color_counter] = blockObj;
+    add_dummy_block_boxes(start_time, end_time);
+    block_color_counter += 1;
+    // if (block_color_counter >= block_colors.length) block_color_counter = 0;
+
+    save_block_data($('#block-select').val());
+    let o = new Option(block_name, block_name);
+    $(o).html(block_name);
+    $("#block-select").append(o);
+}
+
+$.getJSON('/static/block_checkpoints/Block_1_checkpoint.json', function(data) {
+    load_block_checkpoint(data);
+  }).fail(function(jqxhr, textStatus, error) {
+    console.error('Error loading JSON file:', textStatus, error);
+});
+// Block checkpoint related functions - end
