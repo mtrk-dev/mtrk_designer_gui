@@ -448,6 +448,8 @@ $(document).ready(function() {
                 event.dataTransfer.setDragImage(grad_drag_image, 0, 0);
             } else if (dragged.id == "adc_readout_btn") {
                 event.dataTransfer.setDragImage(adc_drag_image, 0, 0);
+            } else if ($(dragged).hasClass("block_btn")) {
+                event.dataTransfer.setDragImage(block_drag_image, 0, 0);
             }
         });
         source.addEventListener("dragend", (event) => {
@@ -494,6 +496,29 @@ $(document).ready(function() {
         let block_duration = block_to_duration[$('#block-select').val()];
         if (starting_point < 0 || starting_point > block_duration) {
             fire_alert("Drop allowed between 0 and block duration");
+            return;
+        }
+
+        if (dragged.id == "block_excitation_btn") {
+            $.getJSON('/static/block_checkpoints/block_excitation.json', function(block_data) {
+                load_block_checkpoint(block_data, starting_point);
+              }).fail(function(jqxhr, textStatus, error) {
+                console.error('Error loading JSON file:', textStatus, error);
+            });
+            return;
+        } else if (dragged.id == "block_refocusing_btn") {
+            $.getJSON('/static/block_checkpoints/block_refocusing.json', function(block_data) {
+                load_block_checkpoint(block_data, starting_point);
+              }).fail(function(jqxhr, textStatus, error) {
+                console.error('Error loading JSON file:', textStatus, error);
+            });
+            return;
+        }else if (dragged.id == "block_TR_btn") {
+            $.getJSON('/static/block_checkpoints/block_TR.json', function(block_data) {
+                load_block_checkpoint(block_data, starting_point);
+              }).fail(function(jqxhr, textStatus, error) {
+                console.error('Error loading JSON file:', textStatus, error);
+            });
             return;
         }
 
@@ -1270,9 +1295,11 @@ $(document).on("click", "#plot-size-btn", function () {
 let rf_drag_image = new Image();
 let grad_drag_image = new Image();
 let adc_drag_image = new Image();
+let block_drag_image = new Image();
 rf_drag_image.src = "/static/drag_images/rf.png";
 grad_drag_image.src = "/static/drag_images/gradient.png";
 adc_drag_image.src = "/static/drag_images/adc.png";
+block_drag_image.src = "/static/drag_images/block.png";
 
 // Pre processing code to convert the mouse point x-value to plot's xaxis value.
 var xaxis = rf_chart._fullLayout.xaxis;
@@ -2261,6 +2288,7 @@ function update_theme(toTheme) {
         $("#events-col").css({'background': "#ffffff", 'border-right': "1px solid #dfe2e6"});
         $("#plot-col").css({'background': "#ffffff", 'border-left': "1px solid #dfe2e6"});
         $("#object-btns-group button").css('border-color', '#dfe2e6');
+        $("#block-btns-group button").css('border-color', '#dfe2e6');
         $(".checkpoint-icon").css({'background': "#ffffff", 'border': "1px solid #dfe2e6"});
         $("#reset-btn, #undo-btn, #redo-btn, #save-plot-btn").css('background', "#ffffff");
         $("#mtrk-logo").hide();
@@ -2287,6 +2315,7 @@ function update_theme(toTheme) {
         $("#events-col").css({'background': "#0e0f10", "border-right": "1px solid #34373b"});
         $("#plot-col").css({'background': "var(--bs-body-bg)", "border-left": "1px solid #34373b"});
         $("#object-btns-group button").css('border-color', '#ffffff1f');
+        $("#block-btns-group button").css('border-color', '#ffffff1f');
         $(".checkpoint-icon").css({'background': "transparent", 'border': "1px solid gray"});
         $("#reset-btn, #undo-btn, #redo-btn, #save-plot-btn").css('background', "transparent");
         $("#mtrk-logo").show();
@@ -3560,18 +3589,17 @@ function generate_block_checkpoint_state(block_name) {
     return block_state;
 }
 
-function load_block_checkpoint(block_state) {
+function load_block_checkpoint(block_state, start_time) {
     let block_name = block_state["block_name"];
-    if (!(block_name in plot_to_box_objects)) {
-        plot_to_box_objects[block_name] = JSON.parse(JSON.stringify(plot_to_box_objects_template));
-    } else {
-        while (block_name in plot_to_box_objects) {
-            block_name = block_name + "_" + Math.random().toString(36).substring(2, 15);
-        }
+    while (block_name in plot_to_box_objects) {
+        block_name = block_name + "_" + Math.random().toString(36).substring(2, 6);
     }
+    plot_to_box_objects[block_name] = JSON.parse(JSON.stringify(plot_to_box_objects_template));
+
     blocks[block_name] = block_state["block_data"];
     block_to_duration[block_name] = parseFloat(block_state["block_duration"]);
     block_to_events_html[block_name] = block_state["block_events_html"];
+    block_to_loops[block_name] = 1;
 
     // update the arrays only with the additional arrays that might be present in the block.
     for (let key in block_state["array_name_to_array"]) {
@@ -3589,23 +3617,15 @@ function load_block_checkpoint(block_state) {
         });
     }
 
-    let start_time = 0;
     let end_time = start_time + block_to_duration[block_name];
     blockObj = new Block(block_name, start_time);
     block_number_to_block_object[block_color_counter] = blockObj;
     add_dummy_block_boxes(start_time, end_time);
+    update_block_boxes_name(block_color_counter, block_name);
     block_color_counter += 1;
-    // if (block_color_counter >= block_colors.length) block_color_counter = 0;
 
-    save_block_data($('#block-select').val());
     let o = new Option(block_name, block_name);
     $(o).html(block_name);
     $("#block-select").append(o);
 }
-
-$.getJSON('/static/block_checkpoints/Block_1_checkpoint.json', function(data) {
-    load_block_checkpoint(data);
-  }).fail(function(jqxhr, textStatus, error) {
-    console.error('Error loading JSON file:', textStatus, error);
-});
 // Block checkpoint related functions - end
