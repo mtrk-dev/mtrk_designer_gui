@@ -1579,6 +1579,7 @@ function load_block_modal_values(plot, trace_number) {
     } else {
         $("#printCounterCheck").prop("checked", false);
     }
+    $('#displayBlockDuration').val(block_to_duration[blockObj.name].toFixed(2));
 }
 
 function save_modal_values(plot, trace_number) {
