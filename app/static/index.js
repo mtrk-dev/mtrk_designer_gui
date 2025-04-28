@@ -499,23 +499,11 @@ $(document).ready(function() {
             return;
         }
 
-        if (dragged.id == "block_excitation_btn") {
-            $.getJSON('/static/block_checkpoints/block_excitation.json', function(block_data) {
-                load_block_checkpoint(block_data, starting_point);
-              }).fail(function(jqxhr, textStatus, error) {
-                console.error('Error loading JSON file:', textStatus, error);
-            });
-            return;
-        } else if (dragged.id == "block_refocusing_btn") {
-            $.getJSON('/static/block_checkpoints/block_refocusing.json', function(block_data) {
-                load_block_checkpoint(block_data, starting_point);
-              }).fail(function(jqxhr, textStatus, error) {
-                console.error('Error loading JSON file:', textStatus, error);
-            });
-            return;
-        }else if (dragged.id == "block_TR_btn") {
-            $.getJSON('/static/block_checkpoints/block_TR.json', function(block_data) {
-                load_block_checkpoint(block_data, starting_point);
+        if ($(dragged).hasClass("block_btn")) {
+            let block_name = dragged.id;
+            let cur_selected_block = $("#block-select").val();
+            $.getJSON('/static/block_checkpoints/'+ block_name + '.json', function(block_data) {
+                load_block_checkpoint(block_data, starting_point, cur_selected_block, cur_selected_block, 0);
               }).fail(function(jqxhr, textStatus, error) {
                 console.error('Error loading JSON file:', textStatus, error);
             });
@@ -3578,6 +3566,8 @@ function generate_block_checkpoint_state(block_name) {
     block_state["block_events_html"] = block_to_events_html[block_name];
     block_state["plot_to_box_objects"] = plot_to_box_objects[block_name];
     block_state["array_name_to_array"] = array_name_to_array;
+    block_state["block_number_to_block_object"] = block_number_to_block_object;
+    block_state["block_to_loops"] = block_to_loops;
 
     let min_block_state = JSON.stringify(block_state);
 
@@ -3589,7 +3579,12 @@ function generate_block_checkpoint_state(block_name) {
     return block_state;
 }
 
-function load_block_checkpoint(block_state, start_time) {
+function load_block_checkpoint(block_state, start_time, parent_block, base_block, active_calls) {
+    if ($("#block-select").val() != parent_block) {
+        load_block_data(parent_block);
+        $("#block-select").val(parent_block);
+    }
+
     let block_name = block_state["block_name"];
     while (block_name in plot_to_box_objects) {
         block_name = block_name + "_" + Math.random().toString(36).substring(2, 6);
@@ -3600,6 +3595,10 @@ function load_block_checkpoint(block_state, start_time) {
     block_to_duration[block_name] = parseFloat(block_state["block_duration"]);
     block_to_events_html[block_name] = block_state["block_events_html"];
     block_to_loops[block_name] = 1;
+    if (block_state["block_to_loops"] && block_name in block_state["block_to_loops"]) {
+        block_to_loops[block_name] = block_state["block_to_loops"][block_name];
+    }
+    let loops = parseInt(block_to_loops[block_name]);
 
     // update the arrays only with the additional arrays that might be present in the block.
     for (let key in block_state["array_name_to_array"]) {
@@ -3609,15 +3608,25 @@ function load_block_checkpoint(block_state, start_time) {
     }
 
     // convert all the box objects to actual Box class objects for coherence.
+    let inner_blocks = {};
+    let temp_block_number_objects = block_state["block_number_to_block_object"];
     for (let key in plot_to_box_objects_template) {
         block_state["plot_to_box_objects"][key].forEach(function (Obj) {
-            let boxObj = new Box(Obj.type, Obj.start_time, Obj.axis, [Obj.array_info.name, Obj.array_info.array]);
-            Object.assign(boxObj, Obj);
-            plot_to_box_objects[block_name][key].push(boxObj);
+            if (Obj.type == "Block") {
+                if (!(block_name in inner_blocks)) {
+                    let inner_block_name = temp_block_number_objects[Obj.block].name;
+                    inner_blocks[inner_block_name] = temp_block_number_objects[Obj.block].start_time;
+                    blocks[block_name] = JSON.parse(default_data_state).plots_data.Main;
+                }
+            } else {
+                let boxObj = new Box(Obj.type, Obj.start_time, Obj.axis, [Obj.array_info.name, Obj.array_info.array]);
+                Object.assign(boxObj, Obj);
+                plot_to_box_objects[block_name][key].push(boxObj);
+            }
         });
     }
 
-    let end_time = start_time + block_to_duration[block_name];
+    let end_time = start_time + (block_to_duration[block_name] * loops);
     blockObj = new Block(block_name, start_time);
     block_number_to_block_object[block_color_counter] = blockObj;
     add_dummy_block_boxes(start_time, end_time);
@@ -3627,5 +3636,20 @@ function load_block_checkpoint(block_state, start_time) {
     let o = new Option(block_name, block_name);
     $(o).html(block_name);
     $("#block-select").append(o);
+
+    for (let inner_block_name in inner_blocks) {
+        active_calls += 1;
+        $.getJSON('/static/block_checkpoints/'+ inner_block_name + '.json', function(inner_block_data) {
+            load_block_checkpoint(inner_block_data, inner_blocks[inner_block_name], block_name, base_block, active_calls);
+          }).fail(function(jqxhr, textStatus, error) {
+            console.error('Error loading JSON file:', textStatus, error);
+          }).always(function() {
+            active_calls -= 1;
+            if (active_calls == 0) {
+                load_block_data(base_block);
+                $("#block-select").val(base_block);
+            }
+        });
+    }
 }
 // Block checkpoint related functions - end
