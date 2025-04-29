@@ -1594,6 +1594,7 @@ function load_block_modal_values(plot, trace_number) {
     } else {
         $("#printCounterCheck").prop("checked", false);
     }
+    $('#displayBlockDuration').val(block_to_duration[blockObj.name].toFixed(2));
 }
 
 function save_modal_values(plot, trace_number) {
@@ -3511,12 +3512,18 @@ function make_dummy_blocks() {
         $("#block-select").val(block_name);
         load_block_data(block_name);
         let info_ranges = dummy_blocks[block_name];
+        let first_block_offset_time = null;
         for (let info_range of info_ranges) {
+            if (first_block_offset_time == null) {
+                first_block_offset_time = parseFloat(info_range[2]);
+            }
             block_color_counter = info_range[0];
-            let loops = parseInt(block_to_loops[info_range[1]]);
-            let end_time_loops = parseInt(info_range[3]);
-            add_dummy_block_boxes(parseInt(info_range[2]), end_time_loops);
+            let start_time = parseFloat(info_range[2]) - first_block_offset_time;
+            let end_time_loops = parseFloat(info_range[3]) - first_block_offset_time;
+            add_dummy_block_boxes(start_time, end_time_loops);
             update_block_boxes_name(block_color_counter, info_range[1]);
+            blockObj = block_number_to_block_object[block_color_counter];
+            blockObj.start_time = start_time;
         }
     }
 }
