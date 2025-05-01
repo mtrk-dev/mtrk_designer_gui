@@ -1767,7 +1767,7 @@ function save_configurations() {
     let fov = $('#fovInfoInput').val();
     let seqstring = $('#seqstringInfoInput').val();
     let reconstruction = $('#reconstructionInfoInput').val();
-    let pelines = $('#peLinesInfoInput').val();
+    let resolution = $('#resolutionInfoInput').val();
 
     // Add default values if left empty
     if (format == "") { format = "mtrk-SDL"; }
@@ -1781,7 +1781,7 @@ function save_configurations() {
     if (seqstring == "") { seqstring = "YARRA"; }
     if (reconstruction == "") { reconstruction = "%SiemensIceProgs%\\IceProgram2D"; }
     else { reconstruction = reconstruction.replace(/\\\\/g, "\\"); }
-    if (pelines == "") { pelines = "128"; }
+    if (resolution == "") { resolution = "128"; }
 
     configs['file'] = {
         'format': format,
@@ -1798,7 +1798,7 @@ function save_configurations() {
         'fov': fov,
         'seqstring': seqstring,
         'reconstruction': reconstruction,
-        'pelines': pelines
+        'resolution': resolution
     }
     return configs
 }
@@ -1817,7 +1817,7 @@ function load_configurations(configs) {
     $('#fovInfoInput').val(configs['info']['fov']);
     $('#seqstringInfoInput').val(configs['info']['seqstring']);
     $('#reconstructionInfoInput').val(configs['info']['reconstruction']);
-    $('#peLinesInfoInput').val(configs['info']['pelines']);
+    $('#resolutionInfoInput').val(configs['info']['resolution']);
 }
 
 function update_plot_config(shiftIsPressed) {
