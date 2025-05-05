@@ -7,8 +7,10 @@ import os
 import sys
 path = os.path.abspath("mtrk_designer_api")
 sys.path.append(path)
+sys.path.append(os.path.join(path, "ReadoutBlocks"))
 
 from backendToUi import *
+from readoutBlockGenerator import *
 
 import webbrowser
 from threading import Timer
@@ -58,6 +60,31 @@ def process():
 
     if os.path.isfile("output.mtrk"):
        return send_file('output.mtrk')
+
+@app.route('/update', methods=['POST'])
+def update():
+    data = json.loads(request.data, strict=False)
+    configurations = data['configurations']
+    info = data['update_info']
+    insertion_block = info['parent_block']
+    previous_block = info['previous_block']
+    block_name = info['block_name']
+
+    readoutList = ["cartesian", "radial", "spiral", "epi"]
+    readoutType = None
+    for readout in readoutList:
+        if readout in block_name.lower():
+            readoutType = readout
+            break
+    if readoutType is None:
+        return jsonify({"error": "Invalid readout type in block name"}), 400
+
+    # can simply use the last generated output.mtrk as input.
+    automaticReadoutBlockGenerator(readoutType = readoutType, inputFilename = "output.mtrk",
+                            insertion_block = insertion_block, previous_block = previous_block)
+
+    if os.path.isfile("updated_sdl.mtrk"):
+       return send_file('updated_sdl.mtrk')
 
 @app.route('/get_port_mapping', methods=['GET'])
 def get_port_mapping():

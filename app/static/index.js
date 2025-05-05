@@ -502,11 +502,24 @@ $(document).ready(function() {
         if ($(dragged).hasClass("block_btn")) {
             let block_name = dragged.id;
             let cur_selected_block = $("#block-select").val();
-            $.getJSON('/static/block_checkpoints/'+ block_name + '.json', function(block_data) {
-                load_block_checkpoint(block_data, starting_point, cur_selected_block, cur_selected_block, 0);
-              }).fail(function(jqxhr, textStatus, error) {
-                console.error('Error loading JSON file:', textStatus, error);
-            });
+            // If not a readout block- load directly, else get updated sdl from backend.
+            if (block_name == "block_excitation" || block_name == "block_refocusing") {
+                $.getJSON('/static/block_checkpoints/'+ block_name + '.json', function(block_data) {
+                    load_block_checkpoint(block_data, starting_point, cur_selected_block, cur_selected_block, 0);
+                  }).fail(function(jqxhr, textStatus, error) {
+                    console.error('Error loading JSON file:', textStatus, error);
+                });
+            } else {
+                let previous_block = get_previous_block(starting_point, cur_selected_block);
+                let update_info = {
+                    "previous_block": previous_block,
+                    "parent_block": cur_selected_block,
+                    "block_name": block_name,
+                }
+                $('#plot-col').addClass('blurred');
+                $('#events-col').addClass('blurred');
+                prepare_data_to_send("update", update_info);
+            }
             return;
         }
 
@@ -578,7 +591,6 @@ $(document).ready(function() {
                     if ("height" in ed || "shape" in ed) {
                         recalculate_mouse_to_plot_conversion_variables();
                     }
-                console.log("Not moved!");
             } else {
                 try {
                     console.log("Moved!");
@@ -842,24 +854,7 @@ $(document).ready(function() {
     });
 
     $("#generate-sdl-btn").click(function(){
-        let block_to_sdl_objects = {};
-        for (let block in plot_to_box_objects) {
-            let sdl_objects = [];
-            for (var key in plot_to_box_objects[block]) {
-                sdl_objects.push(...plot_to_box_objects[block][key]);
-            }
-            block_to_sdl_objects[block] = sdl_objects;
-            // add default loop value for missing blocks.
-            if (!(block in block_to_loops)) block_to_loops[block] = 1;
-        }
-        if (Object.keys(block_to_sdl_objects).length === 0) {
-            fire_alert("Add boxes to generate SDL file.");
-            return;
-        }
-        let configurations = save_configurations();
-        let structure = generate_blocks_nesting_structure();
-        let serialized_events = serialize_events_data();
-        send_data(block_to_sdl_objects, configurations, structure, serialized_events, block_to_duration);
+        prepare_data_to_send("process");
     });
 
     $(document).on('click', '.array-dropdown', function () {
@@ -984,6 +979,12 @@ $(document).ready(function() {
         $('#settingsModal').modal('toggle');
     })
     $("#settings_save_changes_btn").click(function(){
+        // let old_config = JSON.parse(localStorage.getItem("data"))["configurations"];
+        // let new_config = save_configurations();
+        // if (old_config["info"]["fov"] !== new_config["info"]["fov"] || old_config["info"]["resolution"] !== new_config["info"]["resolution"]) {
+        //     save_data();
+        //     prepare_data_to_send("update");
+        // }
         $('#settingsModal').modal('toggle');
     })
 
@@ -3077,7 +3078,44 @@ function download_file(file) {
     window.URL.revokeObjectURL(url);
 }
 
-function send_data(block_to_box_objects, configurations, block_structure, events, block_to_duration) {
+function get_previous_block(starting_point, selected_block) {
+    if (!(plot_to_box_objects[selected_block])) return null;
+    let previous_block_box = null;
+    for (var key in plot_to_box_objects_template) {
+        plot_to_box_objects[selected_block][key].forEach(function (boxObj, index) {
+            if (boxObj.block !== null && boxObj.start_time < starting_point) {
+                if (previous_block_box === null || boxObj.start_time > previous_block_box.start_time) {
+                    previous_block_box = boxObj;
+                }
+            }
+        });
+    }
+    blockObj = previous_block_box ? block_number_to_block_object[previous_block_box.block] : null;
+    return blockObj.name;
+}
+
+function prepare_data_to_send(action, update_info=null) {
+    let block_to_sdl_objects = {};
+    for (let block in plot_to_box_objects) {
+        let sdl_objects = [];
+        for (var key in plot_to_box_objects[block]) {
+            sdl_objects.push(...plot_to_box_objects[block][key]);
+        }
+        block_to_sdl_objects[block] = sdl_objects;
+        // add default loop value for missing blocks.
+        if (!(block in block_to_loops)) block_to_loops[block] = 1;
+    }
+    if (Object.keys(block_to_sdl_objects).length === 0) {
+        fire_alert("Add boxes to generate SDL file.");
+        return;
+    }
+    let configurations = save_configurations();
+    let structure = generate_blocks_nesting_structure();
+    let serialized_events = serialize_events_data();
+    send_data(block_to_sdl_objects, configurations, structure, serialized_events, block_to_duration, action, update_info);
+}
+
+function send_data(block_to_box_objects, configurations, block_structure, events, block_to_duration, action, update_info) {
     $.ajax({
         url: '/process',
         type: 'POST',
@@ -3092,18 +3130,58 @@ function send_data(block_to_box_objects, configurations, block_structure, events
             "block_to_duration": block_to_duration
         }),
         success: function(response) {
-            console.log(response);
-            let response_blob = new Blob([response], { type: 'application/json' });
-            let response_file = new File([response_blob], 'output_sdl_file.mtrk');
-            download_file(response_file);
-            $.ajax({
-                url: '/get_port_mapping',
-                method: 'GET',
-                success: function(data) {
-                    viewer_url = "http://127.0.0.1:" + data["6010"];
-                    verify_and_open_viewer(viewer_url, response);
-                }
-            });
+            if (action == "process") {
+                console.log(response);
+                let response_blob = new Blob([response], { type: 'application/json' });
+                let response_file = new File([response_blob], 'output_sdl_file.mtrk');
+                download_file(response_file);
+                $.ajax({
+                    url: '/get_port_mapping',
+                    method: 'GET',
+                    success: function(data) {
+                        viewer_url = "http://127.0.0.1:" + data["6010"];
+                        verify_and_open_viewer(viewer_url, response);
+                    }
+                });
+            } else if (action == "update") {
+                $.ajax({
+                    url: '/update',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        'configurations': configurations,
+                        'update_info': update_info
+                    }),
+                    success: function(update_response) {
+                        update_response = update_response.replace(/main/g, main_block_str);
+                        let updated_sdl = JSON.parse(update_response);
+                        console.log(updated_sdl);
+                        try {
+                            // replicating sdl load functionality
+                            reload_data(JSON.parse(default_data_state));
+                            populate_global_variables_with_sdl_data(updated_sdl);
+                            make_dummy_blocks();
+                            load_block_data(main_block_str);
+                            scale_boxes_amplitude();
+                            reflect_loops_from_sdl();
+                            block_color_counter = Object.keys(visited_blocks).length;
+                        } catch (e) {
+                            fire_alert("Could not load updated SDL file");
+                            console.log(e);
+                            undo_data();
+                            redo_stack = [];
+                        } finally {
+                            $('#plot-col').removeClass('blurred');
+                            $('#events-col').removeClass('blurred');
+                        }
+                    },
+                    error: function(update_error) {
+                        let update_error_response = update_error.responseJSON;
+                        console.log(update_error_response.traceback);
+                        fire_alert('Internal Error: ' + update_error_response.error + ' (' + update_error_response.type + ')');
+                    }
+                });
+            }
         },
         error: function(error) {
             let errorResponse = error.responseJSON;
