@@ -735,10 +735,12 @@ $(document).ready(function() {
 
         // deleting block from memory
         blockObj = block_number_to_block_object[block_number];
-        delete blocks[blockObj.name];
+        let block_to_delete = blockObj.name;
+        delete blocks[block_to_delete];
         delete block_number_to_block_object[block_number];
-        delete block_to_loops[blockObj.name];
-        delete block_to_duration[blockObj.name];
+        delete block_to_loops[block_to_delete];
+        delete block_to_duration[block_to_delete];
+        delete block_to_events_html[block_to_delete];
         delete blockObj;
 
         // deleting block UI in current block window.
@@ -755,6 +757,7 @@ $(document).ready(function() {
                 }
             });
         }
+        delete plot_to_box_objects[block_to_delete];
 
         load_block_select_options();
         $('#block-select').val(current_block_name);
