@@ -9,8 +9,9 @@ path = os.path.abspath("mtrk_designer_api")
 sys.path.append(path)
 sys.path.append(os.path.join(path, "ReadoutBlocks"))
 
-from backendToUi import *
-from readoutBlockGenerator import *
+from backendToUi import create_sdl_from_ui_inputs
+from readoutBlockGenerator import automaticReadoutBlockGenerator
+from mtrkToPulseqConverter import mtrkToPulseqConverter
 
 import webbrowser
 from threading import Timer
@@ -60,6 +61,14 @@ def process():
 
     if os.path.isfile("output.mtrk"):
        return send_file('output.mtrk')
+
+@app.route('/convert', methods=['GET'])
+def convert():
+    # can simply use the last generated output.mtrk as input.
+    mtrkToPulseqConverter(fileToConvert = "output.mtrk", outputFile = "output.seq")
+
+    if os.path.isfile("output.seq"):
+        return send_file('output.seq')
 
 @app.route('/update', methods=['POST'])
 def update():

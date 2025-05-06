@@ -3138,6 +3138,23 @@ function send_data(block_to_box_objects, configurations, block_structure, events
                 let response_blob = new Blob([response], { type: 'application/json' });
                 let response_file = new File([response_blob], 'output_sdl_file.mtrk');
                 download_file(response_file);
+
+                $.ajax({
+                    url: '/convert',
+                    type: 'GET',
+                    contentType: 'text/plain',
+                    success: function(convert_response) {
+                        let converted_response_blob = new Blob([convert_response], { type: 'application/json' });
+                        let converted_response_file = new File([converted_response_blob], 'output_pulseq.seq');
+                        download_file(converted_response_file);
+                    },
+                    error: function(convert_error) {
+                        let convert_error_response = convert_error.responseJSON;
+                        console.log(convert_error_response.traceback);
+                        fire_alert('Conversion Error: ' + convert_error_response.error + ' (' + convert_error_response.type + ')');
+                    }
+                });
+
                 $.ajax({
                     url: '/get_port_mapping',
                     method: 'GET',

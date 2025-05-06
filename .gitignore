@@ -8,6 +8,7 @@ mtrk_designer_api/
 output.mtrk
 test_backend.txt
 updated_sdl.mtrk
+output.seq
 
 __pycache__/
 
