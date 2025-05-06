@@ -2323,11 +2323,11 @@ function toggle_plot_color(isDark) {
         var update = {
             "plot_bgcolor":"rgba(255,255,255,0.1)",
             "paper_bgcolor":"rgba(255,255,255,0.1)",
-            "xaxis.titlefont.color": "rgba(0,0,0,0.9)",
+            "xaxis.title.font.color": "rgba(0,0,0,0.9)",
             "xaxis.tickfont.color": "rgba(0,0,0,0.9)",
             "xaxis.gridcolor": "rgba(0,0,0,0.05)",
             "xaxis.zerolinecolor": "rgba(0,0,0,0.2)",
-            "yaxis.titlefont.color": "rgba(0,0,0,0.9)",
+            "yaxis.title.font.color": "rgba(0,0,0,0.9)",
             "yaxis.tickfont.color": "rgba(0,0,0,0.9)",
             "yaxis.gridcolor": "rgba(0,0,0,0.05)",
             "yaxis.zerolinecolor": "rgba(0,0,0,0.2)",
@@ -2337,11 +2337,11 @@ function toggle_plot_color(isDark) {
         var update = {
             "plot_bgcolor":"rgba(0,0,0,0.1)",
             "paper_bgcolor":"rgba(0,0,0,0.6)",
-            "xaxis.titlefont.color": "rgba(255,255,255,0.9)",
+            "xaxis.title.font.color": "rgba(255,255,255,0.9)",
             "xaxis.tickfont.color": "rgba(255,255,255,0.9)",
             "xaxis.gridcolor": "rgba(255,255,255,0.05)",
             "xaxis.zerolinecolor": "rgba(255,255,255,0.1)",
-            "yaxis.titlefont.color": "rgba(255,255,255,0.9)",
+            "yaxis.title.font.color": "rgba(255,255,255,0.9)",
             "yaxis.tickfont.color": "rgba(255,255,255,0.9)",
             "yaxis.gridcolor": "rgba(255,255,255,0.05)",
             "yaxis.zerolinecolor": "rgba(255,255,255,0.1)",
@@ -3158,6 +3158,7 @@ function send_data(block_to_box_objects, configurations, block_structure, events
                     success: function(update_response) {
                         update_response = update_response.replace(/main/g, main_block_str);
                         let updated_sdl = JSON.parse(update_response);
+                        let cur_selected_block = $('#block-select').val();
                         console.log(updated_sdl);
                         try {
                             // replicating sdl load functionality
@@ -3174,6 +3175,8 @@ function send_data(block_to_box_objects, configurations, block_structure, events
                             undo_data();
                             redo_stack = [];
                         } finally {
+                            load_block_data(cur_selected_block);
+                            $("#block-select").val(cur_selected_block);
                             $('#plot-col').removeClass('blurred');
                             $('#events-col').removeClass('blurred');
                         }
