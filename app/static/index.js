@@ -519,6 +519,7 @@ $(document).ready(function() {
                 }
                 $('#plot-col').addClass('blurred');
                 $('#events-col').addClass('blurred');
+                toggle_loader_animation(true);
                 prepare_data_to_send("update", update_info);
             }
             return;
@@ -1177,6 +1178,7 @@ $(document).ready(function() {
             $("#sdl-upload-icon").hide();
             $('#plot-col').addClass('blurred');
             $('#events-col').addClass('blurred');
+            toggle_loader_animation(true);
         } catch {
             return;
         }
@@ -1203,6 +1205,7 @@ $(document).ready(function() {
                 $("#sdl-upload-icon").show();
                 $('#plot-col').removeClass('blurred');
                 $('#events-col').removeClass('blurred');
+                toggle_loader_animation(false);
             }
         };
     }
@@ -2361,6 +2364,20 @@ function toggle_plot_color(isDark) {
     Plotly.relayout(adc_chart, update);
 }
 
+function toggle_loader_animation(showLoader) {
+    if (showLoader) {
+        var loader = document.getElementById('loader');
+        loader.style.opacity = '1';
+        loader.style.display = 'flex';
+        loader.style.background = 'transparent';
+    } else {
+        var loader = document.getElementById('loader');
+        loader.style.opacity = '0';
+        loader.style.display = 'none';
+        loader.style.background = 'black';
+    }
+}
+
 function select_box(trace_number, plot) {
     let shape_number = (trace_number-1)*2;
     let shapes = JSON.parse(JSON.stringify(plot.layout["shapes"]));
@@ -3203,6 +3220,7 @@ function send_data(block_to_box_objects, configurations, block_structure, events
                             $("#block-select").val(cur_selected_block);
                             $('#plot-col').removeClass('blurred');
                             $('#events-col').removeClass('blurred');
+                            toggle_loader_animation(false);
                         }
                     },
                     error: function(update_error) {
