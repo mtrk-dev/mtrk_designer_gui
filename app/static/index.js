@@ -94,6 +94,7 @@ var redo_stack = [];
 const max_stack_length = 8;
 
 var viewer_url = "http://127.0.0.1:6010";
+var send_to_viewer = true;
 
 const current_version = "1.6";
 
@@ -1119,6 +1120,10 @@ $(document).ready(function() {
 
         document.body.removeChild(link);
         window.URL.revokeObjectURL(url);
+    });
+
+    $("#sendToViewerCheck").click(function(){
+        send_to_viewer = $(this).is(":checked");
     });
 
     $("#events_save_changes_btn").click(function() {
@@ -2264,7 +2269,7 @@ function validateArrayValues(arrayValues) {
 function update_theme(toTheme) {
     if (toTheme == "light") {
         document.documentElement.setAttribute('data-bs-theme','light');
-        $('input[type="checkbox"]').attr("checked", false);
+        $('#flexSwitchCheckChecked').attr("checked", false);
         $(".btn-secondary").each(function(){
             $(this).removeClass("btn-secondary");
             $(this).addClass("btn-light");
@@ -2291,7 +2296,7 @@ function update_theme(toTheme) {
     }
     else {
         document.documentElement.setAttribute('data-bs-theme','dark');
-        $('input[type="checkbox"]').attr("checked", true);
+        $('#flexSwitchCheckChecked').attr("checked", true);
         $(".btn-light").each(function(){
             $(this).removeClass("btn-light");
             $(this).addClass("btn-secondary");
@@ -3155,14 +3160,16 @@ function send_data(block_to_box_objects, configurations, block_structure, events
                     }
                 });
 
-                $.ajax({
-                    url: '/get_port_mapping',
-                    method: 'GET',
-                    success: function(data) {
-                        viewer_url = "http://127.0.0.1:" + data["6010"];
-                        verify_and_open_viewer(viewer_url, response);
-                    }
-                });
+                if (send_to_viewer) {
+                    $.ajax({
+                        url: '/get_port_mapping',
+                        method: 'GET',
+                        success: function(data) {
+                            viewer_url = "http://127.0.0.1:" + data["6010"];
+                            verify_and_open_viewer(viewer_url, response);
+                        }
+                    });
+                }
             } else if (action == "update") {
                 $.ajax({
                     url: '/update',
