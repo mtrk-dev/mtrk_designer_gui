@@ -3375,6 +3375,7 @@ function populate_global_variables_with_sdl_data(data_sdl) {
     file = data_sdl.file;
     settings = data_sdl.settings;
     info = data_sdl.infos;
+    info["resolution"] = info["pelines"];
     let config_data = {
         "file": file,
         "settings": settings,
