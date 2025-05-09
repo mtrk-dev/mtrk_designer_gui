@@ -2507,6 +2507,7 @@ function add_block_with_selected_boxes() {
     block_to_duration[block_name] = parseFloat(end_time) - parseFloat(start_time);
 
     add_dummy_block_boxes(start_time, end_time);
+    offset_boxes_inside_block(block_name, start_time);
 
     block_color_counter += 1;
     if (block_color_counter >= block_colors.length) block_color_counter = 0;
@@ -2601,6 +2602,23 @@ function add_dummy_block_boxes(starting_point, ending_point) {
         boxObj.block = block_color_counter;
         plot_to_box_objects[block_name][target.id].push(boxObj);
     }
+}
+
+function offset_boxes_inside_block(block_name, offset_time) {
+    let current_block = $('#block-select').val();
+    load_block_data(block_name);
+    $("#block-select").val(block_name);
+    for (var key in plot_to_box_objects_template) {
+        plot_to_box_objects[block_name][key].forEach(function (boxObj, index) {
+            let trace_number = index + 1
+            let plot_id = axis_name_to_axis_id[boxObj.axis];
+            let plot = document.getElementById(plot_id);
+            change_box_start_time(plot, trace_number, boxObj.start_time - offset_time);
+            boxObj.start_time = parseFloat(boxObj.start_time - offset_time);
+        });
+    }
+    load_block_data(current_block);
+    $("#block-select").val(current_block);
 }
 
 function get_increment_size_for_dummy_blocks(block_duration) {
