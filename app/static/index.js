@@ -3206,6 +3206,7 @@ function send_data(block_to_box_objects, configurations, block_structure, events
                     });
                 }
             } else if (action == "update") {
+                let cur_selected_block = $('#block-select').val();
                 $.ajax({
                     url: '/update',
                     type: 'POST',
@@ -3217,7 +3218,6 @@ function send_data(block_to_box_objects, configurations, block_structure, events
                     success: function(update_response) {
                         update_response = update_response.replace(/main/g, main_block_str);
                         let updated_sdl = JSON.parse(update_response);
-                        let cur_selected_block = $('#block-select').val();
                         console.log(updated_sdl);
                         try {
                             // replicating sdl load functionality
@@ -3233,12 +3233,6 @@ function send_data(block_to_box_objects, configurations, block_structure, events
                             console.log(e);
                             undo_data();
                             redo_stack = [];
-                        } finally {
-                            load_block_data(cur_selected_block);
-                            $("#block-select").val(cur_selected_block);
-                            $('#plot-col').removeClass('blurred');
-                            $('#events-col').removeClass('blurred');
-                            toggle_loader_animation(false);
                         }
                     },
                     error: function(update_error) {
@@ -3246,6 +3240,12 @@ function send_data(block_to_box_objects, configurations, block_structure, events
                         console.log(update_error_response.traceback);
                         fire_alert('Internal Error: ' + update_error_response.error + ' (' + update_error_response.type + ')');
                     }
+                }).always(function() {
+                    load_block_data(cur_selected_block);
+                    $("#block-select").val(cur_selected_block);
+                    $('#plot-col').removeClass('blurred');
+                    $('#events-col').removeClass('blurred');
+                    toggle_loader_animation(false);
                 });
             }
         },
