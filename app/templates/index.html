@@ -233,6 +233,11 @@
                               </ul>
                             </div>
                           </div>
+                          <div class="form-group grad-param rf-param">
+                            <a id="generate-waveform-btn" class="btn btn-sm btn-secondary" role="button" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Generate Waveform">
+                              <i class="fa fa-plus"></i>
+                            </a>
+                          </div>
                         </form>
                       </div>
                       <div class="modal-footer">
@@ -252,6 +257,64 @@
                         </div>
                         <button id="modal_close_btn" type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                         <button id="save_changes_btn" type="button" class="btn btn-primary">Save changes</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="modal fade" id="waveformModal" tabindex="-1" aria-labelledby="waveformModalLabel" aria-hidden="true">
+                  <div class="modal-dialog modal-dialog-scrollable">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5 class="modal-title" id="waveformModalLabel">Generate Waveform</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                      </div>
+                      <div class="modal-body">
+                        <form id="generateWaveformForm" action="">
+                          <div class="form-group grad-param">
+                            <label for="gradient-type-select">Gradient Type</label>
+                            <div class="row">
+                              <div class="col-6">
+                                <select id="gradient-type-select" class="form-select" aria-label=".form-select example">
+                                  <option selected value="trap">Trap</option>
+                                  <option value="min_trap">Min Trap</option>
+                                  <option value="ramp_sampled">Ramp Sampled</option>
+                                </select>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="form-group grad-param trap-param">
+                            <label for="ramp_up_time">Ramp Up Time (s)</label>
+                            <input type="number" class="form-control" id="ramp_up_time" placeholder=0>
+                          </div>
+                          <div class="form-group grad-param trap-param">
+                            <label for="ramp_down_time">Ramp Down Time (s)</label>
+                            <input type="number" class="form-control" id="ramp_down_time" placeholder=0>
+                          </div>
+                          <div class="form-group grad-param trap-param">
+                            <label for="plateau_time">Plateau Time (s)</label>
+                            <input type="number" class="form-control" id="plateau_time" placeholder=0>
+                          </div>
+                          <div class="form-group grad-param ramp-sampled-param">
+                            <label for="input_area">Area (mT/m/s)</label>
+                            <input type="number" class="form-control" id="input_area" placeholder=0>
+                          </div>
+                          <div class="form-group grad-param ramp-sampled-param">
+                            <label for="input_gmax">Gmax (mT/m)</label>
+                            <input type="number" class="form-control" id="input_gmax" placeholder=0>
+                          </div>
+                          <div class="form-group grad-param ramp-sampled-param">
+                            <label for="input_slew">Slew (T/m/s)</label>
+                            <input type="number" class="form-control" id="input_slew" placeholder=0>
+                          </div>
+                          <div class="form-group grad-param trap-param ramp-sampled-param">
+                            <label for="dt">Sample Time / dt (s)</label>
+                            <input type="number" class="form-control" id="dt" placeholder=0>
+                          </div>
+                        </form>
+                      </div>
+                      <div class="modal-footer">
+                        <button id="waveform_modal_close_btn" type="button" class="btn btn-secondary" data-bs-target="#parametersModal" data-bs-toggle="modal" data-dismiss="modal">Back</button>
+                        <button id="waveform_save_changes_btn" type="button" class="btn btn-primary">Generate</button>
                       </div>
                     </div>
                   </div>

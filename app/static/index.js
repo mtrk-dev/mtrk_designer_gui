@@ -710,6 +710,16 @@ $(document).ready(function() {
         scale_boxes_amplitude();
     });
 
+    $("#generate-waveform-btn").on( "click", function(event) {
+        load_waveform_modal_values($("#gradient-type-select").val());
+        $("#waveformModal").modal('toggle');
+        $("#parametersModal").modal('toggle');
+    });
+
+    $('#gradient-type-select').change(function(){
+        load_waveform_modal_values($("#gradient-type-select").val());
+    });
+
     $(".duplicate-dropdown-item").on( "click", function(e) {
         let target_plot_name = axis_name_to_axis_id[$(e.target).text()];
         let target_plot = document.getElementById(target_plot_name);
@@ -3061,6 +3071,16 @@ function serialize_events_data() {
     let block_name = $('#block-select').val();
     load_events_data(block_name);
     return events_data;
+}
+
+function load_waveform_modal_values(selected_type) {
+    $(".trap-param").hide();
+    $(".ramp-sampled-param").hide();
+    if (selected_type == "trap") {
+        $(".trap-param").show();
+    } else {
+        $(".ramp-sampled-param").show();
+    }
 }
 
 function maximize_plot_area() {
