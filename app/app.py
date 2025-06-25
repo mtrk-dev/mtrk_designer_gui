@@ -4,6 +4,7 @@ import json
 import traceback
 
 import os
+import numpy as np
 import sys
 path = os.path.abspath("mtrk_designer_api")
 sys.path.append(path)
@@ -12,6 +13,7 @@ sys.path.append(os.path.join(path, "ReadoutBlocks"))
 from backendToUi import create_sdl_from_ui_inputs
 from readoutBlockGenerator import automaticReadoutBlockGenerator
 from mtrkToPulseqConverter import mtrkToPulseqConverter
+from simpleWaveformGenerator import trap_grad, min_trap_grad, ramp_sampled_trap_grad
 
 import webbrowser
 from threading import Timer
@@ -94,6 +96,44 @@ def update():
 
     if os.path.isfile("updated_sdl.mtrk"):
        return send_file('updated_sdl.mtrk')
+
+@app.route('/waveform', methods=['POST'])
+def generate_waveform():
+    waveform_data = json.loads(request.data, strict=False)
+    event_type = waveform_data.get("event_type", "")
+    waveform_type = waveform_data.get("waveform_type", "")
+
+    if not event_type or not waveform_type:
+        return jsonify({"error": "event_type and waveform_type are required"}), 400
+
+    generated_waveform = None
+    if event_type == "gradient":
+        if waveform_type == "trap":
+            ramp_up = waveform_data.get("ramp_up_time")
+            ramp_down = waveform_data.get("ramp_down_time")
+            plateau = waveform_data.get("plateau_time")
+            dt = waveform_data.get("dt")
+            generated_waveform, ampl, ramp_up_time, ramp_down_time, plateau_duration = trap_grad(ramp_up, ramp_down, plateau, dt)
+        elif waveform_type == "min_trap":
+            area = waveform_data.get("input_area")
+            gmax = waveform_data.get("input_gmax")
+            slew = waveform_data.get("input_slew")
+            dt = waveform_data.get("dt")
+            generated_waveform, ampl, ramp_up_time, ramp_down_time, plateau_duration = min_trap_grad(area, gmax, slew, dt)
+        elif waveform_type == "ramp_sampled":
+            area = waveform_data.get("input_area")
+            gmax = waveform_data.get("input_gmax")
+            slew = waveform_data.get("input_slew")
+            dt = waveform_data.get("dt")
+            generated_waveform, ampl, ramp_up_time, ramp_down_time, plateau_duration = ramp_sampled_trap_grad(area, gmax, slew, dt)
+    elif event_type == "rf":
+        pass
+
+    generated_waveform = np.squeeze(generated_waveform).tolist()
+    if not generated_waveform:
+        return jsonify({"error": "Could not generate waveform. Verify params!"}), 400
+
+    return jsonify({"generated_waveform": generated_waveform}), 200
 
 @app.route('/get_port_mapping', methods=['GET'])
 def get_port_mapping():

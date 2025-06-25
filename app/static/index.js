@@ -720,6 +720,18 @@ $(document).ready(function() {
         load_waveform_modal_values($("#gradient-type-select").val());
     });
 
+    $("#waveform_save_changes_btn").on( "click", function(event) {
+        let event_type = "gradient";
+        let selected_type = null;
+        if ($('#rf-params').is(':visible')) {
+            event_type = "rf";
+        }
+        if (event_type == "gradient") {
+            selected_type = $("#gradient-type-select").val();
+        }
+        save_waveform_modal_values(event_type, selected_type);
+    });
+
     $(".duplicate-dropdown-item").on( "click", function(e) {
         let target_plot_name = axis_name_to_axis_id[$(e.target).text()];
         let target_plot = document.getElementById(target_plot_name);
@@ -3081,6 +3093,59 @@ function load_waveform_modal_values(selected_type) {
     } else {
         $(".ramp-sampled-param").show();
     }
+}
+
+function save_waveform_modal_values(event_type, selected_type) {
+    let waveform_data = {};
+    waveform_data["event_type"] = event_type;
+    waveform_data["waveform_type"] = selected_type;
+
+    if (event_type == "gradient") {
+        if (selected_type == "trap") {
+            $(".trap-param input").each(function() {
+                let param_name = $(this).attr("id");
+                let param_value = $(this).val();
+                if (param_value == "") {
+                    param_value = 0;
+                }
+                waveform_data[param_name] = parseFloat(param_value);
+            });
+        } else if (selected_type == "ramp_sampled" || selected_type == "min_trap") {
+            $(".ramp-sampled-param input").each(function() {
+                let param_name = $(this).attr("id");
+                let param_value = $(this).val();
+                if (param_value == "") {
+                    param_value = 0;
+                }
+                waveform_data[param_name] = parseFloat(param_value);
+            });
+        }
+    }
+
+    $.ajax({
+        url: '/waveform',
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify(waveform_data),
+        success: function(response) {
+           let waveform_name = "";
+           for (let key in waveform_data) {
+               waveform_name += waveform_data[key] + "_";
+           }
+           waveform_name = waveform_name.slice(0, -1);
+           array_name_to_array[waveform_name] = response["generated_waveform"];
+           load_parameters_array_dropdown();
+        },
+        error: function(error) {
+            console.log("Params used: ", waveform_data);
+            fire_alert("Error generating waveform data: " + error.responseJSON.error);
+        }
+    }).always(function() {
+        $('#waveformModal').modal('toggle');
+        $('#parametersModal').modal('toggle');
+        // $('#waveformModal input').val('');
+    });
+
 }
 
 function maximize_plot_area() {
