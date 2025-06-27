@@ -282,6 +282,18 @@
                               </div>
                             </div>
                           </div>
+                          <div class="form-group rf-param">
+                            <label for="rf-type-select">RF Type</label>
+                            <div class="row">
+                              <div class="col-6">
+                                <select id="rf-type-select" class="form-select" aria-label=".form-select example">
+                                  <option selected value="slr">SLR</option>
+                                  <option value="sinc">Sinc</option>
+                                  <option value="adiabatic">Adiabatic</option>
+                                </select>
+                              </div>
+                            </div>
+                          </div>
                           <div class="form-group grad-param trap-param">
                             <label for="ramp_up_time">Ramp Up Time (s)</label>
                             <input type="number" class="form-control" id="ramp_up_time" placeholder=0>
@@ -309,6 +321,62 @@
                           <div class="form-group grad-param trap-param ramp-sampled-param">
                             <label for="dt">Sample Time / dt (s)</label>
                             <input type="number" class="form-control" id="dt" placeholder=0>
+                          </div>
+                          <div class="form-group rf-param slr-param">
+                            <label for="tb">RF Pulse Time-Bandwidth Product</label>
+                            <input type="number" class="form-control" id="tb" placeholder=0>
+                            <label for="n_samples">Number of Samples</label>
+                            <input type="number" class="form-control" id="n_samples" placeholder=0>
+                            <label for="d1">Magnetization Passband Ripple Level</label>
+                            <input type="number" class="form-control" id="d1" placeholder=0>
+                            <label for="d2">Magnetization Stopband Ripple Level</label>
+                            <input type="number" class="form-control" id="d2" placeholder=0>
+                            <label for="p_type">RF Pulse Type</label>
+                            <input type="text" class="form-control" id="p_type" placeholder="Ex: st">
+                            <label for="f_type">Filter Type</label>
+                            <input type="text" class="form-control" id="f_type" placeholder="Ex: ms">
+                          </div>
+                          <div class="form-group rf-param sinc-param">
+                            <label for="n_samples_sinc">Number of Samples</label>
+                            <input type="number" class="form-control" id="n_samples_sinc" placeholder=0>
+                            <label for="m_lobes_sinc">Number of Side Lobes</label>
+                            <input type="number" class="form-control" id="m_lobes_sinc" placeholder=0>
+                          </div>
+                          <div class="form-group rf-param adiabatic-param">
+                            <label for="adiabatic-type-select">Adiabatic Type</label>
+                            <select id="adiabatic-type-select" class="form-select" aria-label=".form-select example">
+                              <option selected value="bir4">BIR-4</option>
+                              <option value="wurst">WURST</option>
+                              <option value="hyperbolic">Hyperbolic</option>
+                            </select>
+                            <label for="n_samples_adiabatic">Number of Samples</label>
+                            <input type="number" class="form-control" id="n_samples_adiabatic" placeholder=0>
+                            <div class="form-group bir4-param">
+                              <label for="beta_adiabatic_bir4">Beta</label>
+                              <input type="number" class="form-control" id="beta_adiabatic_bir4" placeholder=0>
+                              <label for="kappa_adiabatic_bir4">Kappa</label>
+                              <input type="number" class="form-control" id="kappa_adiabatic_bir4" placeholder=0>
+                              <label for="theta_adiabatic_bir4">Theta (radians)</label>
+                              <input type="number" class="form-control" id="theta_adiabatic_bir4" placeholder=0>
+                              <label for="dw0_adiabatic_bir4">FM waveform scaling (radians/s)</label>
+                              <input type="number" class="form-control" id="dw0_adiabatic_bir4" placeholder=0>
+                            </div>
+                            <div class="form-group wurst-param">
+                              <label for="n_fac_adiabatic_wurst">N Fac</label>
+                              <input type="number" class="form-control" id="n_fac_adiabatic_wurst" placeholder=0>
+                              <label for="bw_adiabatic_wurst">Bandwidth</label>
+                              <input type="number" class="form-control" id="bw_adiabatic_wurst" placeholder=0>
+                              <label for="dur_adiabatic_wurst">Duration (s)</label>
+                              <input type="number" class="form-control" id="dur_adiabatic_wurst" placeholder=0>
+                            </div>
+                            <div class="form-group hyperbolic-param">
+                              <label for="beta_adiabatic_hyperbolic">Beta</label>
+                              <input type="number" class="form-control" id="beta_adiabatic_hyperbolic" placeholder=0>
+                              <label for="mu_adiabatic">Mu</label>
+                              <input type="number" class="form-control" id="mu_adiabatic" placeholder=0>
+                              <label for="dur_adiabatic_hyperbolic">Duration (s)</label>
+                              <input type="number" class="form-control" id="dur_adiabatic_hyperbolic" placeholder=0>
+                            </div>
                           </div>
                         </form>
                       </div>

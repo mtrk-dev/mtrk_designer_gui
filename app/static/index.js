@@ -711,7 +711,14 @@ $(document).ready(function() {
     });
 
     $("#generate-waveform-btn").on( "click", function(event) {
-        load_waveform_modal_values($("#gradient-type-select").val());
+        // Relying on the last set boxObj by the parameters modal loading for type.
+        if (boxObj.type == "grad") {
+            load_waveform_modal_values($("#gradient-type-select").val());
+        } else if (boxObj.type == "rf") {
+            load_waveform_modal_values($("#rf-type-select").val());
+        } else {
+            return;
+        }
         $("#waveformModal").modal('toggle');
         $("#parametersModal").modal('toggle');
     });
@@ -720,14 +727,35 @@ $(document).ready(function() {
         load_waveform_modal_values($("#gradient-type-select").val());
     });
 
+    $('#rf-type-select').change(function(){
+        load_waveform_modal_values($("#rf-type-select").val());
+    });
+
+    $("#adiabatic-type-select").change(function() {
+        let adiabatic_type = $("#adiabatic-type-select").val();
+        $(".bir4-param").hide();
+        $(".wurst-param").hide();
+        $(".hyperbolic-param").hide();
+        if (adiabatic_type == "bir4") {
+            $(".bir4-param").show();
+        } else if (adiabatic_type == "wurst") {
+            $(".wurst-param").show();
+        } else if (adiabatic_type == "hyperbolic") {
+            $(".hyperbolic-param").show();
+        }
+    });
+
+
     $("#waveform_save_changes_btn").on( "click", function(event) {
         let event_type = "gradient";
         let selected_type = null;
-        if ($('#rf-params').is(':visible')) {
+        if (boxObj.type == "rf") {
             event_type = "rf";
         }
         if (event_type == "gradient") {
             selected_type = $("#gradient-type-select").val();
+        } else if (event_type == "rf") {
+            selected_type = $("#rf-type-select").val();
         }
         save_waveform_modal_values(event_type, selected_type);
     });
@@ -3088,10 +3116,30 @@ function serialize_events_data() {
 function load_waveform_modal_values(selected_type) {
     $(".trap-param").hide();
     $(".ramp-sampled-param").hide();
+    $(".slr-param").hide();
+    $(".sinc-param").hide();
+    $(".adiabatic-param").hide();
     if (selected_type == "trap") {
         $(".trap-param").show();
-    } else {
+    } else if (selected_type == "ramp_sampled" || selected_type == "min_trap") {
         $(".ramp-sampled-param").show();
+    } else if (selected_type == "slr") {
+        $(".slr-param").show();
+    } else if (selected_type == "sinc") {
+        $(".sinc-param").show();
+    } else if (selected_type == "adiabatic") {
+        $(".adiabatic-param").show();
+        let adiabatic_type = $("#adiabatic-type-select").val();
+        $(".bir4-param").hide();
+        $(".wurst-param").hide();
+        $(".hyperbolic-param").hide();
+        if (adiabatic_type == "bir4") {
+            $(".bir4-param").show();
+        } else if (adiabatic_type == "wurst") {
+            $(".wurst-param").show();
+        } else if (adiabatic_type == "hyperbolic") {
+            $(".hyperbolic-param").show();
+        }
     }
 }
 
@@ -3120,6 +3168,42 @@ function save_waveform_modal_values(event_type, selected_type) {
                 waveform_data[param_name] = parseFloat(param_value);
             });
         }
+    } else if (event_type == "rf") {
+        if (selected_type == "slr") {
+            $(".slr-param input").each(function() {
+                let param_name = $(this).attr("id");
+                let param_value = $(this).val();
+                if ($(this).attr("type") == "number") {
+                    param_value = parseFloat(param_value);
+                } else if ($(this).attr("type") == "text") {
+                    param_value = param_value.trim();
+                }
+                waveform_data[param_name] = param_value;
+            });
+        } else if (selected_type == "sinc") {
+            $(".sinc-param input").each(function() {
+                let param_name = $(this).attr("id");
+                let param_value = $(this).val();
+                if ($(this).attr("type") == "number") {
+                    param_value = parseFloat(param_value);
+                } else if ($(this).attr("type") == "text") {
+                    param_value = param_value.trim();
+                }
+                waveform_data[param_name] = param_value;
+            });
+        } else if (selected_type == "adiabatic") {
+            $(".adiabatic-param input").each(function() {
+                let param_name = $(this).attr("id");
+                let param_value = $(this).val();
+                if ($(this).attr("type") == "number") {
+                    param_value = parseFloat(param_value);
+                } else if ($(this).attr("type") == "text") {
+                    param_value = param_value.trim();
+                }
+                waveform_data[param_name] = param_value;
+            });
+            waveform_data["adiabatic_type"] = $("#adiabatic-type-select").val();
+        }
     }
 
     $.ajax({
@@ -3135,6 +3219,7 @@ function save_waveform_modal_values(event_type, selected_type) {
            waveform_name = waveform_name.slice(0, -1);
            array_name_to_array[waveform_name] = response["generated_waveform"];
            load_parameters_array_dropdown();
+           load_parameters_phase_array_dropdown();
         },
         error: function(error) {
             console.log("Params used: ", waveform_data);
