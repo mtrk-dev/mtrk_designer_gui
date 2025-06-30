@@ -13,7 +13,7 @@ sys.path.append(os.path.join(path, "ReadoutBlocks"))
 from backendToUi import create_sdl_from_ui_inputs
 from readoutBlockGenerator import automaticReadoutBlockGenerator
 from mtrkToPulseqConverter import mtrkToPulseqConverter
-from simpleWaveformGenerator import trap_grad, min_trap_grad, ramp_sampled_trap_grad
+from simpleWaveformGenerator import trap_grad, min_trap_grad, ramp_sampled_trap_grad, pulse_designer
 
 import webbrowser
 from threading import Timer
@@ -127,7 +127,47 @@ def generate_waveform():
             dt = waveform_data.get("dt")
             generated_waveform, ampl, ramp_up_time, ramp_down_time, plateau_duration = ramp_sampled_trap_grad(area, gmax, slew, dt)
     elif event_type == "rf":
-        pass
+        if waveform_type == "slr":
+            tb = waveform_data.get("tb")
+            n_samples = waveform_data.get("n_samples")
+            d1 = waveform_data.get("d1")
+            d2 = waveform_data.get("d2")
+            p_type = waveform_data.get("p_type")
+            f_type = waveform_data.get("f_type")
+            generated_waveform, phase = pulse_designer("slr", [8, 512, 0.01, 0.01, 'ex', 'ls'])
+            # generated_waveform, phase = pulse_designer("slr", [tb, n_samples, d1, d2, p_type, f_type])
+        elif waveform_type == "sinc":
+            n_samples_sinc = waveform_data.get("n_samples_sinc")
+            m_lobes_sinc = waveform_data.get("m_lobes_sinc")
+            generated_waveform, phase = pulse_designer("sinc", [64, 2])
+            # generated_waveform, phase = pulse_designer("sinc", [n_samples_sinc, m_lobes_sinc])
+        elif waveform_type == "adiabatic":
+            adiabatic_type = waveform_data.get("adiabatic_type")
+            n_samples_adiabatic = waveform_data.get("n_samples_adiabatic")
+            if adiabatic_type == "bir4":
+                beta_adiabatic_bir4 = waveform_data.get("beta_adiabatic_bir4")
+                kappa_adiabatic_bir4 = waveform_data.get("kappa_adiabatic_bir4")
+                theta_adiabatic_bir4 = waveform_data.get("theta_adiabatic_bir4")
+                dw0_adiabatic_bir4 = waveform_data.get("dw0_adiabatic_bir4")
+                generated_waveform, phase = pulse_designer("adiabatic", ['bir4', 512, 10, np.arctan(20), np.pi/4, 100*np.pi/1e-5/512])
+                # generated_waveform, phase = pulse_designer("adiabatic",
+                # ['bir4', n_samples_adiabatic, beta_adiabatic_bir4, kappa_adiabatic_bir4, theta_adiabatic_bir4, dw0_adiabatic_bir4])
+            elif adiabatic_type == "wurst":
+                n_fac_adiabatic_wurst = waveform_data.get("n_fac_adiabatic_wurst")
+                bw_adiabatic_wurst = waveform_data.get("bw_adiabatic_wurst")
+                dur_adiabatic_wurst = waveform_data.get("dur_adiabatic_wurst")
+                generated_waveform, phase = pulse_designer("adiabatic", ['wurst', 512, 40, 40e3, 2e-3])
+                # generated_waveform, phase = pulse_designer("adiabatic",
+                # ['wurst', n_samples_adiabatic, n_fac_adiabatic_wurst, bw_adiabatic_wurst, dur_adiabatic_wurst])
+            elif adiabatic_type == "hyperbolic":
+                beta_adiabatic_hyperbolic = waveform_data.get("beta_adiabatic_hyperbolic")
+                mu_adiabatic = waveform_data.get("mu_adiabatic")
+                dur_adiabatic_hyperbolic = waveform_data.get("dur_adiabatic_hyperbolic")
+                generated_waveform, phase = pulse_designer("adiabatic", ['hyperbolic', 512, 800, 4.9, 0.012])
+                # generated_waveform, phase = pulse_designer("adiabatic",
+                # ['hyperbolic', n_samples_adiabatic, beta_adiabatic_hyperbolic, mu_adiabatic, dur_adiabatic_hyperbolic])
+        else:
+            return jsonify({"error": "Invalid waveform type"}), 400
 
     generated_waveform = np.squeeze(generated_waveform).tolist()
     if not generated_waveform:
