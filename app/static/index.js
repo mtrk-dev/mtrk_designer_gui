@@ -3228,6 +3228,14 @@ function save_waveform_modal_values(event_type, selected_type) {
             }
            load_parameters_array_dropdown();
            load_parameters_phase_array_dropdown();
+           Swal.fire({
+            icon: "success",
+            title: "Generated Waveform: " + waveform_name,
+            text: "Array is now stored and can be selected from the dropdown.",
+            showConfirmButton: true,
+            background: "#3c3c3c",
+            color: "white",
+          });
         },
         error: function(error) {
             console.log("Params used: ", waveform_data);
