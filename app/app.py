@@ -172,8 +172,18 @@ def generate_waveform():
     generated_waveform = np.squeeze(generated_waveform).tolist()
     if not generated_waveform:
         return jsonify({"error": "Could not generate waveform. Verify params!"}), 400
+    if 'phase' in locals():
+        phase = np.squeeze(phase).tolist()
 
-    return jsonify({"generated_waveform": generated_waveform}), 200
+    generated_waveform_data = {
+        "waveform": generated_waveform,
+        "amplitude": ampl if 'ampl' in locals() else None,
+        "ramp_up_time": ramp_up_time if 'ramp_up_time' in locals() else None,
+        "ramp_down_time": ramp_down_time if 'ramp_down_time' in locals() else None,
+        "plateau_duration": plateau_duration if 'plateau_duration' in locals() else None,
+        "phase": phase if 'phase' in locals() else None
+    }
+    return jsonify(generated_waveform_data), 200
 
 @app.route('/get_port_mapping', methods=['GET'])
 def get_port_mapping():

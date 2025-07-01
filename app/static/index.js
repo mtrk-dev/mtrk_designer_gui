@@ -3214,13 +3214,18 @@ function save_waveform_modal_values(event_type, selected_type) {
         success: function(response) {
            let waveform_name = "";
            for (let key in waveform_data) {
-               waveform_name += waveform_data[key] + "_";
+                value = waveform_data[key];
+                if (value === null || value === undefined || Number.isNaN(value)) continue;
+                waveform_name += waveform_data[key] + "_";
            }
-           waveform_name = waveform_name.slice(0, -1);
+           waveform_name = waveform_name.slice(0, -2);
            if (waveform_name.length > 20) {
-                waveform_name = waveform_name.slice(0, 20) + "...";
+                waveform_name = waveform_name.slice(0, 20);
             }
-           array_name_to_array[waveform_name] = response["generated_waveform"];
+           array_name_to_array[waveform_name] = response["waveform"];
+           if (response["phase"] !== null) {
+               array_name_to_array[waveform_name + "_phase"] = response["phase"];
+            }
            load_parameters_array_dropdown();
            load_parameters_phase_array_dropdown();
         },
