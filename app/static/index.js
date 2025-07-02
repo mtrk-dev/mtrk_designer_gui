@@ -3180,6 +3180,8 @@ function save_waveform_modal_values(event_type, selected_type) {
                 }
                 waveform_data[param_name] = param_value;
             });
+            waveform_data["p_type"] = $("#rf_pulse_type").val();
+            waveform_data["f_type"] = $("#filter_type").val();
         } else if (selected_type == "sinc") {
             $(".sinc-param input").each(function() {
                 let param_name = $(this).attr("id");
