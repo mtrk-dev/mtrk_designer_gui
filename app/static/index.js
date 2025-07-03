@@ -3214,26 +3214,21 @@ function save_waveform_modal_values(event_type, selected_type) {
         contentType: 'application/json',
         data: JSON.stringify(waveform_data),
         success: function(response) {
-           let waveform_name = "";
-           for (let key in waveform_data) {
-                value = waveform_data[key];
-                if (value === null || value === undefined || Number.isNaN(value)) continue;
-                waveform_name += waveform_data[key] + "_";
-           }
-           waveform_name = waveform_name.slice(0, -2);
-           if (waveform_name.length > 20) {
-                waveform_name = waveform_name.slice(0, 20);
-            }
+           let waveform_name = event_type + "_" + selected_type;
+           let hash = Math.random().toString(36).substring(2, 5);
+           waveform_name += "_" + hash;
+
            array_name_to_array[waveform_name] = response["waveform"];
            if (response["phase"] !== null) {
                array_name_to_array[waveform_name + "_phase"] = response["phase"];
             }
            load_parameters_array_dropdown();
            load_parameters_phase_array_dropdown();
+           $('#array-dropdown-btn').text(waveform_name);
            Swal.fire({
             icon: "success",
             title: "Generated Waveform: " + waveform_name,
-            text: "Array is now stored and can be selected from the dropdown.",
+            text: "Array is now stored and selected in the dropdown. Save changes to update the event!",
             showConfirmButton: true,
             background: "#3c3c3c",
             color: "white",
