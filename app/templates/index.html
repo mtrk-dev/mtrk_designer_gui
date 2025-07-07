@@ -297,41 +297,41 @@
                           </div>
                           <div class="form-group grad-param trap-param">
                             <label for="ramp_up_time">Ramp Up Time (&#181;s)</label>
-                            <input type="number" class="form-control" id="ramp_up_time" placeholder=0>
+                            <input type="number" class="form-control" id="ramp_up_time" placeholder=3e-5 value=3e-5>
                           </div>
                           <div class="form-group grad-param trap-param">
                             <label for="ramp_down_time">Ramp Down Time (&#181;s)</label>
-                            <input type="number" class="form-control" id="ramp_down_time" placeholder=0>
+                            <input type="number" class="form-control" id="ramp_down_time" placeholder=6e-5 value=6e-5>
                           </div>
                           <div class="form-group grad-param trap-param">
                             <label for="plateau_time">Plateau Time (&#181;s)</label>
-                            <input type="number" class="form-control" id="plateau_time" placeholder=0>
+                            <input type="number" class="form-control" id="plateau_time" placeholder=2e-4 value=2e-4>
                           </div>
                           <div class="form-group grad-param ramp-sampled-param">
                             <label for="input_area">Area (mT/m/&#181;s)</label>
-                            <input type="number" class="form-control" id="input_area" placeholder=0>
+                            <input type="number" class="form-control" id="input_area" placeholder=2e-3 value=2e-3>
                           </div>
                           <div class="form-group grad-param ramp-sampled-param">
                             <label for="input_gmax">Gmax (mT/m)</label>
-                            <input type="number" class="form-control" id="input_gmax" placeholder=0>
+                            <input type="number" class="form-control" id="input_gmax" placeholder=20 value=20>
                           </div>
                           <div class="form-group grad-param ramp-sampled-param">
                             <label for="input_slew">Slew (T/m/&#181;s)</label>
-                            <input type="number" class="form-control" id="input_slew" placeholder=0>
+                            <input type="number" class="form-control" id="input_slew" placeholder=200 value=200>
                           </div>
                           <div class="form-group grad-param trap-param ramp-sampled-param">
                             <label for="dt">Sample Time / dt (&#181;s)</label>
-                            <input type="number" class="form-control" id="dt" placeholder=0 value="10" disabled>
+                            <input type="number" class="form-control" id="dt" placeholder=1e-5 value=1e-5 disabled>
                           </div>
                           <div class="form-group rf-param slr-param">
                             <label for="tb">RF Pulse Time-Bandwidth Product</label>
-                            <input type="number" class="form-control" id="tb" placeholder=0>
+                            <input type="number" class="form-control" id="tb" placeholder=8 value=8>
                             <label for="n_samples">Number of Samples</label>
-                            <input type="number" class="form-control" id="n_samples" placeholder=0>
+                            <input type="number" class="form-control" id="n_samples" placeholder=512 value=512>
                             <label for="d1">Magnetization Passband Ripple Level</label>
-                            <input type="number" class="form-control" id="d1" placeholder=0>
+                            <input type="number" class="form-control" id="d1" placeholder=0.01 value=0.01>
                             <label for="d2">Magnetization Stopband Ripple Level</label>
-                            <input type="number" class="form-control" id="d2" placeholder=0>
+                            <input type="number" class="form-control" id="d2" placeholder=0.01 value=0.01>
                             <label for="rf_pulse_type">RF Pulse Type</label>
                             <select id="rf_pulse_type" class="form-select" aria-label=".form-select example">
                               <option selected value="st">Small-Tip Excitation</option>
@@ -351,9 +351,9 @@
                           </div>
                           <div class="form-group rf-param sinc-param">
                             <label for="n_samples_sinc">Number of Samples</label>
-                            <input type="number" class="form-control" id="n_samples_sinc" placeholder=0>
+                            <input type="number" class="form-control" id="n_samples_sinc" placeholder=64 value=64>
                             <label for="m_lobes_sinc">Number of Side Lobes</label>
-                            <input type="number" class="form-control" id="m_lobes_sinc" placeholder=0>
+                            <input type="number" class="form-control" id="m_lobes_sinc" placeholder=2 value=2>
                           </div>
                           <div class="form-group rf-param adiabatic-param">
                             <label for="adiabatic-type-select">Adiabatic Type</label>
@@ -363,32 +363,32 @@
                               <option value="hyperbolic">Hyperbolic</option>
                             </select>
                             <label for="n_samples_adiabatic">Number of Samples</label>
-                            <input type="number" class="form-control" id="n_samples_adiabatic" placeholder=0>
+                            <input type="number" class="form-control" id="n_samples_adiabatic" placeholder=512 value=512>
                             <div class="form-group bir4-param">
                               <label for="beta_adiabatic_bir4">Beta</label>
-                              <input type="number" class="form-control" id="beta_adiabatic_bir4" placeholder=0>
+                              <input type="number" class="form-control" id="beta_adiabatic_bir4" placeholder=10 value=10>
                               <label for="kappa_adiabatic_bir4">Kappa</label>
-                              <input type="number" class="form-control" id="kappa_adiabatic_bir4" placeholder=0>
+                              <input type="number" class="form-control" id="kappa_adiabatic_bir4" placeholder=1.5208379310729538 value=1.5208379310729538>
                               <label for="theta_adiabatic_bir4">Theta (radians)</label>
-                              <input type="number" class="form-control" id="theta_adiabatic_bir4" placeholder=0>
+                              <input type="number" class="form-control" id="theta_adiabatic_bir4" placeholder=0.7853981633974483 value=0.7853981633974483>
                               <label for="dw0_adiabatic_bir4">FM waveform scaling (radians/&#181;s)</label>
-                              <input type="number" class="form-control" id="dw0_adiabatic_bir4" placeholder=0>
+                              <input type="number" class="form-control" id="dw0_adiabatic_bir4" placeholder=61359.23151542564 value=61359.23151542564>
                             </div>
                             <div class="form-group wurst-param">
                               <label for="n_fac_adiabatic_wurst">N Fac</label>
-                              <input type="number" class="form-control" id="n_fac_adiabatic_wurst" placeholder=0>
+                              <input type="number" class="form-control" id="n_fac_adiabatic_wurst" placeholder=40 value=40>
                               <label for="bw_adiabatic_wurst">Bandwidth</label>
-                              <input type="number" class="form-control" id="bw_adiabatic_wurst" placeholder=0>
+                              <input type="number" class="form-control" id="bw_adiabatic_wurst" placeholder=4000 value=4000>
                               <label for="dur_adiabatic_wurst">Duration (&#181;s)</label>
-                              <input type="number" class="form-control" id="dur_adiabatic_wurst" placeholder=0>
+                              <input type="number" class="form-control" id="dur_adiabatic_wurst" placeholder=0.002 value=0.002>
                             </div>
                             <div class="form-group hyperbolic-param">
                               <label for="beta_adiabatic_hyperbolic">Beta</label>
-                              <input type="number" class="form-control" id="beta_adiabatic_hyperbolic" placeholder=0>
+                              <input type="number" class="form-control" id="beta_adiabatic_hyperbolic" placeholder=800 value=800>
                               <label for="mu_adiabatic">Mu</label>
-                              <input type="number" class="form-control" id="mu_adiabatic" placeholder=0>
+                              <input type="number" class="form-control" id="mu_adiabatic" placeholder=4.9 value=4.9>
                               <label for="dur_adiabatic_hyperbolic">Duration (&#181;s)</label>
-                              <input type="number" class="form-control" id="dur_adiabatic_hyperbolic" placeholder=0>
+                              <input type="number" class="form-control" id="dur_adiabatic_hyperbolic" placeholder=0.012 value=0.012>
                             </div>
                           </div>
                         </form>
