@@ -3225,6 +3225,9 @@ function save_waveform_modal_values(event_type, selected_type) {
            load_parameters_array_dropdown();
            load_parameters_phase_array_dropdown();
            $('#array-dropdown-btn').text(waveform_name);
+           if (response["phase"] !== null) {
+               $('#phase-array-dropdown-btn').text(waveform_name + "_phase");
+           }
            Swal.fire({
             icon: "success",
             title: "Generated Waveform: " + waveform_name,
