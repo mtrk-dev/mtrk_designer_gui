@@ -3307,6 +3307,33 @@ function download_file(file) {
     window.URL.revokeObjectURL(url);
 }
 
+function evaluate_equation(equation) {
+    // To replace set(parameter) with parameter value from settings.
+    function set(parameter) {
+        if (parameter in settings) {
+            return settings[parameter];
+        } else {
+            throw new Error("Parameter " + parameter + " not found in settings.");
+        }
+    }
+
+    // To add quotation marks around the parameter names in the equation.
+    equation = equation.replace(/set\((\w+)\)/g, "set('$1')");
+
+    var newEquation = equation.replace("sin", "Math.sin");
+    newEquation = newEquation.replace("cos", "Math.cos");
+    newEquation = newEquation.replace("tan", "Math.tan");
+    newEquation = newEquation.replace("cot", "Math.cot");
+    newEquation = newEquation.replace("sec", "Math.sec");
+    newEquation = newEquation.replace("csc", "Math.csc");
+    newEquation = newEquation.replace("exp", "Math.exp");
+    newEquation = newEquation.replace("log", "Math.log");
+    newEquation = newEquation.replace("sqrt", "Math.sqrt");
+
+    var val = eval(newEquation);
+    return val;
+}
+
 function get_previous_block(starting_point, selected_block) {
     if (!(plot_to_box_objects[selected_block])) return null;
     let previous_block_box = null;
@@ -3639,6 +3666,22 @@ function dfs_visit_block(block_name, instructions, visited_blocks, prev_block, m
     let mark_time = null;
     for (let i=0; i < steps.length; i++) {
         let step = steps[i];
+
+        if (typeof step.time === 'object' && step.time.type === "equation") {
+            let equation_name = step.time.equation;
+            if (!(equation_name in equations)) {
+                fire_alert("Equation " + equation_name + " not found in equations.");
+                return;
+            }
+            let equation = equations[equation_name].equation;
+            let equation_result = evaluate_equation(equation, equations, arrays, objects);
+            if (equation_result === null) {
+                fire_alert("Error evaluating equation: " + equation);
+                return;
+            }
+            step.time = equation_result;
+        }
+
         if (step.action == "run_block") {
             inner_block_time = null;
             inner_block_time = dfs_visit_block(step.block, instructions, visited_blocks, block_name, Number.MAX_SAFE_INTEGER, 0);
@@ -3653,7 +3696,6 @@ function dfs_visit_block(block_name, instructions, visited_blocks, prev_block, m
                 repeating_block_name = step.steps[0].block;
                 block_to_loops[repeating_block_name] = range;
             }
-
         } else if (step.action == "rf" || step.action == "grad" || step.action == "adc") {
             min_time = Math.min(min_time, offset_time + parseFloat(step.time/1000));
             let object_name = step.object;
