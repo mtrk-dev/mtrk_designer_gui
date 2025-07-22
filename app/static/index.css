@@ -105,6 +105,20 @@
     background: transparent;
 }
 
+#add-variable-btn {
+    font-size: 12px;
+    background: transparent;
+}
+
+#variables-section .delete-variable-btn {
+    font-size: 16px;
+    background: transparent;
+    border: none;
+    padding-left: 0px;
+    padding-right: 0px;
+}
+
+
 #plot-size-btn {
     font-size: 14px;
     background: transparent;

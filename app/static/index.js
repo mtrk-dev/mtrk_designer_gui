@@ -1217,6 +1217,29 @@ $(document).ready(function() {
         block_to_events_html[block_name] = events_col_inner_html;
     });
 
+    $("#add-variable-btn").click(function () {
+        let selected_theme = document.documentElement.getAttribute('data-bs-theme');
+        let btn_class = selected_theme == "dark" ? "btn-secondary" : "btn-light";
+        let variable_group_html = `
+            <div class="form-group row variable-group">
+                <div class="col-5">
+                    <input type="text" class="form-control" placeholder="Name">
+                </div>
+                <div class="col-1 d-flex align-items-center">
+                    <span>:</span>
+                </div>
+                <div class="col-5">
+                    <input type="number" class="form-control" placeholder="Value">
+                </div>
+                <div class="col-1 d-flex align-items-center">
+                    <button class="btn ${btn_class} btn-sm delete-variable-btn">
+                        <i class="fa fa-minus-circle"></i>
+                    </button>
+                </div>
+            </div>`;
+        $('#variables-section').append(variable_group_html);
+    });
+
     // Handle sdl file uploading.
     const sdlFileInput = document.getElementById('sdlFileInput');
     sdlFileInput.oninput = () => {
@@ -1329,6 +1352,11 @@ $(document).on("click", ".event-btn", function () {
 
     $('#eventsModal').modal('toggle');
 })
+
+// Add click handler to delete each variable item in the settings.
+$(document).on('click', '.delete-variable-btn', function() {
+    $(this).closest('.variable-group').remove();
+});
 
 // Add click handler the plot size button.
 $(document).on("click", "#plot-size-btn", function () {
@@ -1613,7 +1641,7 @@ function load_modal_values(plot, trace_number) {
         }
     } else if (boxObj.type == "grad") {
         $('#inputConstantAmplitude').val(boxObj.amplitude);
-        $('#inputLoopNumber').val(boxObj.loop_number);
+        // $('#inputLoopNumber').val(boxObj.loop_number);
         $('#inputGradEquationName').val(boxObj.equation_info.name);
         $('#inputGradEquationExpression').val(boxObj.equation_info.expression);
         if (boxObj.variable_amplitude) {
@@ -1741,7 +1769,7 @@ function save_modal_values(plot, trace_number) {
         if (!$('#variableRadio').is(':checked')) {
             boxObj.amplitude = $('#inputConstantAmplitude').val();
         } else {
-            boxObj.loop_number = $('#inputLoopNumber').val();
+            // boxObj.loop_number = $('#inputLoopNumber').val();
             boxObj.equation_info.name = $('#inputGradEquationName').val();
             boxObj.equation_info.expression = $('#inputGradEquationExpression').val();
         }
@@ -3509,7 +3537,7 @@ class Box {
     variable_amplitude = false;
     flip_amplitude = false;
     // step_change = null;
-    loop_number = null;
+    // loop_number = null;
     isSelected = false;
     block = null;
     purpose = "";
@@ -3674,7 +3702,7 @@ function dfs_visit_block(block_name, instructions, visited_blocks, prev_block, m
                 return;
             }
             let equation = equations[equation_name].equation;
-            let equation_result = evaluate_equation(equation, equations, arrays, objects);
+            let equation_result = evaluate_equation(equation);
             if (equation_result === null) {
                 fire_alert("Error evaluating equation: " + equation);
                 return;

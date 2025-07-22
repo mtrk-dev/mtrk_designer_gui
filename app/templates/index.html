@@ -181,10 +181,10 @@
                                 <label for="inputStepChange">Step Change</label>
                                 <input type="number" class="form-control form-control-sm" id="inputStepChange" placeholder=0>
                               </div> -->
-                              <div class="form-group col">
+                              <!-- <div class="form-group col">
                                 <label for="inputLoopNumber">Loop Number</label>
                                 <input type="number" class="form-control form-control-sm" id="inputLoopNumber" placeholder=0>
-                              </div>
+                              </div> -->
                               <div class="form-group col">
                                 <label for="inputGradEquationName">Equation Name</label>
                                 <input type="text" class="form-control form-control-sm" id="inputGradEquationName" placeholder="Ex: phaseencoding">
@@ -611,6 +611,32 @@
                                 <div class="accordion-input-item">
                                   <label for="readoutSettingInput" class="form-label accordion-input-label">Readout OS</label>
                                   <input type="number" class="form-control" id="readoutSettingInput" placeholder=2>
+                                </div>
+                                <div class="accordion-input-item">
+                                  <label for="variables-section" class="form-label accordion-input-label">Variables</label>
+                                  <div id="variables-section">
+                                    <!-- variable groups will be added here. -->
+                                      <div class="form-group row variable-group">
+                                        <div class="col-5">
+                                            <input type="text" class="form-control" placeholder="Name">
+                                        </div>
+                                        <div class="col-1 d-flex align-items-center">
+                                            <span>:</span>
+                                        </div>
+                                        <div class="col-5">
+                                            <input type="number" class="form-control" placeholder="Value">
+                                        </div>
+                                        <div class="col-1 d-flex align-items-center">
+                                            <button class="btn btn-secondary btn-sm delete-variable-btn">
+                                                <i class="fa fa-minus-circle"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                  </div>
+                                  <a id="add-variable-btn" class="btn btn-sm btn-secondary" role="button" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Add New Variable">
+                                    <i class="fa fa-plus"></i>
+                                  </a>
+                                  <!-- <label for="add-variable-btn">Add</label> -->
                                 </div>
                               </div>
                             </div>
