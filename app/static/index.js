@@ -1218,26 +1218,7 @@ $(document).ready(function() {
     });
 
     $("#add-variable-btn").click(function () {
-        let selected_theme = document.documentElement.getAttribute('data-bs-theme');
-        let btn_class = selected_theme == "dark" ? "btn-secondary" : "btn-light";
-        let variable_group_html = `
-            <div class="form-group row variable-group">
-                <div class="col-5">
-                    <input type="text" class="form-control" placeholder="Name">
-                </div>
-                <div class="col-1 d-flex align-items-center">
-                    <span>:</span>
-                </div>
-                <div class="col-5">
-                    <input type="number" class="form-control" placeholder="Value">
-                </div>
-                <div class="col-1 d-flex align-items-center">
-                    <button class="btn ${btn_class} btn-sm delete-variable-btn">
-                        <i class="fa fa-minus-circle"></i>
-                    </button>
-                </div>
-            </div>`;
-        $('#variables-section').append(variable_group_html);
+        add_variable_group("", "");
     });
 
     // Handle sdl file uploading.
@@ -1851,6 +1832,7 @@ function save_configurations() {
     let system = $('#systemConfigInput').val();
     // Settings
     let readout = $('#readoutSettingInput').val();
+    let variables = serialize_variables_data();
     // Info
     let description = $('#descriptionInfoInput').val();
     let slices = $('#slicesInfoInput').val();
@@ -1880,7 +1862,8 @@ function save_configurations() {
         'system': system
     }
     configs['settings'] = {
-        'readout': readout
+        'readout': readout,
+        'variables': variables
     }
     configs['info'] = {
         'description': description,
@@ -1901,6 +1884,7 @@ function load_configurations(configs) {
     $('#systemConfigInput').val(configs['file']['system']);
     // Settings
     $('#readoutSettingInput').val(configs['settings']['readout']);
+    load_variables_data(configs['settings']['variables']);
     // Info
     $('#descriptionInfoInput').val(configs['info']['description']);
     $('#slicesInfoInput').val(configs['info']['slices']);
@@ -3139,6 +3123,49 @@ function serialize_events_data() {
     let block_name = $('#block-select').val();
     load_events_data(block_name);
     return events_data;
+}
+
+function add_variable_group(name, value) {
+    let selected_theme = document.documentElement.getAttribute('data-bs-theme');
+    let btn_class = selected_theme == "dark" ? "btn-secondary" : "btn-light";
+    let variable_group_html = `
+        <div class="form-group row variable-group">
+            <div class="col-5">
+                <input type="text" class="form-control variable-name" placeholder="Name" value=${name}>
+            </div>
+            <div class="col-1 d-flex align-items-center">
+                <span>:</span>
+            </div>
+            <div class="col-5">
+                <input type="number" class="form-control variable-value" placeholder="Value" value=${value}>
+            </div>
+            <div class="col-1 d-flex align-items-center">
+                <button class="btn ${btn_class} btn-sm delete-variable-btn">
+                    <i class="fa fa-minus-circle"></i>
+                </button>
+            </div>
+        </div>`;
+    $('#variables-section').append(variable_group_html);
+}
+
+function serialize_variables_data() {
+    let variables_data = {};
+    $(".variable-group").each(function() {
+        let name = $(this).find(".variable-name").val().trim();
+        let value = parseFloat($(this).find(".variable-value").val());
+        if (name && value) {
+            variables_data[name] = value;
+        }
+    });
+    return variables_data;
+}
+
+function load_variables_data(variables_data) {
+    $(".variable-group").remove();
+    for (let name in variables_data) {
+        let value = variables_data[name];
+        add_variable_group(name, value);
+    }
 }
 
 function load_waveform_modal_values(selected_type) {
