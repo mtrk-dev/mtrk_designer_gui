@@ -1221,6 +1221,17 @@ $(document).ready(function() {
         add_variable_group("", "");
     });
 
+    $("#useTimeEquationCheck").click(function() {
+        let isChecked = $(this).is(":checked");
+        if (isChecked) {
+            $("#inputTimeEquation").show();
+            $("#inputStartTime").prop("disabled", true);
+        } else {
+            $("#inputTimeEquation").hide();
+            $("#inputStartTime").prop("disabled", false);
+        }
+    });
+
     // Handle sdl file uploading.
     const sdlFileInput = document.getElementById('sdlFileInput');
     sdlFileInput.oninput = () => {
@@ -1604,6 +1615,16 @@ function load_modal_values(plot, trace_number) {
     }
     $('#inputName').val(boxObj.name);
     $('#inputStartTime').val(boxObj.start_time);
+    $("#useTimeEquationCheck").prop("checked", boxObj.use_equation_time);
+    if (boxObj.use_equation_time) {
+        $("#inputTimeEquation").show();
+        $('#inputStartTime').prop("disabled", true);
+        $('#inputTimeEquation').val(boxObj.equation_time_name);
+    } else {
+        $("#inputTimeEquation").hide();
+        $('#inputStartTime').prop("disabled", false);
+        $('#inputTimeEquation').val("");
+    }
     $('#inputAnchorTime').val(boxObj.anchor_time);
     $('#array-dropdown-btn').text(boxObj.array_info.name);
     $('#phase-array-dropdown-btn').text(boxObj.phase_array_info.name);
@@ -1727,6 +1748,15 @@ function save_modal_values(plot, trace_number) {
     boxObj.anchor_time = $('#inputAnchorTime').val();
     boxObj.array_info.name = selected_box_array_name;
     boxObj.array_info.array = array_name_to_array[selected_box_array_name];
+
+    if (boxObj.type == "rf" || boxObj.type == "grad") {
+        boxObj.use_equation_time = $('#useTimeEquationCheck').is(':checked');
+        if (boxObj.use_equation_time) {
+            boxObj.equation_time_name = $('#inputTimeEquation').val();
+        } else {
+            boxObj.equation_time_name = "";
+        }
+    }
 
     if (boxObj.type == "rf") {
         boxObj.rf_added_phase_type = $('#inputRfAddedPhaseType').val();
@@ -3559,6 +3589,8 @@ class Box {
     axis = "";
     name = "";
     start_time = 0;
+    use_equation_time = false;
+    equation_time_name = "";
     anchor_time = 0;
     amplitude = null;
     variable_amplitude = false;
