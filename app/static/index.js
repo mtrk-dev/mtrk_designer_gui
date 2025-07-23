@@ -1224,10 +1224,10 @@ $(document).ready(function() {
     $("#useTimeEquationCheck").click(function() {
         let isChecked = $(this).is(":checked");
         if (isChecked) {
-            $("#inputTimeEquation").show();
+            $(".equation-time-group").show();
             $("#inputStartTime").prop("disabled", true);
         } else {
-            $("#inputTimeEquation").hide();
+            $(".equation-time-group").hide();
             $("#inputStartTime").prop("disabled", false);
         }
     });
@@ -1617,13 +1617,15 @@ function load_modal_values(plot, trace_number) {
     $('#inputStartTime').val(boxObj.start_time);
     $("#useTimeEquationCheck").prop("checked", boxObj.use_equation_time);
     if (boxObj.use_equation_time) {
-        $("#inputTimeEquation").show();
+        $(".equation-time-group").show();
         $('#inputStartTime').prop("disabled", true);
-        $('#inputTimeEquation').val(boxObj.equation_time_name);
+        $('#inputTimeEquationName').val(boxObj.equation_time_info.name);
+        $('#inputTimeEquationExpression').val(boxObj.equation_time_info.expression);
     } else {
-        $("#inputTimeEquation").hide();
+        $(".equation-time-group").hide();
         $('#inputStartTime').prop("disabled", false);
-        $('#inputTimeEquation').val("");
+        $('#inputTimeEquationName').val("");
+        $('#inputTimeEquationExpression').val("");
     }
     $('#inputAnchorTime').val(boxObj.anchor_time);
     $('#array-dropdown-btn').text(boxObj.array_info.name);
@@ -1752,9 +1754,15 @@ function save_modal_values(plot, trace_number) {
     if (boxObj.type == "rf" || boxObj.type == "grad") {
         boxObj.use_equation_time = $('#useTimeEquationCheck').is(':checked');
         if (boxObj.use_equation_time) {
-            boxObj.equation_time_name = $('#inputTimeEquation').val();
+            boxObj.equation_time_info = {
+                "name": $('#inputTimeEquationName').val(),
+                "expression": $('#inputTimeEquationExpression').val()
+            };
         } else {
-            boxObj.equation_time_name = "";
+            boxObj.equation_time_info = {
+                "name": "",
+                "expression": ""
+            }
         }
     }
 
@@ -3590,7 +3598,6 @@ class Box {
     name = "";
     start_time = 0;
     use_equation_time = false;
-    equation_time_name = "";
     anchor_time = 0;
     amplitude = null;
     variable_amplitude = false;
@@ -3623,6 +3630,10 @@ class Box {
         array: []
     }
     equation_info = {
+        name: "",
+        expression: ""
+    }
+    equation_time_info = {
         name: "",
         expression: ""
     }

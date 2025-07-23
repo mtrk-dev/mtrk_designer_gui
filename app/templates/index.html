@@ -122,7 +122,11 @@
                               <label class="form-check-label" for="useTimeEquationCheck">
                                 Use Equation
                               </label>
-                              <input type="text" class="form-control form-control-sm" id="inputTimeEquation" placeholder="Enter Name (Ex: equation_0_5)">
+                              <div class="form-group equation-time-group">
+                                <input type="text" class="form-control form-control-sm" id="inputTimeEquationName" placeholder="Name (Ex: equation_0_5)">
+                                <label for="inputTimeEquationExpression"><i>Use set(x) to use value of x from settings.</i></label>
+                                <input type="text" class="form-control form-control-sm" id="inputTimeEquationExpression" placeholder="Expression (Ex: set(TE)/2 - 1300)">
+                              </div>
                             </div>
                           </div>
                           <div class="form-group rf-param grad-param">
@@ -195,7 +199,7 @@
                               <div class="form-group col">
                                 <label for="inputGradEquationName">Equation Name</label>
                                 <input type="text" class="form-control form-control-sm" id="inputGradEquationName" placeholder="Ex: phaseencoding">
-                                <label for="inputGradEquationExpression">Equation Expression</label>
+                                <label for="inputGradEquationExpression">Equation Expression (<i>Use ctr(x) to refer the loop number x.</i>)</label>
                                 <input type="text" class="form-control form-control-sm" id="inputGradEquationExpression" placeholder="Ex: 0.3378125*(ctr(1)-64.5)">
                               </div>
                             </div>
