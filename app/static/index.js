@@ -3705,6 +3705,16 @@ function populate_global_variables_with_sdl_data(data_sdl) {
     settings = data_sdl.settings;
     info = data_sdl.infos;
     info["resolution"] = info["pelines"];
+
+    let variables = {};
+    for (let key in settings) {
+        if (key.toLowerCase() !== "readout_os") {
+            let value = settings[key];
+            variables[key] = value;
+        }
+    }
+    settings["variables"] = variables;
+
     let config_data = {
         "file": file,
         "settings": settings,
@@ -3778,6 +3788,10 @@ function dfs_visit_block(block_name, instructions, visited_blocks, prev_block, m
                 return;
             }
             step.time = equation_result;
+            step.equation_time_info = {
+                name: equation_name,
+                expression: equation
+            };
         }
 
         if (step.action == "run_block") {
@@ -3911,6 +3925,13 @@ function add_step(step, block_name, block_data_temp) {
         }
     } else if (object.type == "adc") {
         update_adc_trace_duration(plot, plot.data.length-1, parseFloat(box.start_time), parseFloat(box.adc_duration));
+    }
+
+    if (object.type == "rf" || object.type == "grad") {
+        if ("equation_time_info" in step) {
+            box.use_equation_time = true;
+            box.equation_time_info = step.equation_time_info;
+        }
     }
 
     // Update temp block data to be sent back
