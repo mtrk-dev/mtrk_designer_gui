@@ -117,7 +117,7 @@
                           <div class="form-group">
                             <label for="inputStartTime">Start Time (ms)</label>
                             <input type="number" class="form-control form-control-sm" id="inputStartTime" placeholder=0>
-                            <div class="rf-param grad-param">
+                            <div class="rf-param grad-param adc-param">
                               <input class="form-check-input" type="checkbox" value="" id="useTimeEquationCheck">
                               <label class="form-check-label" for="useTimeEquationCheck">
                                 Use Equation
@@ -472,6 +472,18 @@
                           <div class="form-group">
                             <label for="displayBlockDuration">Block Duration (ms)</label>
                             <input type="text" class="form-control" id="displayBlockDuration" placeholder="10" disabled>
+                          </div>
+                          <div class="form-group">
+                            <input class="form-check-input" type="checkbox" value="" id="useBlockEquationCheck">
+                            <label class="form-check-label" for="useBlockEquationCheck">
+                              Use Equation
+                            </label>
+                          </div>
+                          <div class="form-group block-equation-group">
+                            <label for="inputBlockEquationName">Block Duration Equation</label>
+                            <input type="text" class="form-control form-control-sm" id="inputBlockEquationName" placeholder="Name (Ex: equation_te_event)">
+                            <label for="inputBlockEquationExpression"><i>Use set(x) to use value of x from settings.</i></label>
+                            <input type="text" class="form-control form-control-sm" id="inputBlockEquationExpression" placeholder="Expression (Ex: set(TE) + 1690.0-880)">
                           </div>
                           <div class="form-group">
                             <label for="inputBlockMessage">Message</label>

@@ -1232,6 +1232,15 @@ $(document).ready(function() {
         }
     });
 
+    $("#useBlockEquationCheck").click(function() {
+        let isChecked = $(this).is(":checked");
+        if (isChecked) {
+            $(".block-equation-group").show();
+        } else {
+            $(".block-equation-group").hide();
+        }
+    });
+
     // Handle sdl file uploading.
     const sdlFileInput = document.getElementById('sdlFileInput');
     sdlFileInput.oninput = () => {
@@ -1689,6 +1698,16 @@ function load_block_modal_values(plot, trace_number) {
         $("#printCounterCheck").prop("checked", false);
     }
     $('#displayBlockDuration').val(block_to_duration[blockObj.name].toFixed(2));
+    $("#useBlockEquationCheck").prop("checked", blockObj.use_duration_equation);
+    if (blockObj.use_duration_equation) {
+        $(".block-equation-group").show();
+        $("#inputBlockEquationName").val(blockObj.duration_equation_info.name);
+        $("#inputBlockEquationExpression").val(blockObj.duration_equation_info.expression);
+    } else {
+        $(".block-equation-group").hide();
+        $("#inputBlockEquationName").val("");
+        $("#inputBlockEquationExpression").val("");
+    }
 }
 
 function save_modal_values(plot, trace_number) {
@@ -1751,7 +1770,7 @@ function save_modal_values(plot, trace_number) {
     boxObj.array_info.name = selected_box_array_name;
     boxObj.array_info.array = array_name_to_array[selected_box_array_name];
 
-    if (boxObj.type == "rf" || boxObj.type == "grad") {
+    if (boxObj.type == "rf" || boxObj.type == "grad" || boxObj.type == "adc") {
         boxObj.use_equation_time = $('#useTimeEquationCheck').is(':checked');
         if (boxObj.use_equation_time) {
             boxObj.equation_time_info = {
@@ -1859,6 +1878,18 @@ function save_block_modal_values(plot, trace_number) {
     blockObj.start_time = parseFloat(block_start_time);
     blockObj.message = $('#inputBlockMessage').val();
     blockObj.print_counter = $('#printCounterCheck').is(':checked');
+    blockObj.use_duration_equation = $('#useBlockEquationCheck').is(':checked');
+    if (blockObj.use_duration_equation) {
+        blockObj.duration_equation_info = {
+            "name": $('#inputBlockEquationName').val(),
+            "expression": $('#inputBlockEquationExpression').val()
+        };
+    } else {
+        blockObj.duration_equation_info = {
+            "name": "",
+            "expression": ""
+        }
+    }
 }
 
 function save_configurations() {
@@ -3676,6 +3707,11 @@ class Block {
     start_time = 0;
     message = "";
     print_counter = false;
+    use_duration_equation = false;
+    duration_equation_info = {
+        name: "",
+        expression: ""
+    };
 
     constructor(name, start_time) {
         this.name = name;
@@ -3770,6 +3806,7 @@ function dfs_visit_block(block_name, instructions, visited_blocks, prev_block, m
     let block_data = instructions[block_name];
     let steps = block_data.steps;
     let range = "1";
+    let block_duration_equation = null;
     let inner_block_time = null;
     let mark_time = null;
     for (let i=0; i < steps.length; i++) {
@@ -3818,6 +3855,9 @@ function dfs_visit_block(block_name, instructions, visited_blocks, prev_block, m
             add_event_from_sdl_data(step, block_name);
         } else if (step.action == "mark") {
             mark_time = parseFloat(step.time/1000);
+            if ("equation_time_info" in step) {
+                block_duration_equation = step.equation_time_info;
+            }
         }
     }
 
@@ -3842,6 +3882,10 @@ function dfs_visit_block(block_name, instructions, visited_blocks, prev_block, m
     blockObj = new Block(block_name, min_time);
     blockObj.message = instructions[block_name].print_message;
     blockObj.print_counter = instructions[block_name].print_counter == "on" ? true : false;
+    if (block_duration_equation != null) {
+        blockObj.use_duration_equation = true;
+        blockObj.duration_equation_info = block_duration_equation;
+    }
     block_number_to_block_object[block_color_counter] = blockObj;
 
     if (prev_block != null) {
@@ -3927,7 +3971,7 @@ function add_step(step, block_name, block_data_temp) {
         update_adc_trace_duration(plot, plot.data.length-1, parseFloat(box.start_time), parseFloat(box.adc_duration));
     }
 
-    if (object.type == "rf" || object.type == "grad") {
+    if (object.type == "rf" || object.type == "grad" || object.type =="adc") {
         if ("equation_time_info" in step) {
             box.use_equation_time = true;
             box.equation_time_info = step.equation_time_info;
