@@ -81,6 +81,9 @@ var block_to_events_html = {}
 // To maintain the duration of each block.
 var block_to_duration = {[main_block_str]: 10}
 
+// To maintain the anchor time for each block.
+var block_to_anchor_time = {};
+
 const event_type_to_icon_str = {
     "calc": "fa fa-calculator",
     "init": "fa fa-play",
@@ -349,7 +352,7 @@ var annotation_template = {
     },
   }
 
-// keeping default 0 for now, later to be set by user.
+// Note: it is being set in the event parameters. This should just stay 0.
 const anchor_time = 0;
 
 const config = {
@@ -798,6 +801,7 @@ $(document).ready(function() {
         delete block_to_loops[block_to_delete];
         delete block_to_duration[block_to_delete];
         delete block_to_events_html[block_to_delete];
+        delete block_to_anchor_time[block_to_delete];
         delete blockObj;
 
         // deleting block UI in current block window.
@@ -1297,6 +1301,27 @@ $(document).ready(function() {
     } else {
         $("#instance-tag").hide();
     }
+
+    $("#save-block-anchor-time-btn").click(function() {
+        let block_name = $('#block-select').val();
+        let anchor_time = $("#inputAnchorTime").val();
+        let anchor_mode = $("#anchor-time-mode-select").val();
+        boxObj = plot_to_box_objects[block_name][selected_plot.id][selected_trace_number-1];
+
+        if (boxObj.anchor_time != anchor_time || boxObj.anchor_mode != anchor_mode) {
+            fire_alert("Please save changes for the entire event first.");
+            return;
+        }
+
+        block_to_anchor_time[block_name] = anchor_time;
+
+        $("#save-block-anchor-time-btn").addClass("btn-success");
+        $("#save-block-anchor-time-btn").html("<i class='fa fa-check'></i>");
+        setTimeout(function() {
+            $("#save-block-anchor-time-btn").html("<i class='fa fa-save'></i>");
+            $("#save-block-anchor-time-btn").removeClass("btn-success");
+        }, 1000);
+    });
 });
 
 // Check whether shift button is pressed
@@ -1516,8 +1541,8 @@ function update_box_shape(plot, box_shape_number, starting_point, ending_point) 
 function get_trace_dimensions(plot, trace_number) {
     let x_arr = plot.data[trace_number]["x"];
     let y_arr = plot.data[trace_number]["y"];
-    let width = x_arr.slice(-1)[0] - x_arr[0] + 1;
-    let height = Math.max(...y_arr) - Math.min(...y_arr);
+    let width = x_arr.slice(-1)[0] - x_arr[0];
+    let height = Math.abs(Math.max(...y_arr) - Math.min(...y_arr));
     return [width, height];
 }
 
@@ -1648,6 +1673,12 @@ function load_modal_values(plot, trace_number) {
         $('#inputTimeEquationExpression').val("");
     }
     $('#inputAnchorTime').val(boxObj.anchor_time);
+    $("#anchor-time-mode-select").val(boxObj.anchor_mode);
+    if (boxObj.anchor_mode == "custom") {
+        $("#inputAnchorTime").show();
+    } else {
+        $("#inputAnchorTime").hide();
+    }
     $('#array-dropdown-btn').text(boxObj.array_info.name);
     $('#phase-array-dropdown-btn').text(boxObj.phase_array_info.name);
 
@@ -1781,6 +1812,22 @@ function save_modal_values(plot, trace_number) {
     boxObj.array_info.name = selected_box_array_name;
     boxObj.array_info.array = array_name_to_array[selected_box_array_name];
 
+    // If the anchor mode has been changed, calculate and update time.
+    let anchor_mode = $('#anchor-time-mode-select').val();
+    if (anchor_mode != boxObj.anchor_mode) {
+        boxObj.anchor_mode = anchor_mode;
+        if (anchor_mode == "start") {
+            boxObj.anchor_time = boxObj.start_time;
+        } else if (anchor_mode == "mid") {
+            let [width, height] = get_trace_dimensions(plot, trace_number);
+            boxObj.anchor_time = boxObj.start_time + (width/2);
+        } else if (anchor_mode == "end") {
+            let [width, height] = get_trace_dimensions(plot, trace_number);
+            boxObj.anchor_time = boxObj.start_time + width;
+        }
+        move_vertical_line_shape(plot, (trace_number-1)*2+1, boxObj.anchor_time);
+    }
+
     if (boxObj.type == "rf" || boxObj.type == "grad" || boxObj.type == "adc") {
         boxObj.use_equation_time = $('#useTimeEquationCheck').is(':checked');
         if (boxObj.use_equation_time) {
@@ -1879,6 +1926,10 @@ function save_block_modal_values(plot, trace_number) {
         let block_duration = block_to_duration[cur_block_name];
         delete block_to_duration[cur_block_name];
         block_to_duration[input_block_name] = block_duration;
+
+        let block_anchor_time = block_to_anchor_time[cur_block_name];
+        delete block_to_anchor_time[cur_block_name];
+        block_to_anchor_time[input_block_name] = block_anchor_time;
 
         load_block_select_options();
         $('#block-select').val(block_name);
@@ -2025,6 +2076,7 @@ function reload_data(data) {
     block_to_loops = data["block_to_loops"];
     array_name_to_array = data["array_name_to_array"];
     block_to_events_html = data["block_to_events_html"];
+    block_to_anchor_time = data["block_to_anchor_time"];
     load_events_data(block_name);
     theme = data["theme"];
     let current_theme = document.documentElement.getAttribute('data-bs-theme');
@@ -2053,7 +2105,8 @@ function generate_current_data_state() {
         "block_to_loops": block_to_loops,
         "array_name_to_array": array_name_to_array,
         "block_to_events_html": block_to_events_html,
-        "block_to_duration": block_to_duration
+        "block_to_duration": block_to_duration,
+        "block_to_anchor_time": block_to_anchor_time,
     }
     return current_state_data;
 }
@@ -3641,6 +3694,7 @@ class Box {
     start_time = 0;
     use_equation_time = false;
     anchor_time = 0;
+    anchor_mode = "start";
     amplitude = null;
     variable_amplitude = false;
     flip_amplitude = false;

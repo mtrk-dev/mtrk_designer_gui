@@ -136,13 +136,18 @@
                           <div class="form-group rf-param grad-param">
                             <label for="inputAnchorTime">Anchor Time (ms)</label>
                             <div class="row">
-                              <div class="col-8">
+                              <div class="col-7">
                                 <select id="anchor-time-mode-select" class="form-select form-select-sm" aria-label=".form-select-sm example">
                                   <option selected value="start">Start</option>
                                   <option value="mid">Mid</option>
                                   <option value="end">End</option>
                                   <option value="custom">Custom</option>
                                 </select>
+                              </div>
+                              <div class="col-1">
+                                <a id="save-block-anchor-time-btn" class="btn btn-sm btn-secondary" role="button" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Use for block anchor time">
+                                  <i class="fa fa-save"></i>
+                                </a>
                               </div>
                               <div class="col-4">
                                 <input type="number" class="form-control form-control-sm" id="inputAnchorTime" placeholder=0>
