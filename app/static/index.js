@@ -352,9 +352,6 @@ var annotation_template = {
     },
   }
 
-// Note: it is being set in the event parameters. This should just stay 0.
-const anchor_time = 0;
-
 const config = {
     // scrollZoom: true,
     responsive: true,
@@ -560,8 +557,8 @@ $(document).ready(function() {
 
         // add a line shape to show anchor point.
         var line_shape = JSON.parse(JSON.stringify(line_shape_template));
-        line_shape["x0"] = starting_point+anchor_time;
-        line_shape["x1"] = starting_point+anchor_time;
+        line_shape["x0"] = starting_point;
+        line_shape["x1"] = starting_point;
         added_shapes.push(line_shape);
 
         // add a dummy annotation
@@ -1313,7 +1310,7 @@ $(document).ready(function() {
             return;
         }
 
-        block_to_anchor_time[block_name] = anchor_time;
+        block_to_anchor_time[block_name] = parseFloat(anchor_time);
 
         $("#save-block-anchor-time-btn").addClass("btn-success");
         $("#save-block-anchor-time-btn").html("<i class='fa fa-check'></i>");
@@ -1465,7 +1462,7 @@ function move_shape_to_zero_line(plot, shape_number) {
 
 function move_vertical_line_shape(plot, line_shape_number, starting_point) {
     let shapes = JSON.parse(JSON.stringify(plot.layout["shapes"]));
-    let pos = starting_point + anchor_time;
+    let pos = starting_point;
     shapes[line_shape_number]["x0"] = pos;
     shapes[line_shape_number]["x1"] = pos;
     var update = {
@@ -1808,7 +1805,7 @@ function save_modal_values(plot, trace_number) {
     }
 
     boxObj.start_time = parseFloat(input_start_time);
-    boxObj.anchor_time = $('#inputAnchorTime').val();
+    boxObj.anchor_time = parseFloat($('#inputAnchorTime').val());
     boxObj.array_info.name = selected_box_array_name;
     boxObj.array_info.array = array_name_to_array[selected_box_array_name];
 
@@ -2178,7 +2175,11 @@ function change_box_start_time(plot, trace_number, starting_point) {
     // Move the box shape and vertical line shape to the new location
     // Here, shape_number + 1, will give the line shape number, as we are always creating line shape after box shape.
     move_box_shape(plot, shape_number, starting_point)
-    move_vertical_line_shape(plot, shape_number+1, starting_point);
+
+    let anchor_offset = plot.layout.shapes[shape_number+1]["x0"] - x[0];
+    let anchor_time = starting_point + anchor_offset;
+    move_vertical_line_shape(plot, shape_number+1, anchor_time);
+
     let middle_point = x_data[Math.floor(x_data.length/2)];
     move_annotation(plot, trace_number-1, middle_point);
 }
@@ -2329,6 +2330,10 @@ function scale_boxes_amplitude() {
             if ("shapes" in plot.layout) {
                 var shapes = JSON.parse(JSON.stringify(plot.layout["shapes"]));
                 shapes.forEach(function (shape) {
+                    if (shape["type"] == "line" && "label" in shape) {
+                        // If the shape is a block anchor line, we don't scale it.
+                        return;
+                    }
                     shape["y1"] = Math.sign(shape["y1"]) * shape_height;
                 });
             }
@@ -2767,8 +2772,21 @@ function add_dummy_block_boxes(starting_point, ending_point) {
         added_shapes.push(shape);
 
         var line_shape = JSON.parse(JSON.stringify(line_shape_template));
-        line_shape["x0"] = starting_point+anchor_time;
-        line_shape["x1"] = starting_point+anchor_time;
+        line_shape["x0"] = starting_point;
+        line_shape["x1"] = starting_point;
+        line_shape["y0"] = 0;
+        line_shape["y1"] = -0.5;
+        line_shape["label"] = {
+            text: "&#x2693;&#xfe0e;",
+            textangle: '0',
+            textposition: "end",
+            yanchor: "middle",
+            font: {
+                color: block_color,
+                size: 20
+            },
+        }
+        line_shape["block_number"] = block_color_counter;
         added_shapes.push(line_shape);
 
         var annotation = JSON.parse(JSON.stringify(annotation_template));
@@ -2924,6 +2942,19 @@ function load_block_data(block_name) {
                 yref: 'paper',
                 y: 1
             };
+        }
+        // Check and update the anchor time for inner dummy blocks.
+        if (layout.shapes) {
+            layout.shapes.forEach(function (shape) {
+                if (shape["type"] == "line" && "label" in shape && "block_number" in shape) {
+                    let anchor_block_name = block_number_to_block_object[shape["block_number"]].name;
+                    let anchor_block_start_time = block_number_to_block_object[shape["block_number"]].start_time;
+                    if (anchor_block_name in block_to_anchor_time) {
+                        shape["x0"] = anchor_block_start_time + block_to_anchor_time[anchor_block_name];
+                        shape["x1"] = anchor_block_start_time + block_to_anchor_time[anchor_block_name];
+                    }
+                }
+            });
         }
         // changing the height to handle the case where plot dimension has been changed after block creation.
         layout["height"] = window.innerHeight/5;
@@ -4090,8 +4121,8 @@ function add_box_to_plot_ui(plot, array, starting_point, box_type) {
 
     // add a line shape to show anchor point.
     var line_shape = JSON.parse(JSON.stringify(line_shape_template));
-    line_shape["x0"] = starting_point+anchor_time;
-    line_shape["x1"] = starting_point+anchor_time;
+    line_shape["x0"] = starting_point;
+    line_shape["x1"] = starting_point;
     added_shapes.push(line_shape);
 
     // add a dummy annotation
