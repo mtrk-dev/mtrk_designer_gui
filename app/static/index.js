@@ -84,6 +84,10 @@ var block_to_duration = {[main_block_str]: 10}
 // To maintain the anchor time for each block.
 var block_to_anchor_time = {};
 
+// To maintain adjacency relations between block anchors for each block.
+// {"selected_block": ["anchor_relation_shape", ...]} ("from" and "to" block is embedded within the shape.)
+var block_to_anchor_relations = {};
+
 const event_type_to_icon_str = {
     "calc": "fa fa-calculator",
     "init": "fa fa-play",
@@ -333,7 +337,7 @@ var line_shape_template = {
     y1: shape_height,
     line: {
         color: 'grey',
-        width: 1.5,
+        width: 1,
         dash: 'dot'
     },
 }
@@ -1401,6 +1405,11 @@ $(document).on("click", "#plot-size-btn", function () {
         minimize_plot_area();
         $("#plot-size-icon").removeClass("fa-compress").addClass("fa-expand");
     }
+});
+
+// Add click handler to add anchor button.
+$(document).on("click", "#add-anchor-btn", function() {
+    add_anchor_with_selected_blocks();
 });
 
 // Initialize drag images
@@ -2775,7 +2784,12 @@ function add_dummy_block_boxes(starting_point, ending_point) {
         line_shape["x0"] = starting_point;
         line_shape["x1"] = starting_point;
         line_shape["y0"] = 0;
-        line_shape["y1"] = -0.5;
+        line_shape["y1"] = -0.85;
+        line_shape["line"] = {
+            color: block_color,
+            width: 1,
+            dash: 'dot'
+        };
         line_shape["label"] = {
             text: "&#x2693;&#xfe0e;",
             textangle: '0',
@@ -3466,6 +3480,76 @@ function save_waveform_modal_values(event_type, selected_type) {
         // $('#waveformModal input').val('');
     });
 
+}
+
+function add_anchor_with_selected_blocks() {
+    let start_time = Number.MAX_VALUE;
+    let end_time = Number.MIN_VALUE;
+    let block_names = [];
+
+    let cur_block_name = $('#block-select').val();
+    for (var key in plot_to_box_objects[cur_block_name]) {
+        let boxes = JSON.parse(JSON.stringify(plot_to_box_objects[cur_block_name][key]));
+        boxes.forEach(function (boxObj, index) {
+            if (boxObj.isSelected && boxObj.block != null) {
+                // We unselect the box now by calling the function again and update it.
+                // Here, index of the object in the array plus 1 will give us the trace number.
+                let trace_number = index + 1
+                let plot_id = axis_name_to_axis_id[boxObj.axis];
+                let plot = document.getElementById(plot_id);
+                select_box(trace_number, plot);
+                boxObj.isSelected = false;
+
+                // Retrieve the block name from number
+                let blockObj = block_number_to_block_object[boxObj.block];
+                if (!block_names.includes(blockObj.name)) {
+                    block_names.push(blockObj.name);
+                }
+
+                // Calculating the anchor start time and end time.
+                let shape_number = (trace_number-1)*2;
+                let line_shape = plot.layout["shapes"][shape_number+1];
+                start_time = Math.min(start_time, line_shape["x0"]);
+                end_time = Math.max(end_time, line_shape["x1"]);
+            }
+        });
+    }
+
+    if (block_names.length != 2) {
+        fire_alert("Select exactly 2 blocks for anchor relation!");
+        return false;
+    }
+
+    let plot = document.getElementById("rf_chart"); // block boxes will be the same across all the plots.
+    let total_shapes = plot.layout.shapes;
+    // separate out the regular shapes from anchor line shapes using the length of anchor line shapes in the block. Only take the index till (length - offset)
+    let offset = block_to_anchor_relations[cur_block_name] ? block_to_anchor_relations[cur_block_name].length : 0;
+    let regular_shapes = total_shapes.slice(0, total_shapes.length - offset);
+    let anchor_shapes = block_to_anchor_relations[cur_block_name] || [];
+    let y_values = [-0.25, -0.5, -0.75, -1.0];
+
+    // add a horizontal line shape between start time and end time in shapes and relayout.
+    let anchor_line_shape = JSON.parse(JSON.stringify(line_shape_template));
+    anchor_line_shape["x0"] = start_time;
+    anchor_line_shape["x1"] = end_time;
+    anchor_line_shape["y0"] = y_values[anchor_shapes.length % y_values.length];
+    anchor_line_shape["y1"] = y_values[anchor_shapes.length % y_values.length];
+    anchor_line_shape["label"] = {
+        text: "set(TE)/2",
+        font: {
+            family: 'monospace',
+            size: 12,
+            color: '#777',
+        },
+    },
+    anchor_line_shape["from"] = block_names[0];
+    anchor_line_shape["to"] = block_names[1];
+    anchor_shapes.push(anchor_line_shape);
+    let update = {
+        shapes: regular_shapes.concat(anchor_shapes)
+    };
+    Plotly.relayout(plot, update);
+    block_to_anchor_relations[cur_block_name] = anchor_shapes;
 }
 
 function maximize_plot_area() {
