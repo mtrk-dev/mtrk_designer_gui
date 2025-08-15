@@ -307,7 +307,6 @@ rf_layout["title"] = {
 adc_layout["margin"]["b"] = 30;
 
 // We will use the shape template and keep adding to the total shapes in one axis.
-var shapes_array = [];
 var shape_height = 1.1;
 const default_shape_height = 1.1;
 var shape_template = 
@@ -3520,11 +3519,7 @@ function add_anchor_with_selected_blocks() {
         return false;
     }
 
-    let plot = document.getElementById("rf_chart"); // block boxes will be the same across all the plots.
-    let total_shapes = plot.layout.shapes;
-    // separate out the regular shapes from anchor line shapes using the length of anchor line shapes in the block. Only take the index till (length - offset)
     let offset = block_to_anchor_relations[cur_block_name] ? block_to_anchor_relations[cur_block_name].length : 0;
-    let regular_shapes = total_shapes.slice(0, total_shapes.length - offset);
     let anchor_shapes = block_to_anchor_relations[cur_block_name] || [];
     let y_values = [-0.25, -0.5, -0.75, -1.0];
 
@@ -3545,11 +3540,18 @@ function add_anchor_with_selected_blocks() {
     anchor_line_shape["from"] = block_names[0];
     anchor_line_shape["to"] = block_names[1];
     anchor_shapes.push(anchor_line_shape);
-    let update = {
-        shapes: regular_shapes.concat(anchor_shapes)
-    };
-    Plotly.relayout(plot, update);
-    block_to_anchor_relations[cur_block_name] = anchor_shapes;
+
+    for (let plot_id in plot_to_box_objects_template) {
+        let plot = document.getElementById(plot_id);
+        let total_shapes = JSON.parse(JSON.stringify(plot.layout.shapes));
+        let regular_shapes = total_shapes.slice(0, total_shapes.length - offset);
+        let update = {
+            shapes: regular_shapes.concat(anchor_shapes)
+        };
+        Plotly.relayout(plot, update);
+    }
+
+    block_to_anchor_relations[cur_block_name] = anchor_shapes; // same for all the plots.
 }
 
 function maximize_plot_area() {
