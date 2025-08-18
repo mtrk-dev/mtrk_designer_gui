@@ -556,6 +556,13 @@ $(document).ready(function() {
         else { shape["y1"] = shape_height; }
         let added_shapes=[];
         if ("shapes" in target.layout) { added_shapes = target.layout.shapes;}
+
+        let block_name = $('#block-select').val();
+        // Slice the anchor shapes (if any) from total shapes.
+        let offset = block_to_anchor_relations[block_name] ? block_to_anchor_relations[block_name].length : 0;
+        let anchor_shapes = block_to_anchor_relations[block_name] || [];
+        added_shapes = added_shapes.slice(0, added_shapes.length - offset);
+
         added_shapes.push(shape);
 
         // add a line shape to show anchor point.
@@ -572,7 +579,7 @@ $(document).ready(function() {
         added_annotations.push(annotation);
 
         var update = {
-            shapes: added_shapes,
+            shapes: added_shapes.concat(anchor_shapes),
             annotations: added_annotations
             };
         Plotly.relayout(target, update);
@@ -582,7 +589,6 @@ $(document).ready(function() {
         // let trace_number = target.data.length - 1; // Trace number is simply the index of current added trace i.e last index.
         boxObj = new Box(object_to_type[dragged.id], starting_point, axis_id_to_axis_name[target.id], [dragged_array_name, dragged_array]);
         boxObj.name = boxObj.type + "_" + (target.data.length - 1);
-        let block_name = $('#block-select').val();
         if (!(block_name in plot_to_box_objects)) {
             plot_to_box_objects[block_name] = JSON.parse(JSON.stringify(plot_to_box_objects_template));
         }
@@ -627,6 +633,11 @@ $(document).ready(function() {
                         starting_point = 0;
                     } else if (starting_point > block_duration) {
                         starting_point = block_duration - 1;
+                    }
+
+                    if (shape_number % 2 != 0) {
+                        console.log("Anchor line shape moved!");
+                        return;
                     }
 
                     // If the y0 value is not zero after moving for a shape, we want to move the shape to zero.
@@ -819,6 +830,8 @@ $(document).ready(function() {
             });
         }
         delete plot_to_box_objects[block_to_delete];
+
+        // TODO: delete anchor relations if any for the deleted block.
 
         load_block_select_options();
         $('#block-select').val(current_block_name);
@@ -2777,6 +2790,12 @@ function add_dummy_block_boxes(starting_point, ending_point) {
         shape["fillcolor"] = block_color + "2F";
         let added_shapes=[];
         if ("shapes" in target.layout) { added_shapes = target.layout.shapes;}
+
+        let block_name = $('#block-select').val();
+        // Slice the anchor shapes (if any) from total shapes.
+        let offset = block_to_anchor_relations[block_name] ? block_to_anchor_relations[block_name].length : 0;
+        let anchor_shapes = block_to_anchor_relations[block_name] || [];
+        added_shapes = added_shapes.slice(0, added_shapes.length - offset);
         added_shapes.push(shape);
 
         var line_shape = JSON.parse(JSON.stringify(line_shape_template));
@@ -2814,14 +2833,13 @@ function add_dummy_block_boxes(starting_point, ending_point) {
         added_annotations.push(annotation);
 
         var update = {
-            shapes: added_shapes,
+            shapes: added_shapes.concat(anchor_shapes),
             annotations: added_annotations
             };
         Plotly.relayout(target, update);
 
         boxObj = new Box("Block", starting_point, axis_id_to_axis_name[target.id], ["dummy_block_array", y_data]);
         boxObj.name = "dummy_box_" + (target.data.length-1);
-        let block_name = $('#block-select').val();
         if (!(block_name in plot_to_box_objects)) {
             plot_to_box_objects[block_name] = JSON.parse(JSON.stringify(plot_to_box_objects_template));
         }
@@ -2881,19 +2899,24 @@ function duplicate_box(plot, trace_number, target_plot) {
     let shapes = [];
     let annotations = [];
     if ("shapes" in target_plot.layout) { shapes = target_plot.layout.shapes;}
+    let block_name = $('#block-select').val();
+    // Slice the anchor shapes (if any) from total shapes.
+    let offset = block_to_anchor_relations[block_name] ? block_to_anchor_relations[block_name].length : 0;
+    let anchor_shapes = block_to_anchor_relations[block_name] || [];
+    shapes = shapes.slice(0, shapes.length - offset);
+
     if ("annotations" in target_plot.layout) { annotations = target_plot.layout.annotations;}
     shapes.push(new_shape);
     shapes.push(new_line_shape);
     annotations.push(new_annotation);
 
     let update = {
-        shapes: shapes,
+        shapes: shapes.concat(anchor_shapes),
         annotations: annotations
     };
     Plotly.relayout(target_plot, update);
 
     // Adding the new duplicate box object to the plot to box objects map.
-    let block_name = $('#block-select').val();
     let boxObj = plot_to_box_objects[block_name][plot.id][trace_number-1];
     // Creating a deep copy of the box object.
     let boxObjCopy = Object.assign(Object.create(Object.getPrototypeOf(boxObj),), JSON.parse(JSON.stringify(boxObj)),);
