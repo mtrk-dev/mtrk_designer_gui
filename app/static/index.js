@@ -2801,6 +2801,7 @@ function add_dummy_block_boxes(starting_point, ending_point) {
 
 function offset_boxes_inside_block(block_name, offset_time) {
     let current_block = $('#block-select').val();
+    save_block_data(current_block);
     load_block_data(block_name);
     $("#block-select").val(block_name);
     for (var key in plot_to_box_objects_template) {
