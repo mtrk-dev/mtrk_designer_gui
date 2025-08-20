@@ -110,7 +110,7 @@
     background: transparent;
 }
 
-#variables-section .delete-variable-btn {
+#variables-section .delete-variable-btn, #anchorRelationSection .delete-anchor-btn {
     font-size: 16px;
     background: transparent;
     border: none;
@@ -181,13 +181,6 @@
     margin-bottom: 5%;
     width: 20%;
     margin-left: 75%;
-}
-
-#add-anchor-btn {
-    font-size: 14px;
-    background: transparent;
-    margin-top: 15%;
-    border: none;
 }
 
 #block_enter_btn {
@@ -265,6 +258,10 @@
     border: 1px solid gray;
     border-radius: 0.2rem;
     background: transparent;
+}
+
+.icon-mid {
+    margin-left: 40%;
 }
 
 #flexSwitchCheckChecked {

@@ -58,9 +58,9 @@
                     <a id="loops-btn" class="btn btn-secondary" role="button" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Configure Loops">
                       <i>&#8734;</i>
                     </a>
-                    <!-- <a id="anchor-btn" class="btn btn-secondary" role="button" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Configure Anchors">
+                    <a id="anchor-btn" class="btn btn-secondary" role="button" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Configure Anchors">
                       <i class="fa fa-anchor"></i>
-                    </a> -->
+                    </a>
                   </div>
                 </div>
                 <div class="row objects-group">
@@ -544,6 +544,28 @@
                     </div>
                   </div>
                 </div>
+                <div class="modal fade" id="anchorModal" tabindex="-1" aria-labelledby="anchorModalLabel" aria-hidden="true">
+                  <div class="modal-dialog modal-dialog-scrollable modal-lg">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5 class="modal-title" id="anchorModalLabel">Configure Anchor Relations</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                      </div>
+                      <div class="modal-body">
+                        <div id="anchorRelationSection" class="row">
+                          <!-- space to add anchor relation groups. -->
+                        </div>
+                      </div>
+                      <div class="modal-footer">
+                        <button id="add-anchor-btn" class="btn btn-success" role="button" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Add Anchor with Selected Boxes">
+                           Add Anchor Relation
+                        </button>
+                        <button id="anchor_modal_close_btn" type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button id="anchor_modal_save_changes_btn" type="button" class="btn btn-primary">Save changes</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
                 <div class="modal fade" id="eventsModal" tabindex="-1" aria-labelledby="eventsModalLabel" aria-hidden="true">
                   <div class="modal-dialog modal-dialog-scrollable">
                     <div class="modal-content">
@@ -709,11 +731,6 @@
                 <a id="plot-size-btn" class="btn btn-sm btn-secondary" role="button" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Maximize/Minimize Plot">
                   <i id="plot-size-icon" class="fa fa-expand"></i>
                 </a>
-                <div>
-                  <a id="add-anchor-btn" class="btn btn-sm btn-secondary" role="button" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Add Anchor">
-                    <i class="fa fa-anchor" aria-hidden="true"></i>
-                  </a>
-                </div>
                 <!-- placeholder sections for different events -->
                 <section id="calc-events" class="event-section"></section>
                 <section id="init-events" class="event-section"></section>

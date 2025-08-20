@@ -640,6 +640,13 @@ $(document).ready(function() {
                         return;
                     }
 
+                    let anchor_shapes = block_to_anchor_relations[$('#block-select').val()] || [];
+                    let regular_shapes_length = plot.layout.shapes.length - anchor_shapes.length;
+                    if (shape_number >= regular_shapes_length) {
+                        console.log("Anchor relation shape moved!");
+                        return;
+                    }
+
                     // If the y0 value is not zero after moving for a shape, we want to move the shape to zero.
                     if (Math.abs(y0_val) != 0) {
                         console.log("Lifted!");
@@ -813,6 +820,7 @@ $(document).ready(function() {
         delete block_to_duration[block_to_delete];
         delete block_to_events_html[block_to_delete];
         delete block_to_anchor_time[block_to_delete];
+        delete block_to_anchor_relations[block_to_delete];
         delete blockObj;
 
         // deleting block UI in current block window.
@@ -1048,6 +1056,14 @@ $(document).ready(function() {
         $('#loopsModal').modal('toggle');
     });
 
+    $("#anchor-btn").click(function(){
+        load_anchor_configuration();
+        $('#anchorModal').modal('toggle');
+    });
+    $('#anchor_modal_close_btn').click(function(){
+        $('#anchorModal').modal('toggle');
+    });
+
     $('#events_modal_close_btn').click(function(){
         $('#eventsModal').modal('toggle');
     });
@@ -1151,6 +1167,13 @@ $(document).ready(function() {
         update_annotations_loops_count();
         $('#loopsModal').modal('toggle');
     });
+
+    $("#anchor_modal_save_changes_btn").click(function() {
+        // TODO: update the relation shape with the new text (if changed)
+        // Along with other resulting calculation changes.
+        $("#anchorModal").modal('toggle');
+    });
+
 
     // handle checkpoint file loading.
     const fileInput = document.getElementById('formFileCheckpoint');
@@ -1408,6 +1431,12 @@ $(document).on('click', '.delete-variable-btn', function() {
     $(this).closest('.variable-group').remove();
 });
 
+// Add click handler on each delete anchor relation btn.
+$(document).on('click', '.delete-anchor-btn', function() {
+    // TODO: remove the anchor relation from the block_to_anchor_relations object and UI.
+    $(this).closest('.anchor-relation-group').remove();
+});
+
 // Add click handler the plot size button.
 $(document).on("click", "#plot-size-btn", function () {
     if ($("#leftSidebar").is(":visible")) {
@@ -1421,6 +1450,7 @@ $(document).on("click", "#plot-size-btn", function () {
 
 // Add click handler to add anchor button.
 $(document).on("click", "#add-anchor-btn", function() {
+    $("#anchorModal").modal('toggle');
     add_anchor_with_selected_blocks();
 });
 
@@ -1949,6 +1979,11 @@ function save_block_modal_values(plot, trace_number) {
         delete block_to_anchor_time[cur_block_name];
         block_to_anchor_time[input_block_name] = block_anchor_time;
 
+        let block_anchor_relations = block_to_anchor_relations[cur_block_name];
+        delete block_to_anchor_relations[cur_block_name];
+        block_to_anchor_relations[input_block_name] = block_anchor_relations;
+        // TODO: need to update the "from" key in each relation using this block too.
+
         load_block_select_options();
         $('#block-select').val(block_name);
         update_block_boxes_name(boxObj.block, input_block_name);
@@ -2095,6 +2130,7 @@ function reload_data(data) {
     array_name_to_array = data["array_name_to_array"];
     block_to_events_html = data["block_to_events_html"];
     block_to_anchor_time = data["block_to_anchor_time"];
+    block_to_anchor_relations = data["block_to_anchor_relations"];
     load_events_data(block_name);
     theme = data["theme"];
     let current_theme = document.documentElement.getAttribute('data-bs-theme');
@@ -2125,6 +2161,7 @@ function generate_current_data_state() {
         "block_to_events_html": block_to_events_html,
         "block_to_duration": block_to_duration,
         "block_to_anchor_time": block_to_anchor_time,
+        "block_to_anchor_relations": block_to_anchor_relations,
     }
     return current_state_data;
 }
@@ -3366,6 +3403,48 @@ function load_variables_data(variables_data) {
     for (let name in variables_data) {
         let value = variables_data[name];
         add_variable_group(name, value);
+    }
+}
+
+function load_anchor_configuration() {
+    $("#anchorRelationSection").empty();
+    let selected_theme = document.documentElement.getAttribute('data-bs-theme');
+    let btn_class = selected_theme == "dark" ? "btn-secondary" : "btn-light";
+    let block_name = $('#block-select').val();
+
+    if (block_name in block_to_anchor_relations) {
+        block_to_anchor_relations[block_name].forEach(function(anchor_relation) {
+            let from_block = anchor_relation.from;
+            let to_block = anchor_relation.to;
+            let relation = anchor_relation.label.text;
+
+            let anchor_relation_group_html = `
+                <div class="form-group row anchor-relation-group">
+                    <div class="col-3">
+                        <input readonly type="text" class="form-control" value="${from_block}">
+                    </div>
+                    <div class="col-1 d-flex align-items-center">
+                        <span><i class="fa fa-arrow-left" aria-hidden="true"></i></span>
+                        <span><i class="fa fa-arrow-right" aria-hidden="true"></i></span>
+                    </div>
+                    <div class="col-3">
+                        <input readonly type="text" class="form-control" value="${to_block}">
+                    </div>
+                    <div class="col-1 d-flex align-items-center">
+                        <span class="icon-mid">=</span>
+                    </div>
+                    <div class="col-3">
+                        <input type="text" class="form-control" value="${relation}">
+                    </div>
+                    <div class="col-1 d-flex align-items-center">
+                        <button class="btn ${btn_class} btn-sm delete-anchor-btn">
+                            <i class="fa fa-minus-circle"></i>
+                        </button>
+                    </div>
+                </div>`;
+
+            $('#anchorRelationSection').append(anchor_relation_group_html);
+        });
     }
 }
 
