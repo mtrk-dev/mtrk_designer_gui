@@ -1169,8 +1169,8 @@ $(document).ready(function() {
     });
 
     $("#anchor_modal_save_changes_btn").click(function() {
-        // TODO: update the relation shape with the new text (if changed)
-        // Along with other resulting calculation changes.
+        // TODO: update the block position with the change in relation text.
+        save_anchor_configuration();
         $("#anchorModal").modal('toggle');
     });
 
@@ -3421,20 +3421,20 @@ function load_anchor_configuration() {
             let anchor_relation_group_html = `
                 <div class="form-group row anchor-relation-group">
                     <div class="col-3">
-                        <input readonly type="text" class="form-control" value="${from_block}">
+                        <input readonly type="text" class="form-control from-input" value="${from_block}">
                     </div>
                     <div class="col-1 d-flex align-items-center">
                         <span><i class="fa fa-arrow-left" aria-hidden="true"></i></span>
                         <span><i class="fa fa-arrow-right" aria-hidden="true"></i></span>
                     </div>
                     <div class="col-3">
-                        <input readonly type="text" class="form-control" value="${to_block}">
+                        <input readonly type="text" class="form-control to-input" value="${to_block}">
                     </div>
                     <div class="col-1 d-flex align-items-center">
                         <span class="icon-mid">=</span>
                     </div>
                     <div class="col-3">
-                        <input type="text" class="form-control" value="${relation}">
+                        <input type="text" class="form-control relation-input" value="${relation}">
                     </div>
                     <div class="col-1 d-flex align-items-center">
                         <button class="btn ${btn_class} btn-sm delete-anchor-btn">
@@ -3446,6 +3446,44 @@ function load_anchor_configuration() {
             $('#anchorRelationSection').append(anchor_relation_group_html);
         });
     }
+}
+
+function save_anchor_configuration() {
+    let block_name = $('#block-select').val();
+    let anchor_relations = block_to_anchor_relations[block_name] || [];
+
+    // Update the anchor line shape object if the input text has been changed.
+    $(".anchor-relation-group").each(function() {
+        let from_block = $(this).find(".from-input").val().trim();
+        let to_block = $(this).find(".to-input").val().trim();
+        let relation = $(this).find(".relation-input").val().trim();
+
+        if (from_block && to_block && relation) {
+            for (let i = 0; i < anchor_relations.length; i++) {
+                if (anchor_relations[i].from === from_block && anchor_relations[i].to === to_block) {
+                    if (anchor_relations[i].label.text !== relation) {
+                        console.log("text changed for anchor relation: ", from_block, to_block, relation);
+                        anchor_relations[i].label.text = relation;
+                    }
+                }
+            }
+        }
+    });
+
+    // Relayout the plots with the updated anchor relation shapes.
+    for (let key in plot_to_box_objects_template) {
+        let plot = document.getElementById(key);
+        let added_shapes = [];
+        if ("shapes" in plot.layout) { added_shapes = plot.layout.shapes; }
+
+        added_shapes = added_shapes.slice(0, added_shapes.length - anchor_relations.length);
+        let update = {
+            shapes: added_shapes.concat(anchor_relations),
+        };
+
+        Plotly.relayout(plot, update);
+    }
+    block_to_anchor_relations[block_name] = anchor_relations;
 }
 
 function load_waveform_modal_values(selected_type) {
