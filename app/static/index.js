@@ -839,7 +839,14 @@ $(document).ready(function() {
         }
         delete plot_to_box_objects[block_to_delete];
 
-        // TODO: delete anchor relations if any for the deleted block.
+        // Delete anchor relations (if any) for the deleted block by iterating the anchor relations in the current_block.
+        let anchor_relations = block_to_anchor_relations[current_block_name] || [];
+        for (let i = 0; i < anchor_relations.length; i++) {
+            let anchor_relation = anchor_relations[i];
+            if (anchor_relation.from == block_to_delete || anchor_relation.to == block_to_delete) {
+                delete_anchor_relation(anchor_relation.from, anchor_relation.to);
+            }
+        }
 
         load_block_select_options();
         $('#block-select').val(current_block_name);
@@ -1433,7 +1440,10 @@ $(document).on('click', '.delete-variable-btn', function() {
 
 // Add click handler on each delete anchor relation btn.
 $(document).on('click', '.delete-anchor-btn', function() {
-    // TODO: remove the anchor relation from the block_to_anchor_relations object and UI.
+    let anchor_relation_group = $(this).closest('.anchor-relation-group');
+    let from_block = anchor_relation_group.find('.from-input').val();
+    let to_block = anchor_relation_group.find('.to-input').val();
+    delete_anchor_relation(from_block, to_block);
     $(this).closest('.anchor-relation-group').remove();
 });
 
@@ -3484,6 +3494,34 @@ function save_anchor_configuration() {
         Plotly.relayout(plot, update);
     }
     block_to_anchor_relations[block_name] = anchor_relations;
+}
+
+function delete_anchor_relation(from_block, to_block) {
+    let block_name = $('#block-select').val();
+    if (!(block_name in block_to_anchor_relations)) {
+        return;
+    }
+
+    // Filter out the anchor relation that matches the from_block and to_block.
+    let anchor_relations = block_to_anchor_relations[block_name] || [];
+    let updated_anchor_relations = anchor_relations.filter(function(anchor_relation) {
+        return !(anchor_relation.from === from_block && anchor_relation.to === to_block);
+    });
+
+    // Relayout the plots with the updated anchor relation shapes.
+    for (let key in plot_to_box_objects_template) {
+        let plot = document.getElementById(key);
+        let added_shapes = [];
+        if ("shapes" in plot.layout) { added_shapes = plot.layout.shapes; }
+
+        added_shapes = added_shapes.slice(0, added_shapes.length - anchor_relations.length);
+        let update = {
+            shapes: added_shapes.concat(updated_anchor_relations),
+        };
+
+        Plotly.relayout(plot, update);
+    }
+    block_to_anchor_relations[block_name] = updated_anchor_relations;
 }
 
 function load_waveform_modal_values(selected_type) {
