@@ -1986,13 +1986,25 @@ function save_block_modal_values(plot, trace_number) {
         block_to_duration[input_block_name] = block_duration;
 
         let block_anchor_time = block_to_anchor_time[cur_block_name];
-        delete block_to_anchor_time[cur_block_name];
-        block_to_anchor_time[input_block_name] = block_anchor_time;
-
+        if (block_anchor_time) {
+            delete block_to_anchor_time[cur_block_name];
+            block_to_anchor_time[input_block_name] = block_anchor_time;
+        }
         let block_anchor_relations = block_to_anchor_relations[cur_block_name];
-        delete block_to_anchor_relations[cur_block_name];
-        block_to_anchor_relations[input_block_name] = block_anchor_relations;
-        // TODO: need to update the "from" key in each relation using this block too.
+        if (block_anchor_relations) {
+            delete block_to_anchor_relations[cur_block_name];
+            block_to_anchor_relations[input_block_name] = block_anchor_relations;
+        }
+        let anchor_relations = block_to_anchor_relations[$('#block-select').val()];
+        for (let anchor_relation of anchor_relations) {
+            if (anchor_relation.from === cur_block_name) {
+                anchor_relation.from = input_block_name;
+            }
+            if (anchor_relation.to === cur_block_name) {
+                anchor_relation.to = input_block_name;
+            }
+        }
+        block_to_anchor_relations[$('#block-select').val()] = anchor_relations;
 
         load_block_select_options();
         $('#block-select').val(block_name);
@@ -3034,8 +3046,8 @@ function load_block_data(block_name) {
                     let anchor_block_name = block_number_to_block_object[shape["block_number"]].name;
                     let anchor_block_start_time = block_number_to_block_object[shape["block_number"]].start_time;
                     if (anchor_block_name in block_to_anchor_time) {
-                        shape["x0"] = anchor_block_start_time + block_to_anchor_time[anchor_block_name];
-                        shape["x1"] = anchor_block_start_time + block_to_anchor_time[anchor_block_name];
+                        shape["x0"] = parseFloat(anchor_block_start_time + block_to_anchor_time[anchor_block_name]);
+                        shape["x1"] = parseFloat(anchor_block_start_time + block_to_anchor_time[anchor_block_name]);
                     }
                 }
             });
