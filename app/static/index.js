@@ -1100,8 +1100,10 @@ $(document).ready(function() {
         let selected_mode = $(this).val();
         if (selected_mode == "custom") {
             $("#inputAnchorTime").show();
+            $("#inputAnchorTimeLabel").text("Anchor Time (ms)");
         } else {
             $("#inputAnchorTime").hide();
+            $("#inputAnchorTimeLabel").text("Anchor Time");
         }
     });
 
@@ -1835,6 +1837,14 @@ function save_modal_values(plot, trace_number) {
                 "name": $('#inputTimeEquationName').val(),
                 "expression": $('#inputTimeEquationExpression').val()
             };
+            let equation = $('#inputTimeEquationExpression').val();
+            let equation_result = evaluate_equation(equation);
+            if (equation && equation_result && parseFloat(equation_result)) {
+                change_box_start_time(plot, trace_number, parseFloat(equation_result));
+                boxObj.start_time = parseFloat(equation_result);
+            } else {
+                fire_alert("Could not change start time using expression!");
+            }
         } else {
             boxObj.equation_time_info = {
                 "name": "",
@@ -1946,6 +1956,11 @@ function save_block_modal_values(plot, trace_number) {
             "name": $('#inputBlockEquationName').val(),
             "expression": $('#inputBlockEquationExpression').val()
         };
+        let equation = $('#inputBlockEquationExpression').val();
+        let equation_result = evaluate_equation(equation);
+        if (equation && equation_result && parseFloat(equation_result)) {
+            block_to_duration[blockObj.name] = parseFloat(equation_result);
+        }
     } else {
         blockObj.duration_equation_info = {
             "name": "",
