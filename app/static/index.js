@@ -3054,19 +3054,35 @@ function load_block_data(block_name) {
                 y: 1
             };
         }
-        // Check and update the anchor time for inner dummy blocks.
-        if (layout.shapes) {
-            layout.shapes.forEach(function (shape) {
+
+        let total_shapes = layout.shapes || [];
+        let offset = block_to_anchor_relations[block_name] ? block_to_anchor_relations[block_name].length : 0;
+        let anchor_relation_shapes = block_to_anchor_relations[block_name] || [];
+        added_shapes = total_shapes.slice(0, total_shapes.length - offset);
+        if (added_shapes) {
+            added_shapes.forEach(function (shape) {
                 if (shape["type"] == "line" && "label" in shape && "block_number" in shape) {
+                    // Check and update the anchor time for inner dummy blocks.
                     let anchor_block_name = block_number_to_block_object[shape["block_number"]].name;
                     let anchor_block_start_time = block_number_to_block_object[shape["block_number"]].start_time;
                     if (anchor_block_name in block_to_anchor_time) {
                         shape["x0"] = parseFloat(anchor_block_start_time + block_to_anchor_time[anchor_block_name]);
                         shape["x1"] = parseFloat(anchor_block_start_time + block_to_anchor_time[anchor_block_name]);
                     }
+
+                    // Check if there are any anchor relations linked with this anchor line.
+                    anchor_relation_shapes.forEach(function (relation) {
+                        let anchor_point = block_to_anchor_time[anchor_block_name] || 0;
+                        if (relation["from"] == anchor_block_name) {
+                            relation["x0"] = parseFloat(anchor_block_start_time + anchor_point);
+                        } else if (relation["to"] == anchor_block_name) {
+                            relation["x1"] = parseFloat(anchor_block_start_time + anchor_point);
+                        }
+                    });
                 }
             });
         }
+        layout.shapes = added_shapes.concat(anchor_relation_shapes);
         // changing the height to handle the case where plot dimension has been changed after block creation.
         layout["height"] = window.innerHeight/5;
         layout["width"] =  rf_chart.offsetWidth;
