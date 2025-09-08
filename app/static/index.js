@@ -2951,8 +2951,14 @@ function get_increment_size_for_dummy_blocks(block_duration) {
     else if (block_duration >= 1000 && block_duration < 5000) {
         increment = 5;
     }
-    else if (block_duration >= 5000) {
+    else if (block_duration >= 5000 && block_duration < 10000) {
         increment = 10;
+    }
+    else if (block_duration >= 10000 && block_duration < 100000) {
+        increment = 100;
+    }
+    else if (block_duration >= 100000) {
+        increment = 1000;
     }
     return increment;
 }
