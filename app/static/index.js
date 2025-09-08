@@ -3523,6 +3523,8 @@ function save_anchor_configuration() {
         }
     });
 
+    // TODO: calculate the new block duration with relation change and make required changes.
+
     // Relayout the plots with the updated anchor relation shapes.
     for (let key in plot_to_box_objects_template) {
         let plot = document.getElementById(key);
@@ -3565,6 +3567,34 @@ function delete_anchor_relation(from_block, to_block) {
         Plotly.relayout(plot, update);
     }
     block_to_anchor_relations[block_name] = updated_anchor_relations;
+}
+
+function update_anchor_relation(from_block, to_block, start_time, end_time) {
+    let block_name = $('#block-select').val();
+    if (!(block_name in block_to_anchor_relations)) {
+        return;
+    }
+    let anchor_relations = block_to_anchor_relations[block_name] || [];
+    for (let i = 0; i < anchor_relations.length; i++) {
+        if (anchor_relations[i].from === from_block && anchor_relations[i].to === to_block) {
+            anchor_relations[i].x0 = start_time;
+            anchor_relations[i].x1 = end_time;
+        }
+    }
+
+    for (let key in plot_to_box_objects_template) {
+        let plot = document.getElementById(key);
+        let added_shapes = [];
+        if ("shapes" in plot.layout) { added_shapes = plot.layout.shapes; }
+
+        added_shapes = added_shapes.slice(0, added_shapes.length - anchor_relations.length);
+        let update = {
+            shapes: added_shapes.concat(anchor_relations),
+        };
+
+        Plotly.relayout(plot, update);
+    }
+    block_to_anchor_relations[block_name] = anchor_relations;
 }
 
 function load_waveform_modal_values(selected_type) {
@@ -3707,6 +3737,7 @@ function add_anchor_with_selected_blocks() {
     let start_time = Number.MAX_VALUE;
     let end_time = Number.MIN_VALUE;
     let block_names = [];
+    let block_numbers = [];
 
     let cur_block_name = $('#block-select').val();
     for (var key in plot_to_box_objects[cur_block_name]) {
@@ -3725,9 +3756,10 @@ function add_anchor_with_selected_blocks() {
                 let blockObj = block_number_to_block_object[boxObj.block];
                 if (!block_names.includes(blockObj.name)) {
                     block_names.push(blockObj.name);
+                    block_numbers.push(boxObj.block);
                 }
 
-                // Calculating the anchor start time and end time.
+                // Calculating the initial anchor start time and end time. (useful if the duration calculation fails)
                 let shape_number = (trace_number-1)*2;
                 let line_shape = plot.layout["shapes"][shape_number+1];
                 start_time = Math.min(start_time, line_shape["x0"]);
@@ -3740,6 +3772,10 @@ function add_anchor_with_selected_blocks() {
         fire_alert("Select exactly 2 blocks for anchor relation!");
         return false;
     }
+
+    calculate_block_duration_using_relation("set(TE)/2", block_names[0], block_numbers[0], block_names[1], block_numbers[1]);
+    start_time = block_number_to_block_object[block_numbers[0]].start_time + (block_to_anchor_time[block_names[0]] || 0);
+    end_time = block_number_to_block_object[block_numbers[1]].start_time + (block_to_anchor_time[block_names[1]] || 0);
 
     let offset = block_to_anchor_relations[cur_block_name] ? block_to_anchor_relations[cur_block_name].length : 0;
     let anchor_shapes = block_to_anchor_relations[cur_block_name] || [];
@@ -3774,6 +3810,65 @@ function add_anchor_with_selected_blocks() {
     }
 
     block_to_anchor_relations[cur_block_name] = anchor_shapes; // same for all the plots.
+}
+
+function calculate_block_duration_using_relation(equation, from_block, from_block_number, to_block, to_block_number) {
+    let variable_data = serialize_variables_data();
+    settings = {...settings, ...variable_data};
+
+    let equation_val = evaluate_equation(equation);
+    if (isNaN(equation_val)) {
+        fire_alert("Error evaluating the equation: " + equation);
+        return;
+    }
+
+    let from_block_start_time = block_number_to_block_object[from_block_number].start_time;
+    let anchor_time_from = block_to_anchor_time[from_block] || 0;
+    let anchor_time_to = parseFloat(block_to_anchor_time[to_block] || 0);
+    let new_from_block_duration = parseFloat(equation_val) + parseFloat(anchor_time_from) - parseFloat(anchor_time_to);
+    update_block_boxes_with_relation_change(from_block_number, from_block_start_time + new_from_block_duration);
+}
+
+function update_block_boxes_with_relation_change(changed_block_number, new_end_time) {
+    let parent_block = $('#block-select').val();
+    let relative_shift_start = null;
+    let shift_val = 0;
+
+    // Update the end time of the block with the new value.
+    for (var key in plot_to_box_objects_template) {
+        plot_to_box_objects[parent_block][key].forEach(function (boxObj, index) {
+            if (boxObj.block != null && boxObj.block == changed_block_number) {
+                blockObj = block_number_to_block_object[boxObj.block];
+                let trace_number = index + 1;
+                let plot_id = axis_name_to_axis_id[boxObj.axis];
+                let plot = document.getElementById(plot_id);
+                let x_data = plot.data[trace_number]["x"];
+                let cur_end_time = x_data[x_data.length-1];
+                shift_val = parseFloat(cur_end_time) - parseFloat(new_end_time);
+                change_block_box_end_time(plot, trace_number, new_end_time);
+                relative_shift_start = blockObj.start_time;
+            }
+        });
+    }
+
+    // Update the relative position of the other boxes/blocks.
+    for (var key in plot_to_box_objects_template) {
+        plot_to_box_objects[parent_block][key].forEach(function (boxObj, index) {
+            if (relative_shift_start != null && boxObj.start_time > relative_shift_start) {
+                let trace_number = index + 1;
+                let plot_id = axis_name_to_axis_id[boxObj.axis];
+                let plot = document.getElementById(plot_id);
+                let shifted_start_time = parseFloat(boxObj.start_time) - shift_val;
+                change_box_start_time(plot, trace_number, shifted_start_time);
+                boxObj.start_time = shifted_start_time;
+                if (boxObj.block != null) {
+                    blockObj = block_number_to_block_object[boxObj.block];
+                    blockObj.start_time = shifted_start_time;
+                }
+            }
+        });
+    }
+    // TODO: propagate the duration change to the parent blocks too.
 }
 
 function maximize_plot_area() {
