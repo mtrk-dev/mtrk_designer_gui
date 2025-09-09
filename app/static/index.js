@@ -1178,7 +1178,6 @@ $(document).ready(function() {
     });
 
     $("#anchor_modal_save_changes_btn").click(function() {
-        // TODO: update the block position with the change in relation text.
         save_anchor_configuration();
         $("#anchorModal").modal('toggle');
     });
@@ -3523,13 +3522,34 @@ function save_anchor_configuration() {
                     if (anchor_relations[i].label.text !== relation) {
                         console.log("text changed for anchor relation: ", from_block, to_block, relation);
                         anchor_relations[i].label.text = relation;
+
+                        // find out block numbers using block names.
+                        let block_names = [from_block, to_block];
+                        let block_numbers = [];
+                        for (let j = 0; j < block_names.length; j++) {
+                            let found = false;
+                            for (let key in block_number_to_block_object) {
+                                if (block_number_to_block_object[key].name === block_names[j]) {
+                                    block_numbers.push(key);
+                                    found = true;
+                                    break;
+                                }
+                            }
+                            if (!found) {
+                                block_numbers.push(null);
+                            }
+                        }
+
+                        calculate_block_duration_using_relation(relation, block_names[0], block_numbers[0], block_names[1], block_numbers[1]);
+                        let start_time = block_number_to_block_object[block_numbers[0]].start_time + (block_to_anchor_time[block_names[0]] || 0);
+                        let end_time = block_number_to_block_object[block_numbers[1]].start_time + (block_to_anchor_time[block_names[1]] || 0);
+                        anchor_relations[i].x0 = start_time;
+                        anchor_relations[i].x1 = end_time;
                     }
                 }
             }
         }
     });
-
-    // TODO: calculate the new block duration with relation change and make required changes.
 
     // Relayout the plots with the updated anchor relation shapes.
     for (let key in plot_to_box_objects_template) {
@@ -3573,34 +3593,6 @@ function delete_anchor_relation(from_block, to_block) {
         Plotly.relayout(plot, update);
     }
     block_to_anchor_relations[block_name] = updated_anchor_relations;
-}
-
-function update_anchor_relation(from_block, to_block, start_time, end_time) {
-    let block_name = $('#block-select').val();
-    if (!(block_name in block_to_anchor_relations)) {
-        return;
-    }
-    let anchor_relations = block_to_anchor_relations[block_name] || [];
-    for (let i = 0; i < anchor_relations.length; i++) {
-        if (anchor_relations[i].from === from_block && anchor_relations[i].to === to_block) {
-            anchor_relations[i].x0 = start_time;
-            anchor_relations[i].x1 = end_time;
-        }
-    }
-
-    for (let key in plot_to_box_objects_template) {
-        let plot = document.getElementById(key);
-        let added_shapes = [];
-        if ("shapes" in plot.layout) { added_shapes = plot.layout.shapes; }
-
-        added_shapes = added_shapes.slice(0, added_shapes.length - anchor_relations.length);
-        let update = {
-            shapes: added_shapes.concat(anchor_relations),
-        };
-
-        Plotly.relayout(plot, update);
-    }
-    block_to_anchor_relations[block_name] = anchor_relations;
 }
 
 function load_waveform_modal_values(selected_type) {
@@ -3779,6 +3771,16 @@ function add_anchor_with_selected_blocks() {
         return false;
     }
 
+    // check if there is a relation already between the two selected blocks.
+    let existing_relations = block_to_anchor_relations[cur_block_name] || [];
+    for (let i = 0; i < existing_relations.length; i++) {
+        if ((existing_relations[i].from === block_names[0] && existing_relations[i].to === block_names[1]) ||
+            (existing_relations[i].from === block_names[1] && existing_relations[i].to === block_names[0])) {
+            fire_alert("Anchor relation already exists between " + block_names[0] + " and " + block_names[1] + "!");
+            return false;
+        }
+    }
+
     calculate_block_duration_using_relation("set(TE)/2", block_names[0], block_numbers[0], block_names[1], block_numbers[1]);
     start_time = block_number_to_block_object[block_numbers[0]].start_time + (block_to_anchor_time[block_names[0]] || 0);
     end_time = block_number_to_block_object[block_numbers[1]].start_time + (block_to_anchor_time[block_names[1]] || 0);
@@ -3941,7 +3943,8 @@ function evaluate_equation(equation) {
         if (parameter in settings) {
             return settings[parameter];
         } else {
-            throw new Error("Parameter " + parameter + " not found in settings.");
+            fire_alert("Parameter " + parameter + " not found in settings. Using 1 as default value.");
+            return 1;
         }
     }
 
