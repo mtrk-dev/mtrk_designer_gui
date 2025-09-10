@@ -3166,13 +3166,13 @@ function reflect_block_loops_change(block, loops, old_loops, base_block) {
         return 0;
     }
     dfs_shift_value(main_block_str, null);
-    propagate_loop_change_ui(block_name_to_shift_val);
+    propagate_duration_change_ui(block_name_to_shift_val);
     save_block_data($('#block-select').val());
     $("#block-select").val(base_block);
     load_block_data(base_block);
 }
 
-function propagate_loop_change_ui(block_name_to_shift_val) {
+function propagate_duration_change_ui(block_name_to_shift_val) {
     for (let cur_block in block_name_to_shift_val) {
         if (cur_block == main_block_str) continue;
 
@@ -3540,7 +3540,7 @@ function save_anchor_configuration() {
                             }
                         }
 
-                        calculate_block_duration_using_relation(relation, block_names[0], block_numbers[0], block_names[1], block_numbers[1]);
+                        update_block_duration_using_relation(relation, block_names[0], block_numbers[0], block_names[1], block_numbers[1]);
                         let start_time = block_number_to_block_object[block_numbers[0]].start_time + (block_to_anchor_time[block_names[0]] || 0);
                         let end_time = block_number_to_block_object[block_numbers[1]].start_time + (block_to_anchor_time[block_names[1]] || 0);
                         anchor_relations[i].x0 = start_time;
@@ -3781,7 +3781,7 @@ function add_anchor_with_selected_blocks() {
         }
     }
 
-    calculate_block_duration_using_relation("set(TE)/2", block_names[0], block_numbers[0], block_names[1], block_numbers[1]);
+    update_block_duration_using_relation("set(TE)/2", block_names[0], block_numbers[0], block_names[1], block_numbers[1]);
     start_time = block_number_to_block_object[block_numbers[0]].start_time + (block_to_anchor_time[block_names[0]] || 0);
     end_time = block_number_to_block_object[block_numbers[1]].start_time + (block_to_anchor_time[block_names[1]] || 0);
 
@@ -3820,7 +3820,7 @@ function add_anchor_with_selected_blocks() {
     block_to_anchor_relations[cur_block_name] = anchor_shapes; // same for all the plots.
 }
 
-function calculate_block_duration_using_relation(equation, from_block, from_block_number, to_block, to_block_number) {
+function update_block_duration_using_relation(equation, from_block, from_block_number, to_block, to_block_number) {
     let variable_data = serialize_variables_data();
     settings = {...settings, ...variable_data};
 
@@ -3834,49 +3834,45 @@ function calculate_block_duration_using_relation(equation, from_block, from_bloc
     let anchor_time_from = block_to_anchor_time[from_block] || 0;
     let anchor_time_to = parseFloat(block_to_anchor_time[to_block] || 0);
     let new_from_block_duration = parseFloat(equation_val) + parseFloat(anchor_time_from) - parseFloat(anchor_time_to);
-    update_block_boxes_with_relation_change(from_block_number, from_block_start_time + new_from_block_duration);
+    let cur_end_time = from_block_start_time + parseFloat(block_to_duration[from_block]);
+    let new_end_time = from_block_start_time + new_from_block_duration;
+    update_block_boxes_with_relation_change(from_block_number, parseFloat(cur_end_time) - parseFloat(new_end_time));
+    block_to_duration[from_block] = new_from_block_duration;
 }
 
-function update_block_boxes_with_relation_change(changed_block_number, new_end_time) {
+function update_block_boxes_with_relation_change(changed_block_number, shift_val) {
     let parent_block = $('#block-select').val();
-    let relative_shift_start = null;
-    let shift_val = 0;
+    let changed_block_name = block_number_to_block_object[changed_block_number].name || null;
 
-    // Update the end time of the block with the new value.
-    for (var key in plot_to_box_objects_template) {
-        plot_to_box_objects[parent_block][key].forEach(function (boxObj, index) {
-            if (boxObj.block != null && boxObj.block == changed_block_number) {
-                blockObj = block_number_to_block_object[boxObj.block];
-                let trace_number = index + 1;
-                let plot_id = axis_name_to_axis_id[boxObj.axis];
-                let plot = document.getElementById(plot_id);
-                let x_data = plot.data[trace_number]["x"];
-                let cur_end_time = x_data[x_data.length-1];
-                shift_val = parseFloat(cur_end_time) - parseFloat(new_end_time);
-                change_block_box_end_time(plot, trace_number, new_end_time);
-                relative_shift_start = blockObj.start_time;
-            }
-        });
-    }
+    // Store the blocks that need to be shifted in the UI with their loop adjusted shift values.
+    let block_name_to_shift_val = {};
+    let structure = generate_blocks_nesting_structure();
 
-    // Update the relative position of the other boxes/blocks.
-    for (var key in plot_to_box_objects_template) {
-        plot_to_box_objects[parent_block][key].forEach(function (boxObj, index) {
-            if (relative_shift_start != null && boxObj.start_time > relative_shift_start) {
-                let trace_number = index + 1;
-                let plot_id = axis_name_to_axis_id[boxObj.axis];
-                let plot = document.getElementById(plot_id);
-                let shifted_start_time = parseFloat(boxObj.start_time) - shift_val;
-                change_box_start_time(plot, trace_number, shifted_start_time);
-                boxObj.start_time = shifted_start_time;
-                if (boxObj.block != null) {
-                    blockObj = block_number_to_block_object[boxObj.block];
-                    blockObj.start_time = shifted_start_time;
-                }
+    function dfs_shift_value(block_name, parent) {
+        if (block_name == changed_block_name) {
+            block_name_to_shift_val[block_name] = [shift_val, parent];
+            return shift_val;
+        }
+        if (!(block_name in structure)) {
+            return 0;
+        }
+        for (let child of structure[block_name]) {
+            let child_shift_value = dfs_shift_value(child, block_name);
+            if (child_shift_value != 0) {
+                let loops = parseFloat(block_to_loops[block_name]) || 1;
+                let loops_shift_value = loops * parseFloat(child_shift_value);
+                block_name_to_shift_val[block_name] = [loops_shift_value, parent];
+                return loops_shift_value;
             }
-        });
+        }
+        return 0;
     }
-    // TODO: propagate the duration change to the parent blocks too.
+    dfs_shift_value(main_block_str, null);
+
+    propagate_duration_change_ui(block_name_to_shift_val);
+    save_block_data($('#block-select').val());
+    $("#block-select").val(parent_block);
+    load_block_data(parent_block);
 }
 
 function maximize_plot_area() {
