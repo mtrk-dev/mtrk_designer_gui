@@ -3838,6 +3838,10 @@ function update_block_duration_using_relation(equation, from_block, from_block_n
     let new_end_time = from_block_start_time + new_from_block_duration;
     update_block_boxes_with_relation_change(from_block_number, parseFloat(cur_end_time) - parseFloat(new_end_time));
     block_to_duration[from_block] = new_from_block_duration;
+    blockObj = block_number_to_block_object[from_block_number];
+    blockObj.use_duration_equation = true;
+    blockObj.duration_equation_info.expression = equation + (anchor_time_from != 0 ? (" + " + anchor_time_from) : "")
+                                                + (anchor_time_to != 0 ? (" - " + anchor_time_to) : "");
 }
 
 function update_block_boxes_with_relation_change(changed_block_number, shift_val) {
