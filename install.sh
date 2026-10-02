@@ -2,7 +2,7 @@
 set -e
 echo "------------ Running the install script ---------------"
 
-basefold=/Exp/mtrk/
+basefold=
 
 # setting up nginx and hosting static files for viewer
 if [[ false ]]; then

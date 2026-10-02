@@ -4,8 +4,8 @@ After=network.target
 
 [Service]
 User=root
-WorkingDirectory=/Exp/mtrk/opt/mtrk_designer_gui/app
-ExecStart=/Exp/mtrk/opt/mtrk_designer_gui/venv/bin/flask run --host=127.0.0.1 --port=5010
+WorkingDirectory=/opt/mtrk_designer_gui/app
+ExecStart=/opt/mtrk_designer_gui/venv/bin/flask run --host=127.0.0.1 --port=5010
 Restart=always
 
 [Install]
