@@ -1284,6 +1284,17 @@ $(document).ready(function() {
             $("#inputStartTime").prop("disabled", false);
         }
     });
+    
+    $("#useFreqOffsetEquationCheck").click(function() {
+        let isChecked = $(this).is(":checked");
+        if (isChecked) {
+            $(".equation-freqoffset-group").show();
+            $("#inputRfFrequencyOffset").prop("disabled", true);
+        } else {
+            $(".equation-freqoffset-group").hide();
+            $("#inputRfFrequencyOffset").prop("disabled", false);
+        }
+    });
 
     $("#useBlockEquationCheck").click(function() {
         let isChecked = $(this).is(":checked");
@@ -1731,6 +1742,18 @@ function load_modal_values(plot, trace_number) {
         $('#inputTimeEquationName').val("");
         $('#inputTimeEquationExpression').val("");
     }
+    $("#useFreqOffsetEquationCheck").prop("checked", boxObj.use_equation_freqoffset);
+    if (boxObj.use_equation_freqoffset) {
+        $(".equation-freqoffset-group").show();
+        $('#inputRfFrequencyOffset').prop("disabled", true);
+        $('#inputFreqOffsetEquationName').val(boxObj.equation_freqoffset_info.name);
+        $('#inputFreqOffsetEquationExpression').val(boxObj.equation_freqoffset_info.expression);
+    } else {
+        $(".equation-freqoffset-group").hide();
+        $('#inputRfFrequencyOffset').prop("disabled", false);
+        $('#inputFreqOffsetEquationName').val("");
+        $('#inputFreqOffsetEquationExpression').val("");
+    }
     $('#inputAnchorTime').val(boxObj.anchor_time);
     $("#anchor-time-mode-select").val(boxObj.anchor_mode);
     if (boxObj.anchor_mode == "custom") {
@@ -1745,6 +1768,7 @@ function load_modal_values(plot, trace_number) {
         $('#inputRfAddedPhaseType').val(boxObj.rf_added_phase_type);
         $('#inputRfAddedPhase').val(boxObj.rf_added_phase_float);
         $('#inputRfInitialPhase').val(boxObj.init_phase);
+        $('#inputRfFrequencyOffset').val(boxObj.freq_offset);
         $('#inputRfThickness').val(boxObj.thickness);
         $('#inputRfFlipAngle').val(boxObj.flip_angle);
         $('#inputRfDuration').val(boxObj.rf_duration);
@@ -1909,11 +1933,35 @@ function save_modal_values(plot, trace_number) {
             }
         }
     }
+    
+    if (boxObj.type == "rf" ) {
+        boxObj.use_equation_freqoffset = $('#useFreqOffsetEquationCheck').is(':checked');
+        if (boxObj.use_equation_freqoffset) {
+            boxObj.equation_freqoffset_info = {
+                "name": $('#inputFreqOffsetEquationName').val(),
+                "expression": $('#inputFreqOffsetEquationExpression').val()
+            };
+            let equation = $('#inputFreqOffsetEquationExpression').val();
+            let equation_result = evaluate_equation(equation);
+            if (equation && equation_result && parseFloat(equation_result)) {
+                change_box_freq_offset(plot, trace_number, parseFloat(equation_result));
+                boxObj.freq_offset = parseFloat(equation_result);
+            } else {
+                fire_alert("Could not change start time using expression!");
+            }
+        } else {
+            boxObj.equation_freqoffset_info = {
+                "name": "",
+                "expression": ""
+            }
+        }
+    }
 
     if (boxObj.type == "rf") {
         boxObj.rf_added_phase_type = $('#inputRfAddedPhaseType').val();
         boxObj.rf_added_phase_float = $('#inputRfAddedPhase').val();
         boxObj.init_phase = $('#inputRfInitialPhase').val();
+        boxObj.freq_offset = $('#inputRfFrequencyOffset').val();
         boxObj.thickness = $('#inputRfThickness').val();
         boxObj.flip_angle = $('#inputRfFlipAngle').val();
         boxObj.rf_duration = parseFloat($('#inputRfDuration').val());
@@ -4136,6 +4184,7 @@ class Box {
     name = "";
     start_time = 0;
     use_equation_time = false;
+    use_equation_freqoffset = false;
     anchor_time = 0;
     anchor_mode = "start";
     amplitude = null;
@@ -4173,6 +4222,10 @@ class Box {
         expression: ""
     }
     equation_time_info = {
+        name: "",
+        expression: ""
+    }
+    equation_freqoffset_info = {
         name: "",
         expression: ""
     }
@@ -4486,6 +4539,13 @@ function add_step(step, block_name, block_data_temp) {
         }
     }
 
+    if (object.type == "rf") {
+        if ("equation_freqoffset_info" in step) {
+            box.use_equation_freqoffset = true;
+            box.equation_freqoffset_info = step.equation_freqoffset_info;
+        }
+    }
+    
     // Update temp block data to be sent back
     let trace_number = plot.data.length-1;
     let shape_number = plot.layout.shapes.length-2;
